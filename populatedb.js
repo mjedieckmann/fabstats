@@ -3,215 +3,293 @@
 console.log('This script populates some test books, authors, genres and bookinstances to your database. Specified database as argument - e.g.: populatedb mongodb+srv://cooluser:coolpassword@cluster0.a9azn.mongodb.net/local_library?retryWrites=true');
 
 // Get arguments passed on command line
-var userArgs = process.argv.slice(2);
-/*
+let userArgs = process.argv.slice(2);
 if (!userArgs[0].startsWith('mongodb')) {
     console.log('ERROR: You need to specify a valid mongodb URL as the first argument');
     return
 }
-*/
-var async = require('async')
+
+let async = require("async");
 var Book = require('./models/book')
 var Author = require('./models/author')
 var Genre = require('./models/genre')
 var BookInstance = require('./models/bookinstance')
 
+const Format = require('./models/format');
+const EventType = require('./models/eventtype');
+const MetaChange = require('./models/metachange');
+const Team = require('./models/team');
+const User = require('./models/user');
+const Hero = require('./models/hero');
+const Match = require('./models/match');
 
-var mongoose = require('mongoose');
-var mongoDB = userArgs[0];
+const mongoose = require('mongoose');
+const mongoDB = userArgs[0];
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
 mongoose.Promise = global.Promise;
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-var authors = []
-var genres = []
-var books = []
-var bookinstances = []
+let formats = []
+let event_types = []
+let meta_changes = []
+let teams = []
+let users = []
+let heroes = []
+let matches = []
 
-function authorCreate(first_name, family_name, d_birth, d_death, cb) {
-    authordetail = {first_name:first_name , family_name: family_name }
-    if (d_birth != false) authordetail.date_of_birth = d_birth
-    if (d_death != false) authordetail.date_of_death = d_death
+function formatCreate(descriptor, type, cb) {
+    let format = new Format({ descriptor: descriptor, type: type });
 
-    var author = new Author(authordetail);
-
-    author.save(function (err) {
-        if (err) {
-            cb(err, null)
-            return
-        }
-        console.log('New Author: ' + author);
-        authors.push(author)
-        cb(null, author)
-    }  );
-}
-
-function genreCreate(name, cb) {
-    var genre = new Genre({ name: name });
-
-    genre.save(function (err) {
+    format.save(function (err) {
         if (err) {
             cb(err, null);
             return;
         }
-        console.log('New Genre: ' + genre);
-        genres.push(genre)
-        cb(null, genre);
+        console.log('New Format: ' + format);
+        formats.push(format)
+        cb(null, format);
     }   );
 }
 
-function bookCreate(title, summary, isbn, author, genre, cb) {
-    bookdetail = {
-        title: title,
-        summary: summary,
-        author: author,
-        isbn: isbn
-    }
-    if (genre != false) bookdetail.genre = genre
+function eventtypeCreate(descriptor, cb) {
+    let event_type = new EventType({ descriptor: descriptor });
 
-    var book = new Book(bookdetail);
-    book.save(function (err) {
+    event_type.save(function (err) {
         if (err) {
-            cb(err, null)
-            return
+            cb(err, null);
+            return;
         }
-        console.log('New Book: ' + book);
-        books.push(book)
-        cb(null, book)
-    }  );
+        console.log('New Event Type: ' + event_type);
+        event_types.push(event_type)
+        cb(null, event_type);
+    }   );
 }
 
+function metachangeCreate(descriptor, date, type, cb) {
+    let meta_change = new MetaChange({ descriptor: descriptor, date: date, type: type });
 
-function bookInstanceCreate(book, imprint, due_back, status, cb) {
-    bookinstancedetail = {
-        book: book,
-        imprint: imprint
-    }
-    if (due_back != false) bookinstancedetail.due_back = due_back
-    if (status != false) bookinstancedetail.status = status
-
-    var bookinstance = new BookInstance(bookinstancedetail);
-    bookinstance.save(function (err) {
+    meta_change.save(function (err) {
         if (err) {
-            console.log('ERROR CREATING BookInstance: ' + bookinstance);
-            cb(err, null)
-            return
+            cb(err, null);
+            return;
         }
-        console.log('New BookInstance: ' + bookinstance);
-        bookinstances.push(bookinstance)
-        cb(null, book)
-    }  );
+        console.log('New Meta Change: ' + meta_change);
+        meta_changes.push(meta_change)
+        cb(null, meta_change);
+    }   );
 }
 
+function teamCreate(nick, cb){
+    let team = new Team({nick: nick});
 
-function createGenreAuthors(cb) {
+    team.save(function (err) {
+        if (err) {
+            cb(err, null);
+            return;
+        }
+        console.log('New Team: ' + team);
+        teams.push(team)
+        cb(null, team);
+    }   );
+}
+
+function userCreate(nick, e_mail, team, cb){
+    let user = new User({nick: nick, e_mail: e_mail, team: team});
+
+    user.save(function (err) {
+        if (err) {
+            cb(err, null);
+            return;
+        }
+        console.log('New User: ' + user);
+        users.push(user)
+        cb(null, user);
+    }   );
+}
+
+function heroCreate(name, formats, img, cb){
+    let hero = new Hero({name: name,  formats: formats, img: img});
+
+    hero.save(function (err) {
+        if (err) {
+            cb(err, null);
+            return;
+        }
+        console.log('New Hero: ' + hero);
+        heroes.push(hero)
+        cb(null, hero);
+    }   );
+}
+
+function matchCreate(hero_a, hero_b, winner, date, user_a, user_b, event_type, top_cut, notes, format, cb){
+    let match = new Match({
+        hero_a: hero_a,
+        hero_b: hero_b,
+        winner: winner,
+        date: date,
+        user_a: user_a,
+        user_b: user_b,
+        event_type: event_type,
+        top_cut: top_cut,
+        notes: notes,
+        format: format,
+    });
+
+    match.save(function (err) {
+        if (err) {
+            cb(err, null);
+            return;
+        }
+        console.log('New Hero: ' + match);
+        matches.push(match)
+        cb(null, match);
+    }   );
+}
+
+function createFormats(cb) {
     async.series([
             function(callback) {
-                authorCreate('Patrick', 'Rothfuss', '1973-06-06', false, callback);
+                formatCreate("Classic Constructed", "Constructed", callback);
             },
             function(callback) {
-                authorCreate('Ben', 'Bova', '1932-11-8', false, callback);
+                formatCreate("Blitz","Constructed", callback);
             },
             function(callback) {
-                authorCreate('Isaac', 'Asimov', '1920-01-02', '1992-04-06', callback);
+                formatCreate("Sealed","Limited", callback);
             },
             function(callback) {
-                authorCreate('Bob', 'Billings', false, false, callback);
+                formatCreate("Draft", "Limited", callback);
             },
             function(callback) {
-                authorCreate('Jim', 'Jones', '1971-12-16', false, callback);
+                formatCreate("Commoner","Constructed", callback);
             },
             function(callback) {
-                genreCreate("Fantasy", callback);
-            },
-            function(callback) {
-                genreCreate("Science Fiction", callback);
-            },
-            function(callback) {
-                genreCreate("French Poetry", callback);
+                formatCreate("Ultimate Pit Fight","Constructed", callback);
             },
         ],
         // optional callback
         cb);
 }
 
-
-function createBooks(cb) {
-    async.parallel([
+function createEventTypes(cb) {
+    async.series([
             function(callback) {
-                bookCreate('The Name of the Wind (The Kingkiller Chronicle, #1)', 'I have stolen princesses back from sleeping barrow kings. I burned down the town of Trebon. I have spent the night with Felurian and left with both my sanity and my life. I was expelled from the University at a younger age than most people are allowed in. I tread paths by moonlight that others fear to speak of during day. I have talked to Gods, loved women, and written songs that make the minstrels weep.', '9781473211896', authors[0], [genres[0],], callback);
+                eventtypeCreate("Test Game",  callback);
             },
             function(callback) {
-                bookCreate("The Wise Man's Fear (The Kingkiller Chronicle, #2)", 'Picking up the tale of Kvothe Kingkiller once again, we follow him into exile, into political intrigue, courtship, adventure, love and magic... and further along the path that has turned Kvothe, the mightiest magician of his age, a legend in his own time, into Kote, the unassuming pub landlord.', '9788401352836', authors[0], [genres[0],], callback);
+                eventtypeCreate("On Demand",callback);
             },
             function(callback) {
-                bookCreate("The Slow Regard of Silent Things (Kingkiller Chronicle)", 'Deep below the University, there is a dark place. Few people know of it: a broken web of ancient passageways and abandoned rooms. A young woman lives there, tucked among the sprawling tunnels of the Underthing, snug in the heart of this forgotten place.', '9780756411336', authors[0], [genres[0],], callback);
+                eventtypeCreate("Armory", callback);
             },
             function(callback) {
-                bookCreate("Apes and Angels", "Humankind headed out to the stars not for conquest, nor exploration, nor even for curiosity. Humans went to the stars in a desperate crusade to save intelligent life wherever they found it. A wave of death is spreading through the Milky Way galaxy, an expanding sphere of lethal gamma ...", '9780765379528', authors[1], [genres[1],], callback);
+                eventtypeCreate("Skirmish",  callback);
             },
             function(callback) {
-                bookCreate("Death Wave","In Ben Bova's previous novel New Earth, Jordan Kell led the first human mission beyond the solar system. They discovered the ruins of an ancient alien civilization. But one alien AI survived, and it revealed to Jordan Kell that an explosion in the black hole at the heart of the Milky Way galaxy has created a wave of deadly radiation, expanding out from the core toward Earth. Unless the human race acts to save itself, all life on Earth will be wiped out...", '9780765379504', authors[1], [genres[1],], callback);
+                eventtypeCreate("Road to Nationals", callback);
             },
             function(callback) {
-                bookCreate('Test Book 1', 'Summary of test book 1', 'ISBN111111', authors[4], [genres[0],genres[1]], callback);
+                eventtypeCreate("ProQuest", callback);
             },
             function(callback) {
-                bookCreate('Test Book 2', 'Summary of test book 2', 'ISBN222222', authors[4], false, callback)
-            }
+                eventtypeCreate("Battle Hardened", callback);
+            },
+            function(callback) {
+                eventtypeCreate("Calling", callback);
+            },
+            function(callback) {
+                eventtypeCreate("Nationals", callback);
+            },
+            function(callback) {
+                eventtypeCreate("Pro Tour", callback);
+            },
+            function(callback) {
+                eventtypeCreate("Farewell Welcome to Rathe", callback);
+            },
+            function(callback) {
+                eventtypeCreate("Pre-release", callback);
+            },
+            function(callback) {
+                eventtypeCreate("World Championship", callback);
+            },
         ],
         // optional callback
         cb);
 }
 
-
-function createBookInstances(cb) {
-    async.parallel([
+function createMetaChanges(cb) {
+    async.series([
             function(callback) {
-                bookInstanceCreate(books[0], 'London Gollancz, 2014.', false, 'Available', callback)
+                metachangeCreate("B \& S Announcement May 2nd 2022", new Date('02-may-2022'), "B \& S Announcement", callback);
             },
-            function(callback) {
-                bookInstanceCreate(books[1], ' Gollancz, 2011.', false, 'Loaned', callback)
-            },
-            function(callback) {
-                bookInstanceCreate(books[2], ' Gollancz, 2015.', false, false, callback)
-            },
-            function(callback) {
-                bookInstanceCreate(books[3], 'New York Tom Doherty Associates, 2016.', false, 'Available', callback)
-            },
-            function(callback) {
-                bookInstanceCreate(books[3], 'New York Tom Doherty Associates, 2016.', false, 'Available', callback)
-            },
-            function(callback) {
-                bookInstanceCreate(books[3], 'New York Tom Doherty Associates, 2016.', false, 'Available', callback)
-            },
-            function(callback) {
-                bookInstanceCreate(books[4], 'New York, NY Tom Doherty Associates, LLC, 2015.', false, 'Available', callback)
-            },
-            function(callback) {
-                bookInstanceCreate(books[4], 'New York, NY Tom Doherty Associates, LLC, 2015.', false, 'Maintenance', callback)
-            },
-            function(callback) {
-                bookInstanceCreate(books[4], 'New York, NY Tom Doherty Associates, LLC, 2015.', false, 'Loaned', callback)
-            },
-            function(callback) {
-                bookInstanceCreate(books[0], 'Imprint XXX2', false, false, callback)
-            },
-            function(callback) {
-                bookInstanceCreate(books[1], 'Imprint XXX3', false, false, callback)
-            }
         ],
-        // Optional callback
+        // optional callback
         cb);
 }
 
+function createTeams(cb){
+    async.series([
+        function(callback) {
+            teamCreate('FaB Tryhards', callback)
+        },
+    ], cb)
+}
 
+function createUsers(cb){
+    async.series([
+        function(callback) {
+            userCreate('mjed', 'mje.dieckmann@googlemail.com', teams[0], callback)
+        },
+        function(callback) {
+            userCreate('test', 'test.est@mailmail.com', null, callback)
+        },
+    ], cb)
+}
+
+function createHeroes(cb){
+    async.series([
+        function(callback) {
+            heroCreate('Boltyn', [formats[0], formats[1]], null, callback)
+        },
+        function(callback) {
+            heroCreate('Chane, Bound by Shadow', [formats[0]], null, callback)
+        },
+    ], cb)
+}
+
+function createMatches(cb){
+    async.series([
+        function(callback) {
+            matchCreate(heroes[0],heroes[1], 1, new Date(), users[0], users[1], event_types[0], 'N/A', null, formats[0], callback)
+        },
+        function(callback) {
+            matchCreate(heroes[0],heroes[1], 0, new Date(), users[0], users[1], event_types[0], 'N/A', null, formats[0], callback)
+        },
+        function(callback) {
+            matchCreate(heroes[1],heroes[1], 0, new Date(), users[0], users[1], event_types[0], 'N/A', null, formats[0], callback)
+        },
+    ], cb)
+}
+
+async function cleanDB(cb) {
+    await MetaChange.deleteMany({})
+    await EventType.deleteMany({})
+    await Format.deleteMany({})
+    await Hero.deleteMany({})
+    await User.deleteMany({})
+    await Match.deleteMany({})
+}
 
 async.series([
-        createGenreAuthors,
-        createBooks,
-        createBookInstances
+        cleanDB,
+        createMetaChanges,
+        createEventTypes,
+        createFormats,
+        createHeroes,
+        createTeams,
+        createUsers,
+        createMatches,
     ],
 // Optional callback
     function(err, results) {
@@ -219,7 +297,7 @@ async.series([
             console.log('FINAL ERR: '+err);
         }
         else {
-            console.log('BOOKInstances: '+bookinstances);
+            console.log('Done!');
 
         }
         // All done, disconnect from database

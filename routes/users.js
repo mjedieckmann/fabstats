@@ -1,15 +1,17 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const user_controller = require("../controllers/userController");
+const router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+/// USERS ROUTES ///
+router.get('/', user_controller.user_list);
+router.get('/:id', user_controller.user_detail);
+
+/// TEAM ROUTES ///
+router.get('/teams', function(req, res, next) {
+  res.send('respond with all teams');
 });
-
-/* GET users listing. */
-router.get('/cool', function(req, res, next) {
-  res.send('you\'re so cool!');
+router.get('/teams/:id', function(req, res, next) {
+  res.send('respond with a specific team');
 });
-
 
 module.exports = router;
