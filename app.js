@@ -1,24 +1,15 @@
-const createError = require('http-errors');
+/**
+ * -------------- APP CONFIG ----------------
+ */
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const sassMiddleware = require('node-sass-middleware');
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-let catalogRouter = require('./routes/catalog')
-let apiRouter = require('./routes/api');
-
+// Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
+require('dotenv').config();
 const app = express();
-
-//Set up mongoose connection
-const mongoose = require('mongoose');
-const mongoDB = 'mongodb://localhost:27017';
-mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -35,10 +26,62 @@ app.use(sassMiddleware({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+/**
+ * -------------- DATABASE CONFIG ----------------
+ * */
+const MongoStore = require('connect-mongo');
+//Set up mongoose connection
+const mongoose = require('mongoose');
+const mongoDB = process.env.DB_STRING;
+mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+
+/**
+ * -------------- SESSION SETUP ----------------
+ */
+const session = require('express-session');
+
+app.use(session({
+  secret: process.env.SECRET,
+  saveUninitialized: false, // don't create session until something stored
+  resave: false, //don't save session if unmodified
+  store: MongoStore.create({
+    mongoUrl: process.env.DB_STRING,
+    touchAfter: 24 * 3600 // time period in seconds
+  }),
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 14 // Equals 2 weeks (14 days * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
+  }
+}));
+
+/**
+ * -------------- PASSPORT AUTHENTICATION ----------------
+ */
+const passport = require('passport');
+// Need to require the entire Passport config module so app.js knows about it
+require('./lib/passport/passport');
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+/**
+ * -------------- ROUTES ----------------
+ */
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/user_routes');
+const catalogRouter = require('./routes/catalog')
+const apiRouter = require('./routes/api');
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/catalog', catalogRouter);
 app.use('/api', apiRouter);
+
+/**
+ * -------------- ERROR HANDLING ----------------
+ */
+const createError = require('http-errors');
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

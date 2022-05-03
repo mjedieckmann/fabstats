@@ -10,18 +10,14 @@ if (!userArgs[0].startsWith('mongodb')) {
 }
 
 let async = require("async");
-var Book = require('./models/book')
-var Author = require('./models/author')
-var Genre = require('./models/genre')
-var BookInstance = require('./models/bookinstance')
 
-const Format = require('./models/format');
-const EventType = require('./models/eventtype');
-const MetaChange = require('./models/metachange');
-const Team = require('./models/team');
-const User = require('./models/user');
-const Hero = require('./models/hero');
-const Match = require('./models/match');
+const Format = require('../models/format');
+const EventType = require('../models/eventtype');
+const MetaChange = require('../models/metachange');
+const Team = require('../models/team');
+const User = require('../models/user');
+const Hero = require('../models/hero');
+const Match = require('../models/match');
 
 const mongoose = require('mongoose');
 const mongoDB = userArgs[0];
@@ -288,7 +284,7 @@ async.series([
         createFormats,
         createHeroes,
         createTeams,
-        createUsers,
+        // createUsers,
         createMatches,
     ],
 // Optional callback
