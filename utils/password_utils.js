@@ -23,6 +23,14 @@ function isAuth(req, res, next){
     }
 }
 
+function isLoggedIn(req, res, next){
+    if (req.isAuthenticated()) {
+        res.status(200).json({ msg: 'You are already logged in' });
+    }
+    next();
+}
+
 module.exports.validPassword = validPassword;
 module.exports.genPassword = genPassword;
 module.exports.isAuth = isAuth;
+module.exports.isLoggedIn = isLoggedIn;

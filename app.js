@@ -36,7 +36,7 @@ const mongoDB = process.env.DB_STRING;
 mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
+const client = db.getClient();
 
 /**
  * -------------- SESSION SETUP ----------------
@@ -48,7 +48,7 @@ app.use(session({
   saveUninitialized: false, // don't create session until something stored
   resave: false, //don't save session if unmodified
   store: MongoStore.create({
-    mongoUrl: process.env.DB_STRING,
+    client,
     touchAfter: 24 * 3600 // time period in seconds
   }),
   cookie: {
