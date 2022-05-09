@@ -1,19 +1,60 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-
-import { BrowserRouter } from "react-router-dom";
+import PropTypes from "prop-types";
+import { Link as RouterLink, BrowserRouter } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import reportWebVitals from './reportWebVitals';
 
 import './index.css';
 import App from './App';
+import {RecoilRoot} from "recoil";
 
+
+/**
+ * Configure links and buttons to use Router by default while keeping their styling
+ */
+const LinkBehavior = React.forwardRef((props, ref) => {
+    const { href, ...other } = props;
+    // Map href (MUI) -> to (react-router)
+    return <RouterLink data-testid="custom-link" ref={ref} to={href} {...other} />;
+});
+
+LinkBehavior.propTypes = {
+    href: PropTypes.oneOfType([
+        PropTypes.shape({
+            hash: PropTypes.string,
+            pathname: PropTypes.string,
+            search: PropTypes.string,
+        }),
+        PropTypes.string,
+    ]).isRequired,
+};
+
+const theme = createTheme({
+    components: {
+        MuiLink: {
+            defaultProps: {
+                component: LinkBehavior,
+            },
+        },
+        MuiButtonBase: {
+            defaultProps: {
+                LinkComponent: LinkBehavior,
+            },
+        },
+    },
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ThemeProvider theme={theme}>
+          <RecoilRoot>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+          </RecoilRoot>
+      </ThemeProvider>
   </React.StrictMode>
 );
 

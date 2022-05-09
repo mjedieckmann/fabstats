@@ -1,27 +1,12 @@
-import {useEffect, useState} from "react";
-import handlePostResponse from "./utils";
+import {Grid} from "@mui/material";
+import {useState} from "react";
 
-function Login(props) {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+function Login() {
+    const [ username, setUsername] = useState('');
+    const [ password, setPassword ] = useState('');
 
-    function handleLogin(e) {
-        e.preventDefault();
-        console.log('You clicked login.');
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        };
-        fetch('/users/login', requestOptions)
-            .then(handlePostResponse)
-            .then(() => props.setLoggedIn(true), () => props.setLoggedIn(false))
-            .catch(error => {
-                console.error('There was an error!', error);
-            });
-    }
     return (
-        <form onSubmit={handleLogin}>
+        <Grid item xs={12}>
             <label>
                 Username or e-mail:
                 <input value={username} onInput={e => setUsername(e.target.value)}/>
@@ -30,8 +15,7 @@ function Login(props) {
                 Password:
                 <input value={password} onInput={e => setPassword(e.target.value)}/>
             </label>
-            <button type="submit">Login</button>
-        </form>
+        </Grid>
     );
 }
 
