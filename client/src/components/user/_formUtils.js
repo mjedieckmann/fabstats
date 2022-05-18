@@ -1,17 +1,12 @@
 import {useEffect, useState} from "react";
 import {atom, useRecoilState} from "recoil";
+import {loggedInState} from "../../utils/_globalState";
+import {handlePostResponse} from "../../utils/_globalUtils";
 
 export const dialogOpenState = atom({
     key: 'open',
     default: false,
 });
-
-export function useCurrentPage(open){
-    const [, setOpen] = useRecoilState(dialogOpenState);
-    useEffect(() => {
-        setOpen(open);
-    }, []);
-}
 
 const FIELD_USER = (form, formError) => {
     return {
@@ -121,16 +116,43 @@ const useForm = (form_state, error_state) => {
             [name]: value
         }));
     };
+    const [, setOpen] = useRecoilState(dialogOpenState);
+    const [, setLoggedIn] = useRecoilState(loggedInState);
     return [
         form,
         formError,
         setFormError,
-        handleChange
+        handleChange,
+        setOpen,
+        setLoggedIn
     ]
 }
 
 export const useLoginForm = (form_state, error_state) => {
-    const [form, formError, setFormError, handleChange] = useForm(form_state, error_state);
+    const [form, formError, setFormError, handleChange, setOpen, setLoggedIn] = useForm(form_state, error_state);
+
+
+    const loginUser = () => {
+        validateForm().then(() => {
+            console.log('no problem, continue LOGIN');
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: form.username, password : form.password})
+            };
+            fetch('/users/login', requestOptions)
+                .then(handlePostResponse)
+                .then(() => {
+                    setLoggedIn(true);
+                    setOpen(false);
+                })
+                .catch(error => {
+                    console.error('There was an error!', error);
+                });
+            }, () =>
+                console.log('LOGIN validation errors')
+        );
+    }
 
     const validateForm = () => {
         const userValid = notEmpty(form.username)
@@ -155,14 +177,14 @@ export const useLoginForm = (form_state, error_state) => {
     return [
         {
             handleChange: handleChange,
-            validateForm: validateForm,
+            loginUser: loginUser,
             LOGIN_FIELDS: LOGIN_FIELDS(form, formError)
         }
     ]
 }
 
 export const useRegisterForm = (form_state, error_state) => {
-    const [form, formError, setFormError, handleChange] = useForm(form_state, error_state);
+    const [form, formError, setFormError, handleChange, setOpen, setLoggedIn] = useForm(form_state, error_state);
 
     useEffect(() =>{
         setFormError(prevState => ({
@@ -178,9 +200,33 @@ export const useRegisterForm = (form_state, error_state) => {
         }));
     }, [form.password])
 
+    const registerUser = () => {
+        validateForm().then(() => {
+                console.log('no problem, continue REGISTER');
+                const requestOptions = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: form.username, e_mail: form.e_mail, password : form.password})
+                };
+                fetch('/users/register', requestOptions)
+                    .then(handlePostResponse)
+                    .then(() => fetch('/users/login', requestOptions).then(handlePostResponse).then(() => {setLoggedIn(true); setOpen(false)}))
+                    .catch(error => {
+                        console.error('There was an error!', error);
+                        setFormError(prevState => ({
+                            ...prevState,
+                            username: error,
+                            e_mail: ''
+                        }));
+                    });
+            }, () =>
+                console.log('REGISTER validation errors')
+        );
+    }
+
     const validateForm = () => {
         const userValid = notEmpty(form.username)
-            .then(() => hasLength(form.username, 3))
+            .then(() => hasLength(form.username, 4))
             .catch((rejected) => {
                 setFormError(prevState => ({
                     ...prevState,
@@ -221,7 +267,7 @@ export const useRegisterForm = (form_state, error_state) => {
     return [
         {
             handleChange: handleChange,
-            validateForm: validateForm,
+            registerUser: registerUser,
             REGISTER_FIELDS: REGISTER_FIELDS(form, formError)
         }
     ]

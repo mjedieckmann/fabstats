@@ -25,7 +25,7 @@ app.use(sassMiddleware({
   sourceMap: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use('/public/images', express.static('public/images'));
 /**
  * -------------- DATABASE CONFIG ----------------
  * */
@@ -73,11 +73,11 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/user_routes');
 const catalogRouter = require('./routes/catalog')
 const apiRouter = require('./routes/api');
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/catalog', catalogRouter);
 app.use('/api', apiRouter);
-
 /**
  * -------------- ERROR HANDLING ----------------
  */

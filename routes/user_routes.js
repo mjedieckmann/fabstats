@@ -22,13 +22,13 @@ router.post('/register', user_controller.user_register);
 router.post('/login', isLoggedIn,  passport.authenticate('local', { failureRedirect: '/users/login-failure', successRedirect: '/users/login-success' }));
 
 router.get('/protected-route', isAuth, (req, res, next) => {
-  res.json({msg: 'You made it to the route.'});
+  res.json({message: 'You made it to the route.'});
 });
 
 // Visiting this route logs the user out
 router.get('/logout', (req, res, next) => {
   req.logout();
-  res.json({msg: 'logout successful'});
+  res.json({message: 'logout successful'});
   // res.redirect('/users/protected-route');
 });
 
@@ -37,7 +37,7 @@ router.get('/login-success', (req, res, next) => {
 });
 
 router.get('/login-failure', (req, res, next) => {
-  res.status(401).json({ msg: 'Incorrect username or password.' });
+  res.status(401).json({ message: 'Incorrect username or password.' });
 });
 
 router.get('/login', (req, res, next) => {

@@ -1,5 +1,6 @@
 import {useRecoilState} from "recoil";
-import {currentPageState, nav_buttons} from "../pages/_pageUtils";
+import {nav_buttons} from "../pages/_pageUtils";
+import {currentPageState} from "../../utils/_globalState";
 
 export default function NavbarIcon() {
     const [currentPage, ] = useRecoilState(currentPageState);

@@ -19,13 +19,13 @@ function isAuth(req, res, next){
     if (req.isAuthenticated()) {
         next();
     } else {
-        res.status(401).json({ msg: 'You are not authorized to view this resource' });
+        res.status(401).json({ message: 'You are not authorized to view this resource' });
     }
 }
 
 function isLoggedIn(req, res, next){
     if (req.isAuthenticated()) {
-        res.status(200).json({ msg: 'You are already logged in' });
+        res.status(200).json({ message: 'You are already logged in' });
     }
     next();
 }

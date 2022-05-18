@@ -5,11 +5,7 @@ const HeroSchema = new Schema(
     {
         name: {type: String, required: true, maxLength: 100, unique: true},
         formats: [{type: Schema.Types.ObjectId, ref: 'Format', required: true}],
-        img:
-            {
-                data: Buffer,
-                contentType: String
-            }
+        img: {type: String, required: true, maxLength: 100, unique: true}
     }
 );
 

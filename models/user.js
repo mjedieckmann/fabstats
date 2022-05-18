@@ -8,6 +8,7 @@ const UserSchema = new Schema(
         salt: {type: String, required: true},
         e_mail: {type: String, required: true, maxLength: 100, unique: true},
         team: {type: Schema.Types.ObjectId, ref: 'Team'},
+        img: {type: String},
     }
 );
 

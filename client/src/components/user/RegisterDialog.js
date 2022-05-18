@@ -9,17 +9,12 @@ import {FormFields} from "./FormFields";
 import {useRecoilState} from "recoil";
 
 export default function RegisterDialog() {
-    const [{handleChange, validateForm, REGISTER_FIELDS}] = useRegisterForm({username: '', e_mail: '', password: '', password_repeat: ''}, {username: null, e_mail: null, password: null, password_repeat: null})
+    const [{handleChange, registerUser, REGISTER_FIELDS}] = useRegisterForm({username: '', e_mail: '', password: '', password_repeat: ''}, {username: null, e_mail: null, password: null, password_repeat: null})
     const [, setOpen] = useRecoilState(dialogOpenState);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        validateForm().then(() => {
-            console.log('no problem, continue with REGISTER');
-            setOpen(false);
-        }, () =>
-            console.log('REGISTER validation errors')
-        );
+        registerUser();
     }
 
     return (

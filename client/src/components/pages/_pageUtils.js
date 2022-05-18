@@ -1,24 +1,12 @@
-import About from "./About";
-import Scoreboard from "./Scoreboard";
-import Heroes from "./Heroes";
+import About from "./about/About";
+import Heroes from "./heroes/Heroes";
 import Login from "../user/login";
-import {useEffect} from "react";
-import {atom, useRecoilState} from "recoil";
 import ScoreboardIcon from "@mui/icons-material/Scoreboard";
 import InfoIcon from "@mui/icons-material/Info";
 import ElderlyIcon from "@mui/icons-material/Elderly";
-
-export const currentPageState = atom({
-    key: 'currentPage',
-    default: 'Scoreboard',
-});
-
-export function useCurrentPage(page){
-    const [, setCurrentPage] = useRecoilState(currentPageState);
-    useEffect(() => {
-        setCurrentPage(page);
-    }, []);
-}
+import Protected from "../user/protected";
+import Logout from "../user/logout";
+import ScoreboardContainer from "./scoreboard/ScoreboardContainer";
 
 export const pages = [
     {
@@ -29,7 +17,7 @@ export const pages = [
     {
         url: '/scoreboard',
         name: 'Scoreboard',
-        element: <Scoreboard/>,
+        element: <ScoreboardContainer/>,
     },
     {
         url: '/heroes',
@@ -40,6 +28,16 @@ export const pages = [
         url: '/users/login',
         name: 'Login',
         element: <Login/>,
+    },
+    {
+        url: '/protected',
+        name: 'Protected',
+        element: <Protected/>,
+    },
+    {
+        url: '/logout',
+        name: 'Logout',
+        element: <Logout/>,
     }
 ]
 

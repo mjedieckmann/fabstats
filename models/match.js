@@ -5,16 +5,17 @@ const Schema = mongoose.Schema;
 
 const MatchSchema = new Schema(
     {
-        hero_a: {type: Schema.Types.ObjectId, ref: 'Hero', required: true},
-        hero_b: {type: Schema.Types.ObjectId, ref: 'Hero', required: true},
-        winner: {type: Number, required: true, enum: [0, 1], default: 0},
-        date: {type: Date, default: Date.now},
-        user_a: {type: Schema.Types.ObjectId, ref: 'User'},
-        user_b: {type: Schema.Types.ObjectId, ref: 'User'},
-        event_type: {type: Schema.Types.ObjectId, ref: 'EventType'},
-        top_cut: {type: String, enum: ['Swiss', 'Quarterfinal', 'Semifinal', 'Final', 'N/A']},
-        notes: {type: String},
+        event: {type: Schema.Types.ObjectId, ref: 'Event', required: true},
+        round: {type: String, required: true, enum: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Quarterfinal', 'Semifinal', 'Final', 'N/A']},
+        hero_winner: {type: Schema.Types.ObjectId, ref: 'Hero', required: true},
+        hero_loser: {type: Schema.Types.ObjectId, ref: 'Hero', required: true},
+        user_winner: {type: Schema.Types.ObjectId, ref: 'User'},
+        user_loser: {type: Schema.Types.ObjectId, ref: 'User'},
         format: {type: Schema.Types.ObjectId, ref: 'Format'},
+        notes: {type: String},
+    },
+    {
+        toJSON: { virtuals: true }
     }
 );
 
@@ -23,12 +24,6 @@ MatchSchema
     .virtual('url')
     .get(function () {
         return '/api/match/' + this._id;
-    });
-
-MatchSchema
-    .virtual('date_formatted')
-    .get(() => {
-        return DateTime.fromJSDate(this.date).toLocaleString(DateTime.DATE_MED);
     });
 
 //Export model

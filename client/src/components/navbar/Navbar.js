@@ -6,8 +6,9 @@ import {Grid, ToggleButton} from "@mui/material";
 
 import NavbarIcon from "./NavbarIcon";
 import {useRecoilState} from "recoil";
-import {currentPageState, nav_buttons} from "../pages/_pageUtils";
+import {nav_buttons} from "../pages/_pageUtils";
 import AuthenticationDialog from "../user/AuthenticationDialog";
+import {currentPageState} from "../../utils/_globalState";
 
 export default function Navbar() {
     const [currentPage, ] = useRecoilState(currentPageState);

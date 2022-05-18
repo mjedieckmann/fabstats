@@ -12,8 +12,9 @@ if (!userArgs[0].startsWith('mongodb')) {
 let async = require("async");
 
 const Format = require('../models/format');
-const EventType = require('../models/eventtype');
-const MetaChange = require('../models/metachange');
+const TO = require('../models/to');
+const Event = require('../models/event');
+const Meta = require('../models/meta');
 const Team = require('../models/team');
 const User = require('../models/user');
 const Hero = require('../models/hero');
@@ -27,8 +28,9 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 let formats = []
-let event_types = []
-let meta_changes = []
+let tos = []
+let events = []
+let metas = []
 let teams = []
 let users = []
 let heroes = []
@@ -45,34 +47,48 @@ function formatCreate(descriptor, type, cb) {
         console.log('New Format: ' + format);
         formats.push(format)
         cb(null, format);
-    }   );
+    });
 }
 
-function eventtypeCreate(descriptor, cb) {
-    let event_type = new EventType({ descriptor: descriptor });
+function toCreate(descriptor, cb) {
+    let to = new TO({descriptor: descriptor});
 
-    event_type.save(function (err) {
+    to.save(function (err) {
         if (err) {
             cb(err, null);
             return;
         }
-        console.log('New Event Type: ' + event_type);
-        event_types.push(event_type)
-        cb(null, event_type);
-    }   );
+        console.log('New TO: ' + to);
+        tos.push(to)
+        cb(null, to);
+    });
 }
 
-function metachangeCreate(descriptor, date, type, cb) {
-    let meta_change = new MetaChange({ descriptor: descriptor, date: date, type: type });
+function eventCreate(descriptor, to, type, meta, date, cb) {
+    let event = new Event({ descriptor: descriptor, to: to, type: type, meta: meta, date: date });
 
-    meta_change.save(function (err) {
+    event.save(function (err) {
         if (err) {
             cb(err, null);
             return;
         }
-        console.log('New Meta Change: ' + meta_change);
-        meta_changes.push(meta_change)
-        cb(null, meta_change);
+        console.log('New Event: ' + event);
+        events.push(event)
+        cb(null, event);
+    }   );
+}
+
+function metaCreate(descriptor, date, type, cb) {
+    let meta = new Meta({ descriptor: descriptor, date: date, type: type });
+
+    meta.save(function (err) {
+        if (err) {
+            cb(err, null);
+            return;
+        }
+        console.log('New Meta: ' + meta);
+        metas.push(meta)
+        cb(null, meta);
     }   );
 }
 
@@ -90,8 +106,8 @@ function teamCreate(nick, cb){
     }   );
 }
 
-function userCreate(nick, e_mail, team, cb){
-    let user = new User({nick: nick, e_mail: e_mail, team: team});
+function userCreate(nick, e_mail, team, salt, hash, cb){
+    let user = new User({nick: nick, e_mail: e_mail, team: team, salt: salt, hash: hash});
 
     user.save(function (err) {
         if (err) {
@@ -118,16 +134,14 @@ function heroCreate(name, formats, img, cb){
     }   );
 }
 
-function matchCreate(hero_a, hero_b, winner, date, user_a, user_b, event_type, top_cut, notes, format, cb){
+function matchCreate(hero_winner, hero_loser, user_winner, user_loser, event, round, notes, format, cb){
     let match = new Match({
-        hero_a: hero_a,
-        hero_b: hero_b,
-        winner: winner,
-        date: date,
-        user_a: user_a,
-        user_b: user_b,
-        event_type: event_type,
-        top_cut: top_cut,
+        hero_winner: hero_winner,
+        hero_loser: hero_loser,
+        user_winner: user_winner,
+        user_loser: user_loser,
+        event: event,
+        round: round,
         notes: notes,
         format: format,
     });
@@ -137,7 +151,7 @@ function matchCreate(hero_a, hero_b, winner, date, user_a, user_b, event_type, t
             cb(err, null);
             return;
         }
-        console.log('New Hero: ' + match);
+        console.log('New match: ' + match);
         matches.push(match)
         cb(null, match);
     }   );
@@ -168,56 +182,84 @@ function createFormats(cb) {
         cb);
 }
 
-function createEventTypes(cb) {
+function createTOs(cb) {
     async.series([
             function(callback) {
-                eventtypeCreate("Test Game",  callback);
+                toCreate("Júpiter",callback);
             },
             function(callback) {
-                eventtypeCreate("On Demand",callback);
+                toCreate("Azkaban", callback);
             },
             function(callback) {
-                eventtypeCreate("Armory", callback);
+                toCreate("Channel Fireball", callback);
             },
             function(callback) {
-                eventtypeCreate("Skirmish",  callback);
+                toCreate("LSS", callback);
             },
             function(callback) {
-                eventtypeCreate("Road to Nationals", callback);
+                toCreate("N/A", callback);
             },
             function(callback) {
-                eventtypeCreate("ProQuest", callback);
-            },
-            function(callback) {
-                eventtypeCreate("Battle Hardened", callback);
-            },
-            function(callback) {
-                eventtypeCreate("Calling", callback);
-            },
-            function(callback) {
-                eventtypeCreate("Nationals", callback);
-            },
-            function(callback) {
-                eventtypeCreate("Pro Tour", callback);
-            },
-            function(callback) {
-                eventtypeCreate("Farewell Welcome to Rathe", callback);
-            },
-            function(callback) {
-                eventtypeCreate("Pre-release", callback);
-            },
-            function(callback) {
-                eventtypeCreate("World Championship", callback);
+                toCreate("Tournamentcenter", callback);
             },
         ],
         // optional callback
         cb);
 }
 
-function createMetaChanges(cb) {
+function createEvents(cb) {
     async.series([
             function(callback) {
-                metachangeCreate("B \& S Announcement May 2nd 2022", new Date('02-may-2022'), "B \& S Announcement", callback);
+                eventCreate("Armory sábado", tos[between(0, 5)], "Test Game", metas[between(0, 1)], new Date(), callback);
+            },
+            function(callback) {
+                eventCreate("Armory sábado", tos[between(0, 5)], "On Demand", metas[between(0, 1)], new Date(), callback);
+            },
+            function(callback) {
+                eventCreate("Jupiter armory 24.05.", tos[between(0, 5)],"Armory", metas[between(0, 1)], new Date(),callback);
+            },
+            function(callback) {
+                eventCreate("some skirmish", tos[between(0, 5)],"Skirmish", metas[between(0, 1)],new Date(), callback);
+            },
+            function(callback) {
+                eventCreate("RTN madrid", tos[between(0, 5)],"Road to Nationals", metas[between(0, 1)], new Date(),callback);
+            },
+            function(callback) {
+                eventCreate("a ProQuest", tos[between(0, 5)], "ProQuest", metas[between(0, 1)], new Date(),callback);
+            },
+            function(callback) {
+                eventCreate("a Battle Hardened", tos[between(0, 5)],"Battle Hardened", metas[between(0, 1)], new Date(),callback);
+            },
+            function(callback) {
+                eventCreate("a Calling", tos[between(0, 5)],"Calling", metas[between(0, 1)], new Date(),callback);
+            },
+            function(callback) {
+                eventCreate("a Nationals", tos[between(0, 5)],"Nationals", metas[between(0, 1)], new Date(),callback);
+            },
+            function(callback) {
+                eventCreate("a Pro Tour", tos[between(0, 5)],"Pro Tour", metas[between(0, 1)], new Date(),callback);
+            },
+            function(callback) {
+                eventCreate("a Farewell Welcome to Rathe", tos[between(0, 5)],"Farewell Welcome to Rathe", metas[between(0, 1)], new Date(),callback);
+            },
+            function(callback) {
+                eventCreate("a Pre-release", tos[between(0, 5)],"Pre-release", metas[between(0, 1)], new Date(),callback);
+            },
+            function(callback) {
+                eventCreate("a World Championship", tos[between(0, 5)],"World Championship", metas[between(0, 1)], new Date(),callback);
+            },
+        ],
+        // optional callback
+        cb);
+}
+
+function createMetas(cb) {
+    async.series([
+            function(callback) {
+                metaCreate("B \& S Announcement May 2nd 2022", new Date('02-may-2022'), "B \& S Announcement", callback);
+            },
+            function(callback) {
+                metaCreate("Welcome to Rathe", new Date('11-oct-2019'), "Set Release", callback);
             },
         ],
         // optional callback
@@ -235,10 +277,10 @@ function createTeams(cb){
 function createUsers(cb){
     async.series([
         function(callback) {
-            userCreate('mjed', 'mje.dieckmann@googlemail.com', teams[0], callback)
+            userCreate('mjed', 'mje.dieckmann@googlemail.com', teams[0], 'salty', 'hashy', callback)
         },
         function(callback) {
-            userCreate('test', 'test.est@mailmail.com', null, callback)
+            userCreate('test', 'test.est@mailmail.com', null,'salty#', '#hashy', callback)
         },
     ], cb)
 }
@@ -246,32 +288,56 @@ function createUsers(cb){
 function createHeroes(cb){
     async.series([
         function(callback) {
-            heroCreate('Boltyn', [formats[0], formats[1]], null, callback)
+            heroCreate('Boltyn, Breaker of Dawn', [formats[0]], '/public/images/heroes/boltyn_old_sm.jpg', callback)
         },
         function(callback) {
-            heroCreate('Chane, Bound by Shadow', [formats[0]], null, callback)
+            heroCreate('Chane, Bound by Shadow', [formats[0]], '/public/images/heroes/chane_old_sm.jpg', callback)
+        },
+        function(callback) {
+            heroCreate('Viserai, Rune Blood', [formats[0]], '/public/images/heroes/viserai_old_sm.jpg', callback)
+        },
+        function(callback) {
+            heroCreate('Bravo, Star of the Show', [formats[0]], '/public/images/heroes/bravo_star_old_sm.jpg', callback)
+        },
+        function(callback) {
+            heroCreate('Lexi, Livewire', [formats[0]], '/public/images/heroes/lexi_old_sm.jpg', callback)
+        },
+        function(callback) {
+            heroCreate('Kano, Dracai of Aether', [formats[0]], '/public/images/heroes/kano_old_sm.jpg', callback)
+        },
+        function(callback) {
+            heroCreate('Dorinthea Ironsong', [formats[0]], '/public/images/heroes/dorinthea_old_sm.jpg', callback)
+        },
+        function(callback) {
+            heroCreate('Bravo, Showstopper', [formats[0]], '/public/images/heroes/bravo_showstopper_old_sm.jpg', callback)
+        },
+        function(callback) {
+            heroCreate('Oldhim, Grandfather of Time', [formats[0]], '/public/images/heroes/oldhim_old_sm.jpg', callback)
+        },
+        function(callback) {
+            heroCreate('Prism, Sculptor of Arc Light', [formats[0]], '/public/images/heroes/prism_old_sm.jpg', callback)
         },
     ], cb)
+}
+function between(min, max) {
+    return Math.floor(
+        Math.random() * (max - min + 1) + min
+    )
 }
 
 function createMatches(cb){
-    async.series([
-        function(callback) {
-            matchCreate(heroes[0],heroes[1], 1, new Date(), users[0], users[1], event_types[0], 'N/A', null, formats[0], callback)
-        },
-        function(callback) {
-            matchCreate(heroes[0],heroes[1], 0, new Date(), users[0], users[1], event_types[0], 'N/A', null, formats[0], callback)
-        },
-        function(callback) {
-            matchCreate(heroes[1],heroes[1], 0, new Date(), users[0], users[1], event_types[0], 'N/A', null, formats[0], callback)
-        },
-    ], cb)
+    let tasks = [];
+    for (let i=0; i <= 200; i++){
+        tasks.push( (callback) => matchCreate(heroes[between(0, 9)],heroes[between(0, 9)], users[0], users[1], events[between(0, 12)], 'N/A', null, formats[between(0, 5)], callback))
+    }
+    async.series(tasks, cb)
 }
 
 async function cleanDB(cb) {
-    await MetaChange.deleteMany({})
-    await EventType.deleteMany({})
+    await Meta.deleteMany({})
+    await Event.deleteMany({})
     await Format.deleteMany({})
+    await TO.deleteMany({});
     await Hero.deleteMany({})
     await User.deleteMany({})
     await Match.deleteMany({})
@@ -279,12 +345,13 @@ async function cleanDB(cb) {
 
 async.series([
         cleanDB,
-        createMetaChanges,
-        createEventTypes,
+        createMetas,
+        createTOs,
+        createEvents,
         createFormats,
         createHeroes,
         createTeams,
-        // createUsers,
+        createUsers,
         createMatches,
     ],
 // Optional callback

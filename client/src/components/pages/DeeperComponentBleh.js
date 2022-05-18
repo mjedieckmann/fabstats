@@ -1,4 +1,4 @@
-import {AboutDispatch} from "./About";
+import {AboutDispatch} from "./about/About";
 import {useContext} from "react";
 import Button from "@mui/material/Button";
 

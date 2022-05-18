@@ -10,18 +10,12 @@ import {useRecoilState} from "recoil";
 
 
 export default function LoginDialog() {
-    const [{handleChange, validateForm, LOGIN_FIELDS}] = useLoginForm({username: '', password: ''}, {username: null, password: null})
+    const [{handleChange, loginUser, LOGIN_FIELDS}] = useLoginForm({username: '', password: ''}, {username: null, password: null})
     const [, setOpen] = useRecoilState(dialogOpenState);
-
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        validateForm().then(() => {
-            console.log('no problem, continue LOGIN');
-            setOpen(false);
-        }, () =>
-            console.log('LOGIN validation errors')
-        );
+        loginUser();
     }
 
     return (
