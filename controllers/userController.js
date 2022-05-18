@@ -1,11 +1,35 @@
 const User = require('../models/user');
 const Team = require('../models/team');
 const genPassword = require('../utils/password_utils').genPassword;
+const multer = require("multer");
+const storage = multer.diskStorage(
+    {
+        destination: (req, file, cb) => cb(null, 'public/images/avatars'),
+        filename: (req, file, cb) => cb(null, Date.now() + '-' +file.originalname)
+    }
+);
+const upload = multer({storage: storage}).single('file');
+
+exports.user_file_upload = function (req, res) {
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            return res.status(500).json(err)
+        } else if (err) {
+            return res.status(500).json(err)
+        }
+        let user = req.user;
+        user.img = req.file.path;
+        user.save().then(user => {
+            return res.status(200).send(req.file)
+        });
+    })
+}
 
 // Display list of all Users.
 exports.user_list = function(req, res, next) {
     User.find()
         .sort([['nick']])
+        .populate('team')
         .exec(function (err, list_users) {
             if (err) { return next(err); }
             //Successful, so return

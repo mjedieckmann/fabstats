@@ -7,7 +7,7 @@ const UserSchema = new Schema(
         hash: {type: String, required: true},
         salt: {type: String, required: true},
         e_mail: {type: String, required: true, maxLength: 100, unique: true},
-        team: {type: Schema.Types.ObjectId, ref: 'Team'},
+        team: {type: Schema.Types.ObjectId, ref: 'Team', default: null},
         img: {type: String},
     }
 );

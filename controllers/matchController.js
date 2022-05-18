@@ -19,8 +19,26 @@ exports.match_list = function(req, res, next) {
         .sort([['event']])
         .populate({ path: 'hero_winner', select: 'name img -_id' })
         .populate({ path: 'hero_loser', select: 'name img -_id' })
-        .populate({ path: 'user_winner', select: 'nick img -_id' })
-        .populate({ path: 'user_loser', select: 'nick img -_id' })
+        .populate({
+            path: 'user_winner',
+            populate:
+                [
+                    {
+                        path: 'team',
+                        model: 'Team'
+                    }
+                ]
+        })
+        .populate({
+            path: 'user_loser',
+            populate:
+                [
+                    {
+                        path: 'team',
+                        model: 'Team'
+                    }
+                ]
+        })
         .populate({
         path: 'event',
         populate:

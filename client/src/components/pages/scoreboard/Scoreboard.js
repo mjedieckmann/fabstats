@@ -9,7 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import {TableFooter, TablePagination, useTheme} from "@mui/material";
+import {Fab, TableFooter, TablePagination, useTheme} from "@mui/material";
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
@@ -17,6 +17,7 @@ import LastPageIcon from '@mui/icons-material/LastPage';
 import {Row} from "./Row";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, pageState} from "./ScoreboardContainer";
+import AddIcon from "@mui/icons-material/Add";
 
 function TablePaginationActions(props) {
     const theme = useTheme();

@@ -5,8 +5,8 @@ const Schema = mongoose.Schema;
 const EventSchema = new Schema(
     {
         descriptor: {type: String, maxLength: 100, required: true},
-        to: {type: Schema.Types.ObjectId, ref: 'TO'},
-        type: {type: String, required: true, enum: [
+        to: {type: Schema.Types.ObjectId, ref: 'TO', default: null},
+        event_type: {type: String, required: true, enum: [
                 'Test Game',
                 'On Demand',
                 'Armory',

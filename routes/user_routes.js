@@ -19,7 +19,7 @@ router.get('/teams/:id', function(req, res, next) {
 
 router.post('/register', user_controller.user_register);
 
-router.post('/login', isLoggedIn,  passport.authenticate('local', { failureRedirect: '/users/login-failure', successRedirect: '/users/login-success' }));
+router.post('/login', isLoggedIn, passport.authenticate('local', { failureRedirect: '/users/login-failure', successRedirect: '/users/login-success' }));
 
 router.get('/protected-route', isAuth, (req, res, next) => {
   res.json({message: 'You made it to the route.'});
@@ -50,5 +50,7 @@ router.get('/login', (req, res, next) => {
   res.send(form);
 
 });
+
+router.post('/upload',user_controller.user_file_upload);
 
 module.exports = router;

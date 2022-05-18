@@ -21,7 +21,7 @@ export function Row(props) {
         <React.Fragment>
             <TableRow hover sx={{ '& > *': { borderBottom: 'unset'} }}>
                 <TableCell align="center">{row.event.descriptor}</TableCell>
-                <TableCell align="center">{row.event.type}</TableCell>
+                <TableCell align="center">{row.event.event_type}</TableCell>
                 <TableCell align="center">{row.round}</TableCell>
                 <TableCell align="center">
                     <BadgeAvatars

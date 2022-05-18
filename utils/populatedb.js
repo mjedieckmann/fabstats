@@ -35,6 +35,7 @@ let teams = []
 let users = []
 let heroes = []
 let matches = []
+const rounds = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Quarterfinal', 'Semifinal', 'Final', 'N/A']
 
 function formatCreate(descriptor, type, cb) {
     let format = new Format({ descriptor: descriptor, type: type });
@@ -64,8 +65,8 @@ function toCreate(descriptor, cb) {
     });
 }
 
-function eventCreate(descriptor, to, type, meta, date, cb) {
-    let event = new Event({ descriptor: descriptor, to: to, type: type, meta: meta, date: date });
+function eventCreate(descriptor, to, event_type, meta, date, cb) {
+    let event = new Event({ descriptor: descriptor, to: to, event_type: event_type, meta: meta, date: date });
 
     event.save(function (err) {
         if (err) {
@@ -328,7 +329,7 @@ function between(min, max) {
 function createMatches(cb){
     let tasks = [];
     for (let i=0; i <= 200; i++){
-        tasks.push( (callback) => matchCreate(heroes[between(0, 9)],heroes[between(0, 9)], users[0], users[1], events[between(0, 12)], 'N/A', null, formats[between(0, 5)], callback))
+        tasks.push( (callback) => matchCreate(heroes[between(0, 9)],heroes[between(0, 9)], users[0], users[1], events[between(0, 12)], rounds[between(0, 13)], null, formats[between(0, 5)], callback))
     }
     async.series(tasks, cb)
 }

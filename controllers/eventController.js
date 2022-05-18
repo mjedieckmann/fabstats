@@ -4,6 +4,8 @@ const Event = require('../models/event');
 exports.event_list = function(req, res, next) {
     Event.find()
         .sort([['descriptor']])
+        .populate('to')
+        .populate('meta')
         .exec(function (err, list_events) {
             if (err) { return next(err); }
             //Successful, so return
