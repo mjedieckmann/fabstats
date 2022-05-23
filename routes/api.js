@@ -8,6 +8,7 @@ const meta_controller = require('../controllers/metaController');
 const to_controller = require('../controllers/toController');
 const hero_controller = require('../controllers/heroController');
 const match_controller = require('../controllers/matchController');
+const book_controller = require("../controllers/bookController");
 
 /// HEROES ROUTES ///
 router.get('/heroes', hero_controller.hero_list);
@@ -15,6 +16,9 @@ router.get('/hero/:id', hero_controller.hero_detail);
 
 /// MATCHES ROUTES ///
 router.get('/matches', match_controller.match_list);
+router.get('/match/:id', match_controller.match_detail);
+router.post('/match/create', match_controller.event_create_match);
+router.post('/match/edit', match_controller.event_edit_match);
 
 /// FORMAT ROUTE ///
 router.get('/formats', format_controller.format_list);
@@ -22,9 +26,10 @@ router.get('/format/:id', format_controller.format_detail);
 
 /// EVENT TYPE ROUTE ///
 router.get('/events', event_controller.event_list);
+router.post('/event/create', to_controller.event_create_to, event_controller.event_create_post);
 
 /// META CHANGES ROUTE ///
-router.get('/meta', meta_controller.meta_list);
-router.get('/to', to_controller.to_list);
+router.get('/metas', meta_controller.meta_list);
+router.get('/tos', to_controller.to_list);
 
 module.exports = router;

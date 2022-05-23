@@ -9,6 +9,7 @@ const isLoggedIn = require("../utils/password_utils").isLoggedIn
 router.get('/', user_controller.user_list);
 // router.get('/:id', user_controller.user_detail);
 
+router.get('/current', user_controller.user_current);
 /// TEAM ROUTES ///
 router.get('/teams', function(req, res, next) {
   res.send('respond with all teams');
@@ -19,7 +20,7 @@ router.get('/teams/:id', function(req, res, next) {
 
 router.post('/register', user_controller.user_register);
 
-router.post('/login', isLoggedIn, passport.authenticate('local', { failureRedirect: '/users/login-failure', successRedirect: '/users/login-success' }));
+router.post('/login', isLoggedIn, passport.authenticate('local', { failureRedirect: '/users/login-failure', successRedirect: '/users/current' }));
 
 router.get('/protected-route', isAuth, (req, res, next) => {
   res.json({message: 'You made it to the route.'});
@@ -33,7 +34,7 @@ router.get('/logout', (req, res, next) => {
 });
 
 router.get('/login-success', (req, res, next) => {
-  res.send('<p>You successfully logged in. --> <a href="/users/protected-route">Go to protected route</a></p>');
+  res.status(200).json({user: {}});
 });
 
 router.get('/login-failure', (req, res, next) => {

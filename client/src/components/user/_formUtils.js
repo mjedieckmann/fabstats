@@ -1,7 +1,8 @@
 import {useEffect, useState} from "react";
 import {atom, useRecoilState} from "recoil";
-import {loggedInState} from "../../utils/_globalState";
+import {currentUserState} from "../../utils/_globalState";
 import {handlePostResponse} from "../../utils/_globalUtils";
+import axios from "axios";
 
 export const dialogOpenState = atom({
     key: 'open',
@@ -91,8 +92,9 @@ const booleanPromise = (boolean, message) => {
     return boolean ? Promise.resolve() : Promise.reject(message);
 }
 
-const useForm = (form_state, error_state) => {
-    const [ form, setForm ] = useState(form_state);
+const useAuthenticationForm = (form_state, error_state) => {
+    const [form, formError, setFormError, handleChange] = useForm(form_state, error_state);
+
     useEffect(() =>{
         setFormError(prevState => ({
             ...prevState,
@@ -107,6 +109,20 @@ const useForm = (form_state, error_state) => {
         }));
     }, [form.e_mail])
 
+    const [, setOpen] = useRecoilState(dialogOpenState);
+    const [, setCurrentUser] = useRecoilState(currentUserState);
+    return [
+        form,
+        formError,
+        setFormError,
+        handleChange,
+        setOpen,
+        setCurrentUser
+    ]
+}
+
+export const useForm = (form_state, error_state) => {
+    const [ form, setForm ] = useState(form_state);
     const [ formError, setFormError ] = useState(error_state);
 
     const handleChange = e => {
@@ -116,39 +132,40 @@ const useForm = (form_state, error_state) => {
             [name]: value
         }));
     };
-    const [, setOpen] = useRecoilState(dialogOpenState);
-    const [, setLoggedIn] = useRecoilState(loggedInState);
     return [
         form,
         formError,
         setFormError,
         handleChange,
-        setOpen,
-        setLoggedIn
     ]
 }
 
 export const useLoginForm = (form_state, error_state) => {
-    const [form, formError, setFormError, handleChange, setOpen, setLoggedIn] = useForm(form_state, error_state);
+    const [form, formError, setFormError, handleChange, setOpen, setCurrentUser] = useAuthenticationForm(form_state, error_state);
 
 
     const loginUser = () => {
         validateForm().then(() => {
             console.log('no problem, continue LOGIN');
-            const requestOptions = {
+            /*const requestOptions = {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: form.username, password : form.password})
-            };
-            fetch('/users/login', requestOptions)
+                body: JSON.stringify(f)
+            };*/
+            axios.post("/users/login", form)
+                .then((res) => {
+                    setCurrentUser(res.data.user);
+                    setOpen(false);
+                });
+            /*fetch('/users/login', requestOptions)
                 .then(handlePostResponse)
-                .then(() => {
-                    setLoggedIn(true);
+                .then((res) => {
+                    setCurrentUser(res.data.user);
                     setOpen(false);
                 })
                 .catch(error => {
                     console.error('There was an error!', error);
-                });
+                });*/
             }, () =>
                 console.log('LOGIN validation errors')
         );
@@ -184,7 +201,7 @@ export const useLoginForm = (form_state, error_state) => {
 }
 
 export const useRegisterForm = (form_state, error_state) => {
-    const [form, formError, setFormError, handleChange, setOpen, setLoggedIn] = useForm(form_state, error_state);
+    const [form, formError, setFormError, handleChange, setOpen, setCurrentUser] = useAuthenticationForm(form_state, error_state);
 
     useEffect(() =>{
         setFormError(prevState => ({
@@ -210,7 +227,7 @@ export const useRegisterForm = (form_state, error_state) => {
                 };
                 fetch('/users/register', requestOptions)
                     .then(handlePostResponse)
-                    .then(() => fetch('/users/login', requestOptions).then(handlePostResponse).then(() => {setLoggedIn(true); setOpen(false)}))
+                    .then(() => fetch('/users/login', requestOptions).then(handlePostResponse).then((res) => {setCurrentUser(res.data.user); setOpen(false)}))
                     .catch(error => {
                         console.error('There was an error!', error);
                         setFormError(prevState => ({

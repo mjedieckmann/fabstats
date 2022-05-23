@@ -18,27 +18,25 @@ export default function RegisterDialog() {
     }
 
     return (
-        <>
-            <Box noValidate component="form" onSubmit={handleSubmit}>
-                <DialogTitle>Register</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        No account? Create one here:
-                    </DialogContentText>
-                    <Box
+        <Box noValidate component="form" onSubmit={handleSubmit}>
+            <DialogTitle>Register</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    No account? Create one here:
+                </DialogContentText>
+                <Box
 
-                        sx={{
-                            '& .MuiTextField-root': { m: 1, width: '25ch' },
-                        }}
-                    >
-                        <FormFields fields={REGISTER_FIELDS} handleChange={handleChange}/>
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Cancel</Button>
-                    <Button type={"submit"}>Register</Button>
-                </DialogActions>
-            </Box>
-        </>
+                    sx={{
+                        '& .MuiTextField-root': { m: 1, width: '25ch' },
+                    }}
+                >
+                    <FormFields fields={REGISTER_FIELDS} handleChange={handleChange}/>
+                </Box>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setOpen(false)}>Cancel</Button>
+                <Button type={"submit"}>Register</Button>
+            </DialogActions>
+        </Box>
     );
 }

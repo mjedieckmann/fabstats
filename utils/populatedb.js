@@ -65,8 +65,12 @@ function toCreate(descriptor, cb) {
     });
 }
 
-function eventCreate(descriptor, to, event_type, meta, date, cb) {
-    let event = new Event({ descriptor: descriptor, to: to, event_type: event_type, meta: meta, date: date });
+function eventCreate(descriptor, to, event_type, cb) {
+    let event = new Event({
+        descriptor: descriptor,
+        to: to,
+        event_type: event_type,
+        });
 
     event.save(function (err) {
         if (err) {
@@ -135,7 +139,7 @@ function heroCreate(name, formats, img, cb){
     }   );
 }
 
-function matchCreate(hero_winner, hero_loser, user_winner, user_loser, event, round, notes, format, cb){
+function matchCreate(hero_winner, hero_loser, user_winner, user_loser, event, round, notes, format, meta, date, cb){
     let match = new Match({
         hero_winner: hero_winner,
         hero_loser: hero_loser,
@@ -145,6 +149,8 @@ function matchCreate(hero_winner, hero_loser, user_winner, user_loser, event, ro
         round: round,
         notes: notes,
         format: format,
+        meta: meta,
+        date: date
     });
 
     match.save(function (err) {
@@ -211,43 +217,43 @@ function createTOs(cb) {
 function createEvents(cb) {
     async.series([
             function(callback) {
-                eventCreate("Armory sábado", tos[between(0, 5)], "Test Game", metas[between(0, 1)], new Date(), callback);
+                eventCreate("Armory sábado", tos[between(0, 5)], "Armory", callback);
             },
             function(callback) {
-                eventCreate("Armory sábado", tos[between(0, 5)], "On Demand", metas[between(0, 1)], new Date(), callback);
+                eventCreate("Draft sábado", tos[between(0, 5)], "Armory", callback);
             },
             function(callback) {
-                eventCreate("Jupiter armory 24.05.", tos[between(0, 5)],"Armory", metas[between(0, 1)], new Date(),callback);
+                eventCreate("Jupiter armory 24.05.", tos[between(0, 5)],"Armory",callback);
             },
             function(callback) {
-                eventCreate("some skirmish", tos[between(0, 5)],"Skirmish", metas[between(0, 1)],new Date(), callback);
+                eventCreate("some skirmish", tos[between(0, 5)],"Skirmish",  callback);
             },
             function(callback) {
-                eventCreate("RTN madrid", tos[between(0, 5)],"Road to Nationals", metas[between(0, 1)], new Date(),callback);
+                eventCreate("RTN madrid", tos[between(0, 5)],"Road to Nationals", callback);
             },
             function(callback) {
-                eventCreate("a ProQuest", tos[between(0, 5)], "ProQuest", metas[between(0, 1)], new Date(),callback);
+                eventCreate("a ProQuest", tos[between(0, 5)], "ProQuest", callback);
             },
             function(callback) {
-                eventCreate("a Battle Hardened", tos[between(0, 5)],"Battle Hardened", metas[between(0, 1)], new Date(),callback);
+                eventCreate("a Battle Hardened", tos[between(0, 5)],"Battle Hardened", callback);
             },
             function(callback) {
-                eventCreate("a Calling", tos[between(0, 5)],"Calling", metas[between(0, 1)], new Date(),callback);
+                eventCreate("a Calling", tos[between(0, 5)],"Calling", callback);
             },
             function(callback) {
-                eventCreate("a Nationals", tos[between(0, 5)],"Nationals", metas[between(0, 1)], new Date(),callback);
+                eventCreate("a Nationals", tos[between(0, 5)],"Nationals", callback);
             },
             function(callback) {
-                eventCreate("a Pro Tour", tos[between(0, 5)],"Pro Tour", metas[between(0, 1)], new Date(),callback);
+                eventCreate("a Pro Tour", tos[between(0, 5)],"Pro Tour",callback);
             },
             function(callback) {
-                eventCreate("a Farewell Welcome to Rathe", tos[between(0, 5)],"Farewell Welcome to Rathe", metas[between(0, 1)], new Date(),callback);
+                eventCreate("a Farewell Welcome to Rathe", tos[between(0, 5)],"Farewell Welcome to Rathe", callback);
             },
             function(callback) {
-                eventCreate("a Pre-release", tos[between(0, 5)],"Pre-release", metas[between(0, 1)], new Date(),callback);
+                eventCreate("a Pre-release", tos[between(0, 5)],"Pre-release", callback);
             },
             function(callback) {
-                eventCreate("a World Championship", tos[between(0, 5)],"World Championship", metas[between(0, 1)], new Date(),callback);
+                eventCreate("a World Championship", tos[between(0, 5)],"World Championship", callback);
             },
         ],
         // optional callback
@@ -329,7 +335,7 @@ function between(min, max) {
 function createMatches(cb){
     let tasks = [];
     for (let i=0; i <= 200; i++){
-        tasks.push( (callback) => matchCreate(heroes[between(0, 9)],heroes[between(0, 9)], users[0], users[1], events[between(0, 12)], rounds[between(0, 13)], null, formats[between(0, 5)], callback))
+        tasks.push( (callback) => matchCreate(heroes[between(0, 9)],heroes[between(0, 9)], users[0], users[1], events[between(0, 12)], rounds[between(0, 13)], null, formats[between(0, 5)], metas[between(0, 1)], new Date(),callback))
     }
     async.series(tasks, cb)
 }

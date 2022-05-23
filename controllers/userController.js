@@ -10,6 +10,14 @@ const storage = multer.diskStorage(
 );
 const upload = multer({storage: storage}).single('file');
 
+exports.user_current = function (req, res) {
+    if (req.isAuthenticated()) {
+        return res.status(200).json({user: {nick: req.user.nick, img: req.user.img, e_mail: req.user.e_mail, team: req.user.team}});
+    } else {
+        return res.status(200).send({user: null});
+    }
+}
+
 exports.user_file_upload = function (req, res) {
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError) {
@@ -20,7 +28,7 @@ exports.user_file_upload = function (req, res) {
         let user = req.user;
         user.img = req.file.path;
         user.save().then(user => {
-            return res.status(200).send(req.file)
+            res.status(200).json({message: 'File upload successful!'});
         });
     })
 }
@@ -64,7 +72,8 @@ exports.user_register = function(req, res, next){
                     e_mail: req.body.e_mail,
                     hash: hash,
                     salt: salt,
-                    team: req.body.team
+                    team: req.body.team,
+                    img: null
                 });
 
                 newUser.save().then(() => res.redirect('/users/login'));

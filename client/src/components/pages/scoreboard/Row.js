@@ -13,6 +13,7 @@ import TableBody from "@mui/material/TableBody";
 import PropTypes from "prop-types";
 import {Avatar, Chip} from "@mui/material";
 import BadgeAvatars from "./BadgeAvatar";
+import MatchDialog from "./MatchDialog";
 
 export function Row(props) {
     const { row } = props;
@@ -20,8 +21,8 @@ export function Row(props) {
     return (
         <React.Fragment>
             <TableRow hover sx={{ '& > *': { borderBottom: 'unset'} }}>
-                <TableCell align="center">{row.event.descriptor}</TableCell>
-                <TableCell align="center">{row.event.event_type}</TableCell>
+                <TableCell align="center">{row.event !== null ? row.event.descriptor : '(none)'}</TableCell>
+                <TableCell align="center">{row.event !== null ? row.event.event_type : '(none)'}</TableCell>
                 <TableCell align="center">{row.round}</TableCell>
                 <TableCell align="center">
                     <BadgeAvatars
@@ -35,10 +36,10 @@ export function Row(props) {
                         user_name={row.user_loser.nick} user_img={row.user_loser.img}/>
                 </TableCell>
                 <TableCell align="center">{row.format.descriptor}</TableCell>
-                <TableCell align="center">{row.event.meta.descriptor}</TableCell>
-                <TableCell align="center">{row.event.to.descriptor}</TableCell>
-                <TableCell align="center">{row.event.date_formatted}</TableCell>
-                <TableCell align="center"></TableCell>
+                <TableCell align="center">{row.meta.descriptor}</TableCell>
+                <TableCell align="center">{row.event !== null && row.event.to != null ? row.event.to.descriptor : '(none)'}</TableCell>
+                <TableCell align="center">{row.date_formatted}</TableCell>
+                <TableCell align="center"><MatchDialog match_url={row.url} submitMode={'edit'}/></TableCell>
             </TableRow>
         </React.Fragment>
     );
@@ -46,13 +47,15 @@ export function Row(props) {
 
 Row.propTypes = {
     row: PropTypes.shape({
-        event: PropTypes.object.isRequired,
+        event: PropTypes.object,
         round: PropTypes.string.isRequired,
         hero_winner: PropTypes.object.isRequired,
         hero_loser: PropTypes.object.isRequired,
         user_winner: PropTypes.object.isRequired,
         user_loser: PropTypes.object.isRequired,
         format: PropTypes.object.isRequired,
-        notes: PropTypes.string
+        meta: PropTypes.object.isRequired,
+        notes: PropTypes.string,
+        date_formatted: PropTypes.string.isRequired
     }).isRequired,
 };

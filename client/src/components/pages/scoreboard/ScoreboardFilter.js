@@ -3,23 +3,10 @@ import {Autocomplete, Container, Grid} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, matchesState, pageState} from "./ScoreboardContainer";
-
-const useSimpleDataFetch = (setState, url, key) => {
-    useEffect(() => {
-        fetch(url)
-            .then(res => res.json())
-            .then(res => {
-                let fetched_data = new Set();
-                res.map((data) => {
-                    fetched_data.add(data[key]);
-                })
-                setState([...fetched_data]);
-            })
-    }, []);
-}
+import {eventsState, heroesState, useSimpleDataFetch} from "../_pageUtils";
 
 export const ScoreboardFilter = () =>{
-    const [heroes, setHeroes] = useState([]);
+    const [heroes, setHeroes] = useRecoilState(heroesState);
     useSimpleDataFetch(setHeroes, 'api/heroes', 'name');
 
     const [formats, setFormats] = useState([]);
@@ -44,10 +31,9 @@ export const ScoreboardFilter = () =>{
             })
     }, []);
 
-    const [events, setEvents] = useState([]);
+    const [events, setEvents] = useRecoilState(eventsState);
     const [eventTypes, setEventTypes] = useState([]);
     const [tos, setTos] = useState([]);
-    const [metas, setMetas] = useState([]);
     useEffect(() => {
         fetch('/api/events')
             .then(res => res.json())
@@ -55,19 +41,16 @@ export const ScoreboardFilter = () =>{
                 let events = new Set();
                 let eventTypes = new Set();
                 let tos = new Set();
-                let metas = new Set();
                 res.map((event) => {
-                    events.add(event.descriptor);
+                    events.add(event);
                     eventTypes.add(event.event_type);
                     if (event.to != null) {
                         tos.add(event.to.descriptor);
                     }
-                    metas.add(event.meta.descriptor);
                 })
                 setEvents([...events]);
                 setEventTypes([...eventTypes]);
                 setTos([...tos]);
-                setMetas([...metas]);
             })
     }, []);
 
@@ -77,10 +60,16 @@ export const ScoreboardFilter = () =>{
     const [filter, setFilter] = useState({hero: null, user: null, team: null, format: null, event: null, eventType: null, to: null, meta: null, round: null});
 
     const [rounds, setRounds] = useState([]);
+    const [metas, setMetas] = useState([]);
     useEffect(() => {
         let rounds = new Set();
-        filteredMatches.map( match => rounds.add(match.round));
+        let metas = new Set();
+        filteredMatches.map( match => {
+            rounds.add(match.round);
+            metas.add(match.meta.descriptor);
+        });
         setRounds([...rounds]);
+        setMetas([...metas]);
     }, [filteredMatches]);
 
     useEffect(() => {
@@ -102,10 +91,10 @@ export const ScoreboardFilter = () =>{
                     )
                 ) &&
                 (filter.format === null || row.format.descriptor === filter.format) &&
-                (filter.event === null || row.event.descriptor === filter.event) &&
-                (filter.eventType === null || row.event.event_type === filter.eventType) &&
-                (filter.to === null || (row.event.to !== null && row.event.to.descriptor === filter.to)) &&
-                (filter.meta === null || row.event.meta.descriptor === filter.meta) &&
+                (filter.event === null || (row.event != null && row.event.descriptor === filter.event)) &&
+                (filter.eventType === null || (row.event != null && row.event.event_type === filter.eventType)) &&
+                (filter.to === null || (row.event != null && row.event.to !== null && row.event.to.descriptor === filter.to)) &&
+                (filter.meta === null || row.meta.descriptor === filter.meta) &&
                 (filter.round === null || row.round === filter.round)
             )))
     },[filter]);
@@ -172,12 +161,16 @@ export const ScoreboardFilter = () =>{
                     <Autocomplete
                         onChange={(event, newValue) => {
                             setPage(0);
-                            setFilter({...filter, event: newValue});
+                            setFilter({...filter, event: newValue !== null ? newValue.descriptor : null});
                         }}
                         size={"small"}
                         disablePortal
                         id="event-filter"
                         options={events}
+                        getOptionLabel={(option) => {
+                            return option.descriptor;
+                        }}
+                        renderOption={(props, option) => <li {...props}>{option.descriptor}</li>}
                         sx={{ width: 1 }}
                         renderInput={(params) => <TextField {...params} label="Event" />}
                     />

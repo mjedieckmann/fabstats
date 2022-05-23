@@ -7,6 +7,8 @@ import ElderlyIcon from "@mui/icons-material/Elderly";
 import Protected from "../user/protected";
 import Logout from "../user/logout";
 import ScoreboardContainer from "./scoreboard/ScoreboardContainer";
+import {atom} from "recoil";
+import {useEffect} from "react";
 
 export const pages = [
     {
@@ -58,3 +60,27 @@ export const nav_buttons = [
         icon: <ElderlyIcon/>
     },
 ]
+
+export const eventsState = atom({
+    key: 'events',
+    default: [],
+});
+
+export const heroesState = atom({
+    key: 'heroes',
+    default: [],
+});
+
+export const useSimpleDataFetch = (setState, url, key) => {
+    useEffect(() => {
+        fetch(url)
+            .then(res => res.json())
+            .then(res => {
+                let fetched_data = new Set();
+                res.map((data) => {
+                    fetched_data.add(data[key]);
+                })
+                setState([...fetched_data]);
+            })
+    }, []);
+}

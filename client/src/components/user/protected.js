@@ -6,7 +6,7 @@ function Protected(){
     useEffect(() => {
         fetch("/users/protected-route")
             .then(res => res.json())
-            .then((protected_message) => setProtectedMessage(protected_message.msg))
+            .then((protected_message) => setProtectedMessage(protected_message.message))
     }, [])
 
     return (

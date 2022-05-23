@@ -6,8 +6,23 @@ import {Container, Grid} from "@mui/material";
 import Navbar from "./components/navbar/Navbar";
 import {pages} from "./components/pages/_pageUtils";
 import Stack from "@mui/material/Stack";
+import {useRecoilState} from "recoil";
+import {currentUserState, dirtyState} from "./utils/_globalState";
+import {useEffect} from "react";
+import axios from "axios";
 
 function App() {
+    const [ currentUser, setCurrentUser ] = useRecoilState(currentUserState);
+    const [ dirty, ] = useRecoilState(dirtyState);
+    useEffect(() => {
+        axios.get('/users/current')
+            .then(res => {
+                setCurrentUser(res.data.user);
+                console.log(res);
+            })
+            .catch(err => console.log(err));
+    }, [dirty])
+
     return (
         <div className="App">
             <HelmetProvider>
@@ -18,7 +33,7 @@ function App() {
             </HelmetProvider>
             {/* Header */}
             <Stack spacing={2}>
-                <Navbar/>
+                <Navbar currentUser={currentUser}/>
                 <Routes>
                     {pages.map((page) => (
                         <Route key={page.name} path={page.url} element={page.element}/>

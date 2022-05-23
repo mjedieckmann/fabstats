@@ -7,11 +7,13 @@ import {Grid, ToggleButton} from "@mui/material";
 import NavbarIcon from "./NavbarIcon";
 import {useRecoilState} from "recoil";
 import {nav_buttons} from "../pages/_pageUtils";
-import AuthenticationDialog from "../user/AuthenticationDialog";
-import {currentPageState} from "../../utils/_globalState";
+import {currentPageState, currentUserState} from "../../utils/_globalState";
+import ProfileDialog from "../user/ProfileDialog";
+import DialogContainer from "../user/DialogContainer";
 
 export default function Navbar() {
     const [currentPage, ] = useRecoilState(currentPageState);
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static" color={"transparent"}>
@@ -22,7 +24,7 @@ export default function Navbar() {
                             <ToggleButton selected={button.name === currentPage} key={button.name} value={button.name} href={button.url}>{button.name}</ToggleButton>
                         ))}
                     </Grid>
-                    <AuthenticationDialog/>
+                    <DialogContainer/>
                 </Toolbar>
             </AppBar>
         </Box>

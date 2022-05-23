@@ -1,15 +1,15 @@
 import {useEffect, useState} from "react";
 import {useRecoilState} from "recoil";
-import {loggedInState} from "../../utils/_globalState";
+import {currentUserState, loggedInState} from "../../utils/_globalState";
 
 function Logout() {
     const [logout_message, setLogoutMessage] = useState('')
-    const [, setLoggedIn] = useRecoilState(loggedInState);
+    const [, setCurrentUser] = useRecoilState(currentUserState);
 
     useEffect(() => {
         fetch("/users/logout")
             .then(res => res.json())
-            .then((logout_message) => {setLoggedIn(false); setLogoutMessage(logout_message.msg)})
+            .then((logout_message) => {setCurrentUser(null); setLogoutMessage(logout_message.message);})
     }, [])
 
     return (

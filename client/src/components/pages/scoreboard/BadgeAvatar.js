@@ -55,23 +55,5 @@ export default function BadgeAvatars(props) {
         >
             <Avatar alt={props.hero_name} src={img} />
         </Badge>
-        /*<Stack direction="row" spacing={2}>
-            {/!*<StyledBadge
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                variant="dot"
-            >
-                <Avatar alt={props.user_name} src={props.user_image} />
-            </StyledBadge>*!/}
-            <Badge
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                badgeContent={
-                    <SmallAvatar alt={props.user_name} src={props.user_image} />
-                }
-            >
-                <Avatar alt={props.hero_name} src={props.hero_img} />
-            </Badge>
-        </Stack>*/
     );
 }

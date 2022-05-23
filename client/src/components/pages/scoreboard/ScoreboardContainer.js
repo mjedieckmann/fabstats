@@ -1,14 +1,12 @@
 import {Fab, Grid} from "@mui/material";
-import {useCurrentPage} from "../../../utils/_globalState";
+import {dirtyState, useCurrentPage} from "../../../utils/_globalState";
 import Scoreboard from "./Scoreboard";
 import {ScoreboardFilter} from "./ScoreboardFilter";
 import {useEffect} from "react";
 import {atom, useRecoilState} from "recoil";
 import Paper from "@mui/material/Paper";
 import {styled} from "@mui/material/styles";
-import AddIcon from '@mui/icons-material/Add';
 import Box from "@mui/material/Box";
-import AuthenticationDialog from "../../user/AuthenticationDialog";
 import MatchDialog from "./MatchDialog";
 
 export const matchesState = atom({
@@ -36,7 +34,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function ScoreboardContainer(){
     useCurrentPage('Scoreboard');
-    const [matches, setMatches] = useRecoilState(matchesState);
+    const [ matches, setMatches ] = useRecoilState(matchesState);
+    const [ dirty, ] = useRecoilState(dirtyState);
     useEffect(() => {
         fetch('/api/matches')
             .then(response => response.json())
@@ -44,7 +43,7 @@ export default function ScoreboardContainer(){
                 setMatches(data);
                 console.log(data);
             });
-    }, []);
+    }, [dirty]);
 
     const [, setFilteredMatches] = useRecoilState(filteredMatchesState);
     useEffect(() => {
@@ -64,7 +63,7 @@ export default function ScoreboardContainer(){
                         alignItems="center"
                         justifyContent="right"
                     >
-                        <MatchDialog/>
+                        <MatchDialog submitMode={'create'}/>
                     </Box>
                 </Grid>
             </Grid>
