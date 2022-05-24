@@ -1,10 +1,11 @@
 import Dialog from '@mui/material/Dialog';
-import {LoadingButton} from "@mui/lab";
 import AuthenticationTabs from "./AuthenticationTabs";
 import {useRecoilState} from "recoil";
 import {dialogOpenState} from "./_formUtils";
 import ProfileDialog from "./ProfileDialog";
 import {currentUserState} from "../../utils/_globalState";
+import BasicMenu from "../navbar/BasicMenu";
+import Button from "@mui/material/Button";
 
 export default function DialogContainer() {
     const [ open, setOpen ] = useRecoilState(dialogOpenState);;
@@ -18,20 +19,19 @@ export default function DialogContainer() {
         setOpen(false);
     };
 
+
     return (
-        <div>
-            <LoadingButton loading={currentUser === 0} variant="outlined" onClick={handleOpen}>
-                {currentUser !== null
-                    ? "Profile"
-                    : "Login"
-                }
-            </LoadingButton>
+        <>
+            {currentUser !== null
+                ? <BasicMenu handleOpen={handleOpen}/>
+                : <Button variant="outlined" onClick={handleOpen}>Login</Button>
+            }
             <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth={'sm'}>
                 {currentUser !== null
                     ? <ProfileDialog/>
                     : <AuthenticationTabs/>
                 }
             </Dialog>
-        </div>
+        </>
     );
 }

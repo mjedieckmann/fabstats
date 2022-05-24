@@ -1,44 +1,65 @@
-import * as React from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {IconButton} from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
+import {Avatar, IconButton} from "@mui/material";
+import {LoadingButton} from "@mui/lab";
+import {useRecoilState} from "recoil";
+import {currentUserState, dirtyState} from "../../utils/_globalState";
+import {useState} from "react";
+import axios from "axios";
+import uuid from "react-uuid";
 
 export default function BasicMenu (props) {
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
+    const [ userMenuAnchor, setUserMenuAnchor ] = useState(null);
+    const [ currentUser, ] = useRecoilState(currentUserState);
+    const [ ,setDirty ] = useRecoilState(dirtyState);
+    const userMenuOpen = Boolean(userMenuAnchor);
+
+    const handleMenuClick = (event) => {
+        setUserMenuAnchor(event.currentTarget);
     };
-    const handleClose = () => {
-        setAnchorEl(null);
+
+    const handleProfileClick = () => {
+        props.handleOpen();
+        handleMenuClose();
+    }
+
+    const handleLogout = () => {
+        console.log('logging out');
+        axios.get("/users/logout")
+            .then(res => {
+                setDirty(uuid());
+                console.log(res);
+                handleMenuClose();
+            });
+    }
+
+    const handleMenuClose = () => {
+        setUserMenuAnchor(null);
     };
 
     return (
-        <div>
+        <>
             <IconButton
-                id="basic-button"
-                aria-controls={open ? 'basic-menu' : undefined}
+                id="user-menu-button"
+                aria-controls={userMenuOpen ? 'user-menu' : undefined}
                 aria-haspopup="true"
-                aria-expanded={open ? 'true' : undefined}
-                onClick={handleClick}
+                aria-expanded={userMenuOpen ? 'true' : undefined}
+                onClick={handleMenuClick}
             >
-                <MenuIcon
-                sx={{color: "white"}}/>
+                <Avatar src={currentUser.img}></Avatar>
             </IconButton>
             <Menu
-                id="basic-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
+                id="user-menu"
+                anchorEl={userMenuAnchor}
+                open={userMenuOpen}
+                onClose={handleMenuClose}
                 MenuListProps={{
-                    'aria-labelledby': 'basic-button',
+                    'aria-labelledby': 'user-menu-button',
                 }}
             >
-                <MenuItem onClick={() => props.childToParent}>Login</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
-                <MenuItem onClick={handleClose}>Logout</MenuItem>
+                <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
-        </div>
+        </>
     );
 }

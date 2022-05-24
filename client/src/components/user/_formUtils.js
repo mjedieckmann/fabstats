@@ -147,25 +147,11 @@ export const useLoginForm = (form_state, error_state) => {
     const loginUser = () => {
         validateForm().then(() => {
             console.log('no problem, continue LOGIN');
-            /*const requestOptions = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(f)
-            };*/
             axios.post("/users/login", form)
                 .then((res) => {
                     setCurrentUser(res.data.user);
                     setOpen(false);
                 });
-            /*fetch('/users/login', requestOptions)
-                .then(handlePostResponse)
-                .then((res) => {
-                    setCurrentUser(res.data.user);
-                    setOpen(false);
-                })
-                .catch(error => {
-                    console.error('There was an error!', error);
-                });*/
             }, () =>
                 console.log('LOGIN validation errors')
         );
@@ -220,21 +206,10 @@ export const useRegisterForm = (form_state, error_state) => {
     const registerUser = () => {
         validateForm().then(() => {
                 console.log('no problem, continue REGISTER');
-                const requestOptions = {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: form.username, e_mail: form.e_mail, password : form.password})
-                };
-                fetch('/users/register', requestOptions)
-                    .then(handlePostResponse)
-                    .then(() => fetch('/users/login', requestOptions).then(handlePostResponse).then((res) => {setCurrentUser(res.data.user); setOpen(false)}))
-                    .catch(error => {
-                        console.error('There was an error!', error);
-                        setFormError(prevState => ({
-                            ...prevState,
-                            username: error,
-                            e_mail: ''
-                        }));
+                axios.post("/users/register", form)
+                    .then((res) => {
+                        setCurrentUser(res.data.user);
+                        setOpen(false);
                     });
             }, () =>
                 console.log('REGISTER validation errors')

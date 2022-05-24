@@ -24,7 +24,7 @@ import {matchesState} from "./ScoreboardContainer";
 import EditIcon from '@mui/icons-material/Edit';
 
 const ROUNDS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Quarterfinal', 'Semifinal', 'Final', 'N/A'];
-const EMTPY_FORM = {
+const EMPTY_FORM = {
     _id : null,
     date: new Date(),
     round: null,
@@ -39,8 +39,8 @@ const EMTPY_FORM = {
 
 export default function MatchDialog(props) {
     const [ open, setOpen ] = useState(false);
-    const [ form, setForm ] = useState(EMTPY_FORM);
-    const [ formError, setFormError ] = useState(EMTPY_FORM);
+    const [ form, setForm ] = useState(EMPTY_FORM);
+    const [ formError, setFormError ] = useState(EMPTY_FORM);
     const [ heroes, setHeroes ] = useState([]);
     useEffect(() =>{
         axios.get('/api/heroes')
@@ -105,7 +105,7 @@ export default function MatchDialog(props) {
                     setOpen(true);
                 });
         } else {
-            setForm(EMTPY_FORM);
+            setForm(EMPTY_FORM);
             setOpen(true);
         }
     };

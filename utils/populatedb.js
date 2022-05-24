@@ -341,13 +341,14 @@ function createMatches(cb){
 }
 
 async function cleanDB(cb) {
-    await Meta.deleteMany({})
-    await Event.deleteMany({})
-    await Format.deleteMany({})
+    await Meta.deleteMany({});
+    await Event.deleteMany({});
+    await Format.deleteMany({});
     await TO.deleteMany({});
-    await Hero.deleteMany({})
-    await User.deleteMany({})
-    await Match.deleteMany({})
+    await Hero.deleteMany({});
+    await Team.deleteMany({});
+    await User.deleteMany({});
+    await Match.deleteMany({});
 }
 
 async.series([
