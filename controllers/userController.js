@@ -3,6 +3,7 @@ const Team = require('../models/team');
 const genPassword = require('../utils/password_utils').genPassword;
 const multer = require("multer");
 const {validPassword} = require("../utils/password_utils");
+const Match = require("../models/match");
 const storage = multer.diskStorage(
     {
         destination: (req, file, cb) => cb(null, 'public/images/avatars'),
@@ -10,6 +11,22 @@ const storage = multer.diskStorage(
     }
 );
 const upload = multer({storage: storage}).single('file');
+
+exports.isMatchCreator = function(req, res, next) {
+    Match.findOne({
+        _id: req.body._id,
+        created_by: req.user._id
+    }).exec((err, match) => {
+      if (err !== null) { return next(err)}
+      if (match === null){
+          return res.status(401).json({message: "You are not the creator of this match!"});
+      } else {
+          res.locals.match = match;
+          return next();
+      }
+    });
+}
+
 
 exports.user_current = function (req, res) {
     if (req.isAuthenticated()) {

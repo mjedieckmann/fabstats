@@ -15,6 +15,7 @@ const MatchSchema = new Schema(
         format: {type: Schema.Types.ObjectId, required: true, ref: 'Format'},
         meta: {type: Schema.Types.ObjectId, required: true, ref: 'Meta'},
         notes: {type: String},
+        created_by: {type: Schema.Types.ObjectId, ref: 'User', required: true},
     },
     {
         toJSON: { virtuals: true }

@@ -139,7 +139,7 @@ function heroCreate(name, formats, img, cb){
     }   );
 }
 
-function matchCreate(hero_winner, hero_loser, user_winner, user_loser, event, round, notes, format, meta, date, cb){
+function matchCreate(hero_winner, hero_loser, user_winner, user_loser, event, round, notes, format, meta, date, creator, cb){
     let match = new Match({
         hero_winner: hero_winner,
         hero_loser: hero_loser,
@@ -150,7 +150,8 @@ function matchCreate(hero_winner, hero_loser, user_winner, user_loser, event, ro
         notes: notes,
         format: format,
         meta: meta,
-        date: date
+        date: date,
+        created_by: creator,
     });
 
     match.save(function (err) {
@@ -335,7 +336,7 @@ function between(min, max) {
 function createMatches(cb){
     let tasks = [];
     for (let i=0; i <= 200; i++){
-        tasks.push( (callback) => matchCreate(heroes[between(0, 9)],heroes[between(0, 9)], users[0], users[1], events[between(0, 12)], rounds[between(0, 13)], null, formats[between(0, 5)], metas[between(0, 1)], new Date(),callback))
+        tasks.push( (callback) => matchCreate(heroes[between(0, 9)],heroes[between(0, 9)], users[0], users[1], events[between(0, 12)], rounds[between(0, 13)], null, formats[between(0, 5)], metas[between(0, 1)], new Date(), users[between(0, 1)], callback))
     }
     async.series(tasks, cb)
 }

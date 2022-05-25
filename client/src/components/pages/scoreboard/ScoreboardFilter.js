@@ -4,6 +4,7 @@ import TextField from "@mui/material/TextField";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, matchesState, pageState} from "./ScoreboardContainer";
 import {eventsState, heroesState, useSimpleDataFetch} from "../_pageUtils";
+import {dirtyState} from "../../../utils/_globalState";
 
 export const ScoreboardFilter = () =>{
     const [heroes, setHeroes] = useRecoilState(heroesState);

@@ -14,9 +14,12 @@ import PropTypes from "prop-types";
 import {Avatar, Chip} from "@mui/material";
 import BadgeAvatars from "./BadgeAvatar";
 import MatchDialog from "./MatchDialog";
+import {useRecoilState} from "recoil";
+import {currentUserState} from "../../../utils/_globalState";
 
 export function Row(props) {
     const { row } = props;
+    const [ currentUser, ] = useRecoilState(currentUserState);
 
     return (
         <React.Fragment>
@@ -39,7 +42,15 @@ export function Row(props) {
                 <TableCell align="center">{row.meta.descriptor}</TableCell>
                 <TableCell align="center">{row.event !== null && row.event.to != null ? row.event.to.descriptor : '(none)'}</TableCell>
                 <TableCell align="center">{row.date_formatted}</TableCell>
-                <TableCell align="center"><MatchDialog match_url={row.url} submitMode={'edit'}/></TableCell>
+                <TableCell align="center">
+                    {
+                        currentUser !== null &&
+                        currentUser !== 0 &&
+                        currentUser._id === row.created_by._id
+                            ? <MatchDialog match_url={row.url} submitMode={'edit'}/>
+                            : ''
+                    }
+                </TableCell>
             </TableRow>
         </React.Fragment>
     );
@@ -56,6 +67,7 @@ Row.propTypes = {
         format: PropTypes.object.isRequired,
         meta: PropTypes.object.isRequired,
         notes: PropTypes.string,
-        date_formatted: PropTypes.string.isRequired
+        date_formatted: PropTypes.string.isRequired,
+        created_by: PropTypes.object.isRequired,
     }).isRequired,
 };

@@ -22,6 +22,9 @@ import axios from "axios";
 import {SimpleAutocomplete} from "./SimpleAutocomplete";
 import {matchesState} from "./ScoreboardContainer";
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import uuid from "react-uuid";
+import {dirtyState} from "../../../utils/_globalState";
 
 const ROUNDS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Quarterfinal', 'Semifinal', 'Final', 'N/A'];
 const EMPTY_FORM = {
@@ -42,6 +45,7 @@ export default function MatchDialog(props) {
     const [ form, setForm ] = useState(EMPTY_FORM);
     const [ formError, setFormError ] = useState(EMPTY_FORM);
     const [ heroes, setHeroes ] = useState([]);
+    const [ ,setDirty] = useRecoilState(dirtyState);
     useEffect(() =>{
         axios.get('/api/heroes')
             .then(res => {
@@ -121,16 +125,21 @@ export default function MatchDialog(props) {
         axios.post("/api/match/" + props.submitMode, form)
             .then(res => {
                 console.log(res);
-                if (props.submitMode === 'edit'){
-                    setMatches(matches.map(function(match) { return match._id === res.data._id ? res.data : match; }));
-                } else {
-                    setMatches(matches => [...matches, res.data]);
-                }
+                setDirty(uuid());
             })
             .catch((err) => {
                 //TODO: Better error handling, especially with axios, which seems to dislike me.
                 console.log(err);
             });
+    }
+
+    const handleDelete = () => {
+        axios.post("/api/match/delete", form)
+            .then((res) => {
+                console.log('deleted', res);
+                setDirty(new uuid());
+            })
+            .catch(err => console.log(err));
     }
 
     return (
@@ -147,17 +156,18 @@ export default function MatchDialog(props) {
             <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth={'sm'}>
                 <Box sx={{ width: '100%', typography: 'body1' }}>
                     <Box noValidate component="form" onSubmit={handleSubmit}>
-                        <DialogTitle>Register</DialogTitle>
+                        <DialogTitle>
+                            Match
+                            {props.submitMode === 'edit'
+                                ? <IconButton aria-label="edit" onClick={handleDelete}><DeleteIcon/></IconButton>
+                                : ""
+                            }
+                        </DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                                No account? Create one here:
+                                Create / edit match:
                             </DialogContentText>
-                            <Box
-
-                                sx={{
-                                    '& .MuiTextField-root': { m: 1, width: '25ch' },
-                                }}
-                            >
+                            <Box sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
                                 {/*Date*/}
                                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                                     <DesktopDatePicker

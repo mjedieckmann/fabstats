@@ -17,17 +17,17 @@ function validPassword(password, hash, salt) {
 
 function isAuth(req, res, next){
     if (req.isAuthenticated()) {
-        next();
+        return next();
     } else {
-        res.status(401).json({ message: 'You are not authorized to view this resource' });
+        return res.status(401).json({ message: 'You are not authorized to view this resource' });
     }
 }
 
 function isLoggedIn(req, res, next){
     if (req.isAuthenticated()) {
-        res.status(200).json({ message: 'You are already logged in' });
+        return res.status(200).json({ message: 'You are already logged in' });
     }
-    next();
+    return next();
 }
 
 module.exports.validPassword = validPassword;

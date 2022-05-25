@@ -24,6 +24,7 @@ exports.match_list = function(req, res, next) {
         .populate({ path: 'hero_loser', select: 'name img -_id' })
         .populate({
             path: 'user_winner',
+            select: 'nick e_mail img _id',
             populate:
                 [
                     {
@@ -34,6 +35,7 @@ exports.match_list = function(req, res, next) {
         })
         .populate({
             path: 'user_loser',
+            select: 'nick e_mail img _id',
             populate:
                 [
                     {
@@ -54,6 +56,7 @@ exports.match_list = function(req, res, next) {
         })
         .populate({ path: 'meta', select: 'descriptor -_id' })
         .populate({ path: 'format', select: 'descriptor -_id' })
+        .populate({ path: 'created_by', select: '_id' })
         .exec(function (err, list_matches) {
             if (err) { return next(err); }
             // res.json(list_matches.sort(sortMatches));
@@ -94,28 +97,27 @@ exports.event_edit_match = [
     body('format', 'Format must not be empty.').isObject(),
     body('meta', 'Meta must not be empty.').isObject(),
     (req, res, next) => {
-        Match.findById(req.body._id).then((match) => {
-            match.date = req.body.date;
-            match.event= req.body.event.id;
-            match.round= req.body.round;
-            match.hero_winner= req.body.hero_winner.id;
-            match.hero_loser= req.body.hero_loser.id;
-            match.user_winner= req.body.user_winner.id;
-            match.user_loser= req.body.user_loser.id;
-            match.format= req.body.format.id;
-            match.meta= req.body.meta.id;
-            match.save(function (err, match) {
-                if (err) { return next(err); }
-                Match.populate(match, [
-                    { path: 'hero_winner', select: 'name img' },
-                    { path: 'hero_loser', select: 'name img -_id' },
-                    { path: 'user_winner', populate: [{ path: 'team', model: 'Team' }] },
-                    { path: 'user_loser', populate: [{ path: 'team', model: 'Team' }] },
-                    { path: 'event', populate: [{ path: 'to', model: 'TO'}] },
-                    { path: 'meta', select: 'descriptor -_id' },
-                    { path: 'format', select: 'descriptor -_id' }
-                ]).then((populatedMatch) => res.json(populatedMatch));
-            });
+        const match = res.locals.match;
+        match.date = req.body.date;
+        match.event= req.body.event.id;
+        match.round= req.body.round;
+        match.hero_winner= req.body.hero_winner.id;
+        match.hero_loser= req.body.hero_loser.id;
+        match.user_winner= req.body.user_winner.id;
+        match.user_loser= req.body.user_loser.id;
+        match.format= req.body.format.id;
+        match.meta= req.body.meta.id;
+        match.save(function (err, match) {
+            if (err) { return next(err); }
+            Match.populate(match, [
+                { path: 'hero_winner', select: 'name img' },
+                { path: 'hero_loser', select: 'name img -_id' },
+                { path: 'user_winner', populate: [{ path: 'team', model: 'Team' }] },
+                { path: 'user_loser', populate: [{ path: 'team', model: 'Team' }] },
+                { path: 'event', populate: [{ path: 'to', model: 'TO'}] },
+                { path: 'meta', select: 'descriptor -_id' },
+                { path: 'format', select: 'descriptor -_id' }
+            ]).then((populatedMatch) => res.json(populatedMatch));
         });
     }
 ]
@@ -140,6 +142,7 @@ exports.event_create_match = [
                 user_loser: req.body.user_loser.id,
                 format: req.body.format.id,
                 meta: req.body.meta.id,
+                created_by: req.user._id,
             });
         match.save(function (err, match) {
             if (err) { return next(err); }
@@ -155,3 +158,9 @@ exports.event_create_match = [
         });
     }
 ]
+
+exports.event_delete_match = function (req, res) {
+    Match.findByIdAndRemove(req.body._id).then(() => {
+        return res.status(200).json({message: "Match deleted!"});
+    });
+}
