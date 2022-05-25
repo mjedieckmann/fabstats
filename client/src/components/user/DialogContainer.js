@@ -24,7 +24,7 @@ export default function DialogContainer() {
         <>
             {currentUser !== null
                 ? <BasicMenu handleOpen={handleOpen}/>
-                : <Button variant="outlined" onClick={handleOpen}>Login</Button>
+                : <Button size={"small"} variant="outlined" onClick={handleOpen} sx={{whiteSpace: "nowrap", minWidth: "auto"}}>Login / Register</Button>
             }
             <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth={'sm'}>
                 {currentUser !== null

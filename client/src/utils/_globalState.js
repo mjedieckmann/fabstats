@@ -23,3 +23,5 @@ export const dirtyState = atom( {
     key: 'dirty',
     default: uuid()
 })
+
+export const ROUNDS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Quarterfinal', 'Semifinal', 'Final', 'N/A'];

@@ -7,7 +7,6 @@ export const SimpleAutocomplete = (props) =>{
             <Autocomplete
                 id={props.handle + "-input"}
                 options={props.options}
-                sx={{color:"red"}}
                 name={props.handle}
                 onChange={(event, newValue) => {
                     props.setForm({...props.form, [props.handle]: newValue});
@@ -16,7 +15,7 @@ export const SimpleAutocomplete = (props) =>{
                     return option.id === value.id;
                 }}
                 value={props.form[props.handle]}
-                renderInput={(params) => <TextField {...params} label={props.label} required/>}
+                renderInput={(params) => <TextField {...params} label={props.label} required={props.required}/>}
             />
         </>
     )

@@ -4,7 +4,9 @@ import TextField from "@mui/material/TextField";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, matchesState, pageState} from "./ScoreboardContainer";
 import {eventsState, heroesState, useSimpleDataFetch} from "../_pageUtils";
-import {dirtyState} from "../../../utils/_globalState";
+import {dirtyState, ROUNDS} from "../../../utils/_globalState";
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
 
 export const ScoreboardFilter = () =>{
     const [heroes, setHeroes] = useRecoilState(heroesState);
@@ -33,6 +35,7 @@ export const ScoreboardFilter = () =>{
     }, []);
 
     const [events, setEvents] = useRecoilState(eventsState);
+    const [ dirty, ] = useRecoilState(dirtyState);
     const [eventTypes, setEventTypes] = useState([]);
     const [tos, setTos] = useState([]);
     useEffect(() => {
@@ -58,18 +61,18 @@ export const ScoreboardFilter = () =>{
     const [matches,] = useRecoilState(matchesState);
     const [,setPage] = useRecoilState(pageState);
     const [filteredMatches,setFilteredMatches] = useRecoilState(filteredMatchesState);
-    const [filter, setFilter] = useState({hero: null, user: null, team: null, format: null, event: null, eventType: null, to: null, meta: null, round: null});
+    const NO_FILTER = {hero: null, user: null, team: null, format: null, event: null, eventType: null, to: null, meta: null, round: null, date_after: null, date_before: null};
+    const [filter, setFilter] = useState(NO_FILTER);
+    useEffect(() => {
+        setFilter(NO_FILTER);
+    }, [dirty])
 
-    const [rounds, setRounds] = useState([]);
     const [metas, setMetas] = useState([]);
     useEffect(() => {
-        let rounds = new Set();
         let metas = new Set();
         filteredMatches.map( match => {
-            rounds.add(match.round);
             metas.add(match.meta.descriptor);
         });
-        setRounds([...rounds]);
         setMetas([...metas]);
     }, [filteredMatches]);
 
@@ -96,42 +99,88 @@ export const ScoreboardFilter = () =>{
                 (filter.eventType === null || (row.event != null && row.event.event_type === filter.eventType)) &&
                 (filter.to === null || (row.event != null && row.event.to !== null && row.event.to.descriptor === filter.to)) &&
                 (filter.meta === null || row.meta.descriptor === filter.meta) &&
-                (filter.round === null || row.round === filter.round)
+                (filter.round === null || row.round === filter.round) &&
+                (filter.date_after === null || new Date(row.date).setHours(0,0,0,0) >= new Date(filter.date_after).setHours(0,0,0,0)) &&
+                (filter.date_before === null || new Date(row.date).setHours(0,0,0,0) <= new Date(filter.date_before).setHours(0,0,0,0))
             )))
     },[filter]);
 
     return(
             <Grid container spacing={2}>
                 <Grid item lg={6}>
-                <Autocomplete
-                    onChange={(event, newValue) => {
-                        setPage(0);
-                        setFilter({...filter, hero: newValue});
-                    }}
-                    size={"small"}
-                    disablePortal
-                    id="hero-filter"
-                    options={heroes}
-                    sx={{ width: 1 }}
-                    renderInput={(params) => <TextField {...params} label="Hero" />}
-                />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <DesktopDatePicker
+                            label="Match date (after)"
+                            value={filter.date_after}
+                            minDate={new Date('2017-01-01')}
+                            onChange={(newValue) => {
+                                setFilter({...filter, date_after: newValue});
+                            }}
+                            renderInput={(params) => <TextField size={"small"} {...params} />}
+                        />
+                    </LocalizationProvider>
                 </Grid>
                 <Grid item lg={6}>
-                <Autocomplete
-                    onChange={(event, newValue) => {
-                        setPage(0);
-                        setFilter({...filter, user: newValue});
-                    }}
-                    size={"small"}
-                    disablePortal
-                    id="user-filter"
-                    options={users}
-                    sx={{ width: 1 }}
-                    renderInput={(params) => <TextField {...params} label="User" />}
-                />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <DesktopDatePicker
+                            label="Match date (before)"
+                            value={filter.date_before}
+                            minDate={new Date('2017-01-01')}
+                            onChange={(newValue) => {
+                                setFilter({...filter, date_before: newValue});
+                            }}
+                            renderInput={(params) => <TextField size={"small"} {...params} />}
+                        />
+                    </LocalizationProvider>
                 </Grid>
                 <Grid item lg={6}>
                     <Autocomplete
+                        key={dirty}
+                        onChange={(event, newValue) => {
+                            setPage(0);
+                            setFilter({...filter, hero: newValue});
+                        }}
+                        size={"small"}
+                        disablePortal
+                        id="hero-filter"
+                        options={heroes}
+                        sx={{ width: 1 }}
+                        renderInput={(params) => <TextField {...params} label="Hero" />}
+                    />
+                </Grid>
+                <Grid item lg={6}>
+                    <Autocomplete
+                        key={dirty}
+                        onChange={(event, newValue) => {
+                            setPage(0);
+                            setFilter({...filter, meta: newValue});
+                        }}
+                        size={"small"}
+                        disablePortal
+                        id="meta-filter"
+                        options={metas}
+                        sx={{ width: 1 }}
+                        renderInput={(params) => <TextField {...params} label="Meta" />}
+                    />
+                </Grid>
+                <Grid item lg={6}>
+                    <Autocomplete
+                        key={dirty}
+                        onChange={(event, newValue) => {
+                            setPage(0);
+                            setFilter({...filter, user: newValue});
+                        }}
+                        size={"small"}
+                        disablePortal
+                        id="user-filter"
+                        options={users}
+                        sx={{ width: 1 }}
+                        renderInput={(params) => <TextField {...params} label="User" />}
+                    />
+                </Grid>
+                <Grid item lg={6}>
+                    <Autocomplete
+                        key={dirty}
                         onChange={(event, newValue) => {
                             setPage(0);
                             setFilter({...filter, team: newValue});
@@ -146,20 +195,7 @@ export const ScoreboardFilter = () =>{
                 </Grid>
                 <Grid item lg={6}>
                     <Autocomplete
-                        onChange={(event, newValue) => {
-                            setPage(0);
-                            setFilter({...filter, format: newValue});
-                        }}
-                        size={"small"}
-                        disablePortal
-                        id="format-filter"
-                        options={formats}
-                        sx={{ width: 1 }}
-                        renderInput={(params) => <TextField {...params} label="Format" />}
-                    />
-                </Grid>
-                <Grid item lg={6}>
-                    <Autocomplete
+                        key={dirty}
                         onChange={(event, newValue) => {
                             setPage(0);
                             setFilter({...filter, event: newValue !== null ? newValue.descriptor : null});
@@ -178,6 +214,7 @@ export const ScoreboardFilter = () =>{
                 </Grid>
                 <Grid item lg={6}>
                     <Autocomplete
+                        key={dirty}
                         onChange={(event, newValue) => {
                             setPage(0);
                             setFilter({...filter, eventType: newValue});
@@ -192,6 +229,37 @@ export const ScoreboardFilter = () =>{
                 </Grid>
                 <Grid item lg={6}>
                     <Autocomplete
+                        key={dirty}
+                        onChange={(event, newValue) => {
+                            setPage(0);
+                            setFilter({...filter, round: newValue});
+                        }}
+                        size={"small"}
+                        disablePortal
+                        id="round-filter"
+                        options={ROUNDS}
+                        sx={{ width: 1 }}
+                        renderInput={(params) => <TextField {...params} label="Round" />}
+                    />
+                </Grid>
+                <Grid item lg={6}>
+                    <Autocomplete
+                        key={dirty}
+                        onChange={(event, newValue) => {
+                            setPage(0);
+                            setFilter({...filter, format: newValue});
+                        }}
+                        size={"small"}
+                        disablePortal
+                        id="format-filter"
+                        options={formats}
+                        sx={{ width: 1 }}
+                        renderInput={(params) => <TextField {...params} label="Format" />}
+                    />
+                </Grid>
+                <Grid item lg={6}>
+                    <Autocomplete
+                        key={dirty}
                         onChange={(event, newValue) => {
                             setPage(0);
                             setFilter({...filter, to: newValue});
@@ -202,34 +270,6 @@ export const ScoreboardFilter = () =>{
                         options={tos}
                         sx={{ width: 1 }}
                         renderInput={(params) => <TextField {...params} label="TO" />}
-                    />
-                </Grid>
-                <Grid item lg={6}>
-                    <Autocomplete
-                        onChange={(event, newValue) => {
-                            setPage(0);
-                            setFilter({...filter, meta: newValue});
-                        }}
-                        size={"small"}
-                        disablePortal
-                        id="meta-filter"
-                        options={metas}
-                        sx={{ width: 1 }}
-                        renderInput={(params) => <TextField {...params} label="Meta" />}
-                    />
-                </Grid>
-                <Grid item lg={6}>
-                    <Autocomplete
-                        onChange={(event, newValue) => {
-                            setPage(0);
-                            setFilter({...filter, round: newValue});
-                        }}
-                        size={"small"}
-                        disablePortal
-                        id="round-filter"
-                        options={rounds}
-                        sx={{ width: 1 }}
-                        renderInput={(params) => <TextField {...params} label="Round" />}
                     />
                 </Grid>
             </Grid>

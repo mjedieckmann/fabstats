@@ -21,7 +21,7 @@ export default function Navbar() {
                     <NavbarIcon/>
                     <Grid container={true} justifyContent={"center"} columnGap={2}>
                         {nav_buttons.map( (button) => (
-                            <ToggleButton selected={button.name === currentPage} key={button.name} value={button.name} href={button.url}>{button.name}</ToggleButton>
+                            <ToggleButton selected={button.name === currentPage} key={button.name} value={button.name} href={button.url} size={"small"}>{button.name}</ToggleButton>
                         ))}
                     </Grid>
                     <DialogContainer/>

@@ -117,6 +117,7 @@ export default function ProfileDialog() {
             .then(res => {
                 setDirty(uuid());
                 console.log(res);
+                setOpen(false);
             });
     }
 

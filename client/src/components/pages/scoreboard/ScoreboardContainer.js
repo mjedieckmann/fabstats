@@ -52,10 +52,11 @@ export default function ScoreboardContainer(){
 
     return (
             <Grid container spacing={2}>
+                <Grid item xs={1}/>
                 <Grid item xs={3} >
                     <ScoreboardFilter/>
                 </Grid>
-                <Grid item xs={8}>
+                <Grid item xs={7}>
                     <Scoreboard/>
                     <Box
                         display="flex"
@@ -66,6 +67,7 @@ export default function ScoreboardContainer(){
                         <MatchDialog submitMode={'create'}/>
                     </Box>
                 </Grid>
+                <Grid item xs={1}/>
             </Grid>
     )
 }

@@ -54,11 +54,11 @@ export const nav_buttons = [
         name: 'Scoreboard',
         icon: <ScoreboardIcon/>
     },
-    {
+    /*{
         url: '/heroes',
         name: 'Heroes',
         icon: <ElderlyIcon/>
-    },
+    },*/
 ]
 
 export const eventsState = atom({

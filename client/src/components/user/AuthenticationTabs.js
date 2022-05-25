@@ -3,8 +3,8 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import PersonPinIcon from '@mui/icons-material/PersonPin';
+import LoginIcon from '@mui/icons-material/Login';
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import {useState} from "react";
 import LoginDialog from "./LoginDialog";
 import RegisterDialog from "./RegisterDialog";
@@ -21,8 +21,8 @@ export default function AuthenticationTabs() {
             <TabContext value={tab}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <TabList onChange={handleTabChange} aria-label="lab API tabs example" centered>
-                        <Tab icon={<FavoriteIcon/>} label="Item Two" value="1" />
-                        <Tab icon={<PersonPinIcon/>} label="Item Three" value="2" />
+                        <Tab icon={<LoginIcon/>} label="Login" value="1" />
+                        <Tab icon={<AppRegistrationIcon/>} label="Register" value="2" />
                     </TabList>
                 </Box>
                 <TabPanel value="1">

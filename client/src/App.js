@@ -1,8 +1,6 @@
 import {Helmet, HelmetProvider} from "react-helmet-async";
-import {Routes, Route} from "react-router-dom";
-import {Container, Grid} from "@mui/material";
+import {Routes, Route, Navigate} from "react-router-dom";
 
-// import './App.css';
 import Navbar from "./components/navbar/Navbar";
 import {pages} from "./components/pages/_pageUtils";
 import Stack from "@mui/material/Stack";
@@ -35,14 +33,12 @@ function App() {
             <Stack spacing={2}>
                 <Navbar currentUser={currentUser}/>
                 <Routes>
+                    <Route path="/" element={ <Navigate to="/scoreboard" /> } />
                     {pages.map((page) => (
                         <Route key={page.name} path={page.url} element={page.element}/>
                     ))}
                 </Routes>
             </Stack>
-            {/* Body */}
-           {/*<Grid container spacing={2}>*/}
-           {/*</Grid>*/}
         </div>
   );
 }

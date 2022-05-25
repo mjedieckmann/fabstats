@@ -1,6 +1,6 @@
 import Dialog from '@mui/material/Dialog';
 import AddIcon from "@mui/icons-material/Add";
-import {Fab, IconButton} from "@mui/material";
+import {Fab, Grid, IconButton} from "@mui/material";
 import {useEffect, useState} from "react";
 import Box from "@mui/material/Box";
 import RegisterDialog from "../../user/RegisterDialog";
@@ -20,13 +20,13 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import EventAutocomplete from "./EventAutocomplete";
 import axios from "axios";
 import {SimpleAutocomplete} from "./SimpleAutocomplete";
-import {matchesState} from "./ScoreboardContainer";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import uuid from "react-uuid";
-import {dirtyState} from "../../../utils/_globalState";
+import {dirtyState, ROUNDS} from "../../../utils/_globalState";
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import {capitalizeFirstLetter} from "../../../utils/_globalUtils";
 
-const ROUNDS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Quarterfinal', 'Semifinal', 'Final', 'N/A'];
 const EMPTY_FORM = {
     _id : null,
     date: new Date(),
@@ -118,28 +118,18 @@ export default function MatchDialog(props) {
         setOpen(false);
     };
 
-    const [ matches, setMatches ] = useRecoilState(matchesState);
-
     const handleSubmit = (e) => {
         e.preventDefault();
         axios.post("/api/match/" + props.submitMode, form)
             .then(res => {
                 console.log(res);
                 setDirty(uuid());
+                handleClose();
             })
             .catch((err) => {
                 //TODO: Better error handling, especially with axios, which seems to dislike me.
                 console.log(err);
             });
-    }
-
-    const handleDelete = () => {
-        axios.post("/api/match/delete", form)
-            .then((res) => {
-                console.log('deleted', res);
-                setDirty(new uuid());
-            })
-            .catch(err => console.log(err));
     }
 
     return (
@@ -159,54 +149,74 @@ export default function MatchDialog(props) {
                         <DialogTitle>
                             Match
                             {props.submitMode === 'edit'
-                                ? <IconButton aria-label="edit" onClick={handleDelete}><DeleteIcon/></IconButton>
+                                ? <DeleteConfirmationDialog form={form}/>
                                 : ""
                             }
                         </DialogTitle>
                         <DialogContent>
                             <DialogContentText>
-                                Create / edit match:
+                                {capitalizeFirstLetter(props.submitMode)} match:
                             </DialogContentText>
                             <Box sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
-                                {/*Date*/}
-                                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <DesktopDatePicker
-                                        label="Date"
-                                        value={form.date}
-                                        minDate={new Date('2017-01-01')}
-                                        onChange={(newValue) => {
-                                            console.log(newValue)
-                                            setForm({...form, date: newValue});
-                                        }}
-                                        renderInput={(params) => <TextField {...params} error={false} required />}
-                                    />
-                                </LocalizationProvider>
-                                {/*Free-solo with dialog*/}
-                                <EventAutocomplete setForm={setForm} form={form}/>
-                                {/*Select only*/}
-                                <Autocomplete
-                                    id={"round-input"}
-                                    options={ROUNDS}
-                                    sx={{color:"red"}}
-                                    name={"round"}
-                                    onChange={(event, newValue) => {
-                                        setForm({...form, round : newValue});
-                                    }}
-                                    value={form.round}
-                                    renderInput={(params) => <TextField {...params} label={"Round"} required/>}
-                                />
-                                <SimpleAutocomplete handle="hero_winner" options={heroes} label="Hero (winner)" form={form} setForm={setForm}/>
-                                <SimpleAutocomplete handle="hero_loser" options={heroes} label="Hero (loser)" form={form} setForm={setForm}/>
-                                <SimpleAutocomplete handle="user_winner" options={users} label="Player (winner)" form={form} setForm={setForm}/>
-                                <SimpleAutocomplete handle="user_loser" options={users} label="Player (loser)" form={form} setForm={setForm}/>
-                                <SimpleAutocomplete handle="format" options={formats} label="Format" form={form} setForm={setForm}/>
-                                <SimpleAutocomplete handle="meta" options={metas} label="Meta" form={form} setForm={setForm}/>
-                                {/*(Notes)*/}
+                                <Grid container>
+                                    {/*Free-solo with dialog*/}
+                                    <Grid item lg={6}>
+                                        <EventAutocomplete setForm={setForm} form={form}/>
+                                    </Grid>
+                                    {/*Select only*/}
+                                    <Grid item lg={6}>
+                                        <Autocomplete
+                                            id={"round-input"}
+                                            options={ROUNDS}
+                                            sx={{color:"red"}}
+                                            name={"round"}
+                                            onChange={(event, newValue) => {
+                                                setForm({...form, round : newValue});
+                                            }}
+                                            value={form.round}
+                                            renderInput={(params) => <TextField {...params} label={"Round"} required/>}
+                                        />
+                                    </Grid>
+                                    <Grid item lg={6}>
+                                        <SimpleAutocomplete handle="hero_winner" options={heroes} label="Hero (winner)" form={form} setForm={setForm} required={true}/>
+                                    </Grid>
+                                    <Grid item lg={6}>
+                                        <SimpleAutocomplete handle="hero_loser" options={heroes} label="Hero (loser)" form={form} setForm={setForm} required={true}/>
+                                    </Grid>
+                                    <Grid item lg={6}>
+                                        <SimpleAutocomplete handle="user_winner" options={users} label="Player (winner)" form={form} setForm={setForm} required={false}/>
+                                    </Grid>
+                                    <Grid item lg={6}>
+                                        <SimpleAutocomplete handle="user_loser" options={users} label="Player (loser)" form={form} setForm={setForm} required={false}/>
+                                    </Grid>
+                                    <Grid item lg={6}>
+                                        <SimpleAutocomplete handle="format" options={formats} label="Format" form={form} setForm={setForm} required={true}/>
+                                    </Grid>
+                                    <Grid item lg={6}>
+                                        <SimpleAutocomplete handle="meta" options={metas} label="Meta" form={form} setForm={setForm} required={true}/>
+                                    </Grid>
+                                    {/*Date*/}
+                                    <Grid item lg={6}>
+                                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                            <DesktopDatePicker
+                                                label="Date"
+                                                value={form.date}
+                                                minDate={new Date('2017-01-01')}
+                                                onChange={(newValue) => {
+                                                    console.log(newValue)
+                                                    setForm({...form, date: newValue});
+                                                }}
+                                                renderInput={(params) => <TextField {...params} error={false} required />}
+                                            />
+                                        </LocalizationProvider>
+                                    </Grid>
+                                    {/*(Notes)*/}
+                                </Grid>
                             </Box>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={() => setOpen(false)}>Cancel</Button>
-                            <Button color={"success"} type={"submit"}>Create</Button>
+                            <Button color={"success"} type={"submit"}>{props.submitMode}</Button>
                         </DialogActions>
                     </Box>
                 </Box>
