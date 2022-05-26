@@ -24,11 +24,9 @@ export default function BasicMenu (props) {
     }
 
     const handleLogout = () => {
-        console.log('logging out');
         axios.get("/users/logout")
             .then(res => {
                 setDirty(uuid());
-                console.log(res);
                 handleMenuClose();
             });
     }

@@ -41,7 +41,6 @@ export default function ScoreboardContainer(){
             .then(response => response.json())
             .then(data => {
                 setMatches(data);
-                console.log(data);
             });
     }, [dirty]);
 

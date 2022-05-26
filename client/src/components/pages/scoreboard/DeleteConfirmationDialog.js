@@ -27,7 +27,6 @@ export default function DeleteConfirmationDialog(props) {
     const handleDelete = () => {
         axios.post("/api/match/delete", props.form)
             .then((res) => {
-                console.log('deleted', res);
                 setDirty(new uuid());
                 handleDeleteDialogClose();
             })

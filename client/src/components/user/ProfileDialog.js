@@ -103,20 +103,17 @@ export default function ProfileDialog() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('we submit and save the user profile');
         if (form.file !== null && typeof form.file !== 'string' && !(form.file instanceof String)){
             const data = new FormData()
             data.append('file', form.file);
             axios.post("/users/upload", data, {})
                 .then(res => {
                     setDirty(uuid());
-                    console.log(res);
                 });
         }
         axios.post("/users/edit", form, {})
             .then(res => {
                 setDirty(uuid());
-                console.log(res);
                 setOpen(false);
             });
     }

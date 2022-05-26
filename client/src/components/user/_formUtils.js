@@ -146,7 +146,6 @@ export const useLoginForm = (form_state, error_state) => {
 
     const loginUser = () => {
         validateForm().then(() => {
-            console.log('no problem, continue LOGIN');
             axios.post("/users/login", form)
                 .then((res) => {
                     setCurrentUser(res.data.user);
@@ -205,14 +204,12 @@ export const useRegisterForm = (form_state, error_state) => {
 
     const registerUser = () => {
         validateForm().then(() => {
-                console.log('no problem, continue REGISTER');
                 axios.post("/users/register", form)
                     .then((res) => {
                         setCurrentUser(res.data.user);
                         setOpen(false);
                     });
-            }, () =>
-                console.log('REGISTER validation errors')
+            }, () => console.log('REGISTER validation errors')
         );
     }
 

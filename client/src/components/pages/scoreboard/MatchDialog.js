@@ -122,7 +122,6 @@ export default function MatchDialog(props) {
         e.preventDefault();
         axios.post("/api/match/" + props.submitMode, form)
             .then(res => {
-                console.log(res);
                 setDirty(uuid());
                 handleClose();
             })
@@ -203,7 +202,6 @@ export default function MatchDialog(props) {
                                                 value={form.date}
                                                 minDate={new Date('2017-01-01')}
                                                 onChange={(newValue) => {
-                                                    console.log(newValue)
                                                     setForm({...form, date: newValue});
                                                 }}
                                                 renderInput={(params) => <TextField {...params} error={false} required />}

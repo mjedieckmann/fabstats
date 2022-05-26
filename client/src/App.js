@@ -16,7 +16,6 @@ function App() {
         axios.get('/users/current')
             .then(res => {
                 setCurrentUser(res.data.user);
-                console.log(res);
             })
             .catch(err => console.log(err));
     }, [dirty])
