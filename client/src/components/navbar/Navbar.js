@@ -10,6 +10,7 @@ import {nav_buttons} from "../pages/_pageUtils";
 import {currentPageState, currentUserState} from "../../utils/_globalState";
 import ProfileDialog from "../user/ProfileDialog";
 import DialogContainer from "../user/DialogContainer";
+import Stack from "@mui/material/Stack";
 
 export default function Navbar() {
     const [currentPage, ] = useRecoilState(currentPageState);
@@ -18,13 +19,24 @@ export default function Navbar() {
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static" color={"transparent"}>
                 <Toolbar>
-                    <NavbarIcon/>
-                    <Grid container={true} justifyContent={"center"} columnGap={2}>
-                        {nav_buttons.map( (button) => (
-                            <ToggleButton selected={button.name === currentPage} key={button.name} value={button.name} href={button.url} size={"small"}>{button.name}</ToggleButton>
-                        ))}
+                    <Grid container alignItems={"center"}>
+                        <Grid item xs={3} textAlign={"center"}>
+                            <NavbarIcon/>
+
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Stack spacing={2} direction={"row"} justifyContent={"center"}>
+                                {nav_buttons.map( (button) => (
+                                    <ToggleButton selected={button.name === currentPage} key={button.name} value={button.name} href={button.url} size={"small"}>{button.name}</ToggleButton>
+                                ))}
+                            </Stack>
+                        </Grid>
+                        <Grid item xs={3} textAlign={"center"}>
+                            <DialogContainer/>
+
+                        </Grid>
                     </Grid>
-                    <DialogContainer/>
+
                 </Toolbar>
             </AppBar>
         </Box>
