@@ -34,8 +34,7 @@ app.use('/public/images', express.static('public/images'));
 const MongoStore = require('connect-mongo');
 //Set up mongoose connection
 const mongoose = require('mongoose');
-const mongoDB = process.env.DB_STRING;
-// const mongoDB = "mongodb://localhost:27017";
+const mongoDB = process.env.DB_STRING || "mongodb://localhost:27017";
 mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true}, () => {
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, 'MongoDB connection error:'));
@@ -68,15 +67,15 @@ mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true}, (
     app.use(passport.initialize());
     app.use(passport.session());
 
+    app.use('/', express.static(path.join(__dirname,"client/build")));
+
     /**
      * -------------- ROUTES ----------------
      */
-    const indexRouter = require('./routes/index');
     const usersRouter = require('./routes/user_routes');
     const catalogRouter = require('./routes/catalog')
     const apiRouter = require('./routes/api');
 
-    app.use('/', indexRouter);
     app.use('/users', usersRouter);
     app.use('/catalog', catalogRouter);
     app.use('/api', apiRouter);

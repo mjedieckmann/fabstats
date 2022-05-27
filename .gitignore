@@ -1,1 +1,8 @@
+# libs
 /node_modules/
+
+# local environment
+.env
+
+# user uploaded images
+/public/images/avatars
