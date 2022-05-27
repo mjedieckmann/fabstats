@@ -14,7 +14,7 @@ export default function Navbar() {
     const [currentPage, ] = useRecoilState(currentPageState);
 
     return (
-        <Box sx={{ flexGrow: 1 }}>
+        <Box>
             <AppBar position="static" color={"transparent"}>
                 <Toolbar>
                     <Grid container alignItems={"center"}>

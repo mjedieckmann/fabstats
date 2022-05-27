@@ -25,3 +25,8 @@ export const dirtyState = atom( {
 })
 
 export const ROUNDS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Quarterfinal', 'Semifinal', 'Final', 'N/A'];
+
+export const contactDialogState = atom({
+    key: 'contactDialogOpen',
+    default: false
+})
