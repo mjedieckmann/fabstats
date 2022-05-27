@@ -10,13 +10,10 @@ import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import Box from "@mui/material/Box";
-import {FormFields} from "./FormFields";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import {dialogOpenState} from "./_formUtils";
-import CollapsiblePasswordFields from "./CollapsiblePasswordFields";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Collapse from "@mui/material/Collapse";
@@ -57,7 +54,7 @@ export default function ProfileDialog() {
         axios.get('/users/teams')
             .then(res => {
                 let teams = new Set();
-                res.data.map(team => {
+                res.data.forEach(team => {
                     teams.add({label: team.nick, id: team._id});
                 })
                 setTeams([...teams]);

@@ -1,10 +1,5 @@
 const Event = require('../models/event');
 const {body, validationResult} = require("express-validator");
-const Book = require("../models/book");
-const async = require("async");
-const Author = require("../models/author");
-const Genre = require("../models/genre");
-const TO = require("../models/to");
 // Display list of all events.
 exports.event_list = function(req, res, next) {
     Event.find()

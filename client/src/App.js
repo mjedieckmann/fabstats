@@ -18,7 +18,7 @@ function App() {
                 setCurrentUser(res.data.user);
             })
             .catch(err => console.log(err));
-    }, [dirty])
+    }, [dirty, setCurrentUser])
 
     return (
         <div className="App">

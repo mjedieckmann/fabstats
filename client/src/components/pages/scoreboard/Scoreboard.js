@@ -1,4 +1,3 @@
-import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -9,7 +8,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import {Fab, TableFooter, TablePagination, useTheme} from "@mui/material";
+import {TableFooter, TablePagination, useTheme} from "@mui/material";
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
@@ -17,7 +16,7 @@ import LastPageIcon from '@mui/icons-material/LastPage';
 import {Row} from "./Row";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, pageState} from "./ScoreboardContainer";
-import AddIcon from "@mui/icons-material/Add";
+import {useState} from "react";
 
 function TablePaginationActions(props) {
     const theme = useTheme();
@@ -81,7 +80,7 @@ TablePaginationActions.propTypes = {
 };
 
 export default function Scoreboard() {
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [page, setPage] = useRecoilState(pageState);
     const [filteredMatches,] = useRecoilState(filteredMatchesState);
 

@@ -8,7 +8,6 @@ const meta_controller = require('../controllers/metaController');
 const to_controller = require('../controllers/toController');
 const hero_controller = require('../controllers/heroController');
 const match_controller = require('../controllers/matchController');
-const book_controller = require("../controllers/bookController");
 const {isAuth} = require("../utils/password_utils");
 const {isMatchCreator} = require("../controllers/userController");
 

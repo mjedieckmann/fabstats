@@ -3,16 +3,12 @@ import AddIcon from "@mui/icons-material/Add";
 import {Fab, Grid, IconButton} from "@mui/material";
 import {useEffect, useState} from "react";
 import Box from "@mui/material/Box";
-import RegisterDialog from "../../user/RegisterDialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import {FormFields} from "../../user/FormFields";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import {useForm} from "../../user/_formUtils";
 import {useRecoilState} from "recoil";
-import {eventsState, heroesState} from "../_pageUtils";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
@@ -21,7 +17,6 @@ import EventAutocomplete from "./EventAutocomplete";
 import axios from "axios";
 import {SimpleAutocomplete} from "./SimpleAutocomplete";
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import uuid from "react-uuid";
 import {dirtyState, ROUNDS} from "../../../utils/_globalState";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
@@ -43,14 +38,14 @@ const EMPTY_FORM = {
 export default function MatchDialog(props) {
     const [ open, setOpen ] = useState(false);
     const [ form, setForm ] = useState(EMPTY_FORM);
-    const [ formError, setFormError ] = useState(EMPTY_FORM);
+    // const [ formError, setFormError ] = useState(EMPTY_FORM);
     const [ heroes, setHeroes ] = useState([]);
     const [ ,setDirty] = useRecoilState(dirtyState);
     useEffect(() =>{
         axios.get('/api/heroes')
             .then(res => {
                 let heroes = new Set();
-                res.data.map(hero => {
+                res.data.forEach(hero => {
                     heroes.add({label: hero.name, id: hero._id});
                 })
                 setHeroes([...heroes]);
@@ -61,7 +56,7 @@ export default function MatchDialog(props) {
         axios.get('/users')
             .then(res => {
                 let users = new Set();
-                res.data.map(user => {
+                res.data.forEach(user => {
                     users.add({label: user.nick, id: user._id});
                 })
                 setUsers([...users]);
@@ -72,7 +67,7 @@ export default function MatchDialog(props) {
         axios.get('/api/formats')
             .then(res => {
                 let formats = new Set();
-                res.data.map(format => {
+                res.data.forEach(format => {
                     formats.add({label: format.descriptor, id: format._id});
                 })
                 setFormats([...formats]);
@@ -83,7 +78,7 @@ export default function MatchDialog(props) {
         axios.get('/api/metas')
             .then(res => {
                 let metas = new Set();
-                res.data.map(meta => {
+                res.data.forEach(meta => {
                     metas.add({label: meta.descriptor, id: meta._id});
                 })
                 setMetas([...metas]);

@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
 import Switch from '@mui/material/Switch';
-import Paper from '@mui/material/Paper';
 import Collapse from '@mui/material/Collapse';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import {useEffect, useState} from "react";

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -7,8 +6,7 @@ import {Grid, ToggleButton} from "@mui/material";
 import NavbarIcon from "./NavbarIcon";
 import {useRecoilState} from "recoil";
 import {nav_buttons} from "../pages/_pageUtils";
-import {currentPageState, currentUserState} from "../../utils/_globalState";
-import ProfileDialog from "../user/ProfileDialog";
+import {currentPageState} from "../../utils/_globalState";
 import DialogContainer from "../user/DialogContainer";
 import Stack from "@mui/material/Stack";
 
@@ -33,10 +31,8 @@ export default function Navbar() {
                         </Grid>
                         <Grid item xs={3} textAlign={"center"}>
                             <DialogContainer/>
-
                         </Grid>
                     </Grid>
-
                 </Toolbar>
             </AppBar>
         </Box>

@@ -5,7 +5,6 @@ import { Link as RouterLink, BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import reportWebVitals from './reportWebVitals';
 
-import './index.css';
 import App from './App';
 import {RecoilRoot} from "recoil";
 

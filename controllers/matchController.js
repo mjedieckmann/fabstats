@@ -1,7 +1,5 @@
 const Match = require("../models/match");
 const {body} = require("express-validator");
-const Event = require("../models/event");
-const Author = require("../models/author");
 
 function sortMatches(a, b) {
     if (a.date < b.date) {return -1;}

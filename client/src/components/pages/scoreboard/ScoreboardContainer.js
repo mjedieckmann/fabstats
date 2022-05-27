@@ -1,11 +1,9 @@
-import {Fab, Grid} from "@mui/material";
+import {Grid} from "@mui/material";
 import {dirtyState, useCurrentPage} from "../../../utils/_globalState";
 import Scoreboard from "./Scoreboard";
 import {ScoreboardFilter} from "./ScoreboardFilter";
 import {useEffect} from "react";
 import {atom, useRecoilState} from "recoil";
-import Paper from "@mui/material/Paper";
-import {styled} from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MatchDialog from "./MatchDialog";
 
@@ -24,14 +22,6 @@ export const pageState = atom({
     default: 0,
 });
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-}));
-
 export default function ScoreboardContainer(){
     useCurrentPage('Scoreboard');
     const [ matches, setMatches ] = useRecoilState(matchesState);
@@ -42,12 +32,12 @@ export default function ScoreboardContainer(){
             .then(data => {
                 setMatches(data);
             });
-    }, [dirty]);
+    }, [dirty, setMatches]);
 
     const [, setFilteredMatches] = useRecoilState(filteredMatchesState);
     useEffect(() => {
         setFilteredMatches(matches);
-    }, [matches]);
+    }, [matches, setFilteredMatches]);
 
     return (
             <Grid container spacing={2}>

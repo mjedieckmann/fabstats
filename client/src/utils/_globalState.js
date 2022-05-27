@@ -11,7 +11,7 @@ export function useCurrentPage(page){
     const [, setCurrentPage] = useRecoilState(currentPageState);
     useEffect(() => {
         setCurrentPage(page);
-    }, []);
+    }, [page, setCurrentPage]);
 }
 
 export const currentUserState = atom( {

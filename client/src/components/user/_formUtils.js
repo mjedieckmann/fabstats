@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import {atom, useRecoilState} from "recoil";
 import {currentUserState} from "../../utils/_globalState";
-import {handlePostResponse} from "../../utils/_globalUtils";
 import axios from "axios";
 
 export const dialogOpenState = atom({
@@ -100,14 +99,14 @@ const useAuthenticationForm = (form_state, error_state) => {
             ...prevState,
             username: null
         }));
-    }, [form.username])
+    }, [form.username, setFormError])
 
     useEffect(() =>{
         setFormError(prevState => ({
             ...prevState,
             e_mail: null
         }));
-    }, [form.e_mail])
+    }, [form.e_mail, setFormError])
 
     const [, setOpen] = useRecoilState(dialogOpenState);
     const [, setCurrentUser] = useRecoilState(currentUserState);
@@ -193,14 +192,14 @@ export const useRegisterForm = (form_state, error_state) => {
             ...prevState,
             e_mail: null
         }));
-    }, [form.e_mail])
+    }, [form.e_mail, setFormError])
 
     useEffect(() =>{
         setFormError(prevState => ({
             ...prevState,
             password: null
         }));
-    }, [form.password])
+    }, [form.password, setFormError])
 
     const registerUser = () => {
         validateForm().then(() => {

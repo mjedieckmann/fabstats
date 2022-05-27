@@ -73,11 +73,9 @@ mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true}, (
      * -------------- ROUTES ----------------
      */
     const usersRouter = require('./routes/user_routes');
-    const catalogRouter = require('./routes/catalog')
     const apiRouter = require('./routes/api');
 
     app.use('/users', usersRouter);
-    app.use('/catalog', catalogRouter);
     app.use('/api', apiRouter);
 
     /**
@@ -97,8 +95,7 @@ mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true}, (
         res.locals.error = req.app.get('env') === 'development' ? err : {};
 
         // render the error page
-        res.status(err.status || 500);
-        res.render('error');
+        return res.status(err.status || 500).json({message: err});
     });
 
 });

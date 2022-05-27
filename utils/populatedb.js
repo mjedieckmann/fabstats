@@ -1,13 +1,9 @@
 #! /usr/bin/env node
 
-console.log('This script populates some test books, authors, genres and bookinstances to your database. Specified database as argument - e.g.: populatedb mongodb+srv://cooluser:coolpassword@cluster0.a9azn.mongodb.net/local_library?retryWrites=true');
+console.log('This script populates some test data to the database.');
 
 // Get arguments passed on command line
 let userArgs = process.argv.slice(2);
-if (!userArgs[0].startsWith('mongodb')) {
-    console.log('ERROR: You need to specify a valid mongodb URL as the first argument');
-    return
-}
 
 let async = require("async");
 
@@ -21,11 +17,12 @@ const Hero = require('../models/hero');
 const Match = require('../models/match');
 
 const mongoose = require('mongoose');
-const mongoDB = userArgs[0];
-mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
-mongoose.Promise = global.Promise;
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+const mongoDB = userArgs[0] || "mongodb://localhost:27017";
+mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, () => {
+    mongoose.Promise = global.Promise;
+    const db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+});
 
 let formats = []
 let tos = []
@@ -335,8 +332,8 @@ function between(min, max) {
 
 function createMatches(cb){
     let tasks = [];
-    for (let i=0; i <= 200; i++){
-        tasks.push( (callback) => matchCreate(heroes[between(0, 9)],heroes[between(0, 9)], users[0], users[1], events[between(0, 12)], rounds[between(0, 13)], null, formats[between(0, 5)], metas[between(0, 1)], new Date(), users[between(0, 1)], callback))
+    for (let i=0; i <= 20; i++){
+        tasks.push( (callback) => matchCreate(heroes[between(0, 9)],heroes[between(0, 9)], null, null, events[between(0, 12)], rounds[between(0, 13)], null, formats[between(0, 5)], metas[between(0, 1)], new Date(), users[between(0, 1)], callback))
     }
     async.series(tasks, cb)
 }

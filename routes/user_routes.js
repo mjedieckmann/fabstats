@@ -8,7 +8,6 @@ const isLoggedIn = require("../utils/password_utils").isLoggedIn
 
 /// USERS ROUTES ///
 router.get('/', user_controller.user_list);
-// router.get('/:id', user_controller.user_detail);
 
 router.get('/current', team_controller.current_team, user_controller.user_current);
 /// TEAM ROUTES ///

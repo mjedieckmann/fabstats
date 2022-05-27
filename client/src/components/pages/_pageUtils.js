@@ -1,14 +1,11 @@
 import About from "./about/About";
 import Heroes from "./heroes/Heroes";
-import Login from "../user/login";
 import ScoreboardIcon from "@mui/icons-material/Scoreboard";
 import InfoIcon from "@mui/icons-material/Info";
-import ElderlyIcon from "@mui/icons-material/Elderly";
-import Protected from "../user/protected";
-import Logout from "../user/logout";
 import ScoreboardContainer from "./scoreboard/ScoreboardContainer";
 import {atom} from "recoil";
 import {useEffect} from "react";
+import axios from "axios";
 
 export const pages = [
     {
@@ -26,21 +23,6 @@ export const pages = [
         name: 'Heroes',
         element: <Heroes/>,
     },
-    {
-        url: '/users/login',
-        name: 'Login',
-        element: <Login/>,
-    },
-    {
-        url: '/protected',
-        name: 'Protected',
-        element: <Protected/>,
-    },
-    {
-        url: '/logout',
-        name: 'Logout',
-        element: <Logout/>,
-    }
 ]
 
 export const nav_buttons = [
@@ -73,14 +55,14 @@ export const heroesState = atom({
 
 export const useSimpleDataFetch = (setState, url, key) => {
     useEffect(() => {
-        fetch(url)
-            .then(res => res.json())
+        axios.get(url)
             .then(res => {
                 let fetched_data = new Set();
-                res.map((data) => {
+                res.data.forEach((data) => {
                     fetched_data.add(data[key]);
                 })
                 setState([...fetched_data]);
             })
-    }, []);
+            .catch(err => console.log(err));
+    },[setState, url, key]);
 }

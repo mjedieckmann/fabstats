@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Autocomplete, Container, Grid} from "@mui/material";
+import {Autocomplete, Grid} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, matchesState, pageState} from "./ScoreboardContainer";
@@ -7,6 +7,8 @@ import {eventsState, heroesState, useSimpleDataFetch} from "../_pageUtils";
 import {dirtyState, ROUNDS} from "../../../utils/_globalState";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
+
+const NO_FILTER = {hero: null, user: null, team: null, format: null, event: null, eventType: null, to: null, meta: null, round: null, date_after: null, date_before: null};
 
 export const ScoreboardFilter = () =>{
     const [heroes, setHeroes] = useRecoilState(heroesState);
@@ -23,7 +25,7 @@ export const ScoreboardFilter = () =>{
             .then(res => {
                 let users = new Set();
                 let teams = new Set();
-                res.map((user) => {
+                res.forEach((user) => {
                     users.add(user.nick);
                     if (user.team != null) {
                         teams.add(user.team.nick)
@@ -45,7 +47,7 @@ export const ScoreboardFilter = () =>{
                 let events = new Set();
                 let eventTypes = new Set();
                 let tos = new Set();
-                res.map((event) => {
+                res.forEach((event) => {
                     events.add(event);
                     eventTypes.add(event.event_type);
                     if (event.to != null) {
@@ -56,12 +58,11 @@ export const ScoreboardFilter = () =>{
                 setEventTypes([...eventTypes]);
                 setTos([...tos]);
             })
-    }, []);
+    }, [setEvents]);
 
     const [matches,] = useRecoilState(matchesState);
     const [,setPage] = useRecoilState(pageState);
     const [filteredMatches,setFilteredMatches] = useRecoilState(filteredMatchesState);
-    const NO_FILTER = {hero: null, user: null, team: null, format: null, event: null, eventType: null, to: null, meta: null, round: null, date_after: null, date_before: null};
     const [filter, setFilter] = useState(NO_FILTER);
     useEffect(() => {
         setFilter(NO_FILTER);
@@ -70,7 +71,7 @@ export const ScoreboardFilter = () =>{
     const [metas, setMetas] = useState([]);
     useEffect(() => {
         let metas = new Set();
-        filteredMatches.map( match => {
+        filteredMatches.forEach( match => {
             metas.add(match.meta.descriptor);
         });
         setMetas([...metas]);
@@ -80,7 +81,7 @@ export const ScoreboardFilter = () =>{
         setFilteredMatches(
             matches.filter((row) =>(
                 (filter.hero === null || filter.hero === row.hero_winner.name || filter.hero === row.hero_loser.name) &&
-                (filter.user === null || filter.user === row.user_winner.nick || filter.user === row.user_loser.nick) &&
+                (filter.user === null || (row.user_winner != null && row.user_winner.nick === filter.user) || (row.user_loser != null && row.user_loser.nick === filter.user)) &&
                 (
                     filter.team === null ||
                     (
@@ -103,7 +104,7 @@ export const ScoreboardFilter = () =>{
                 (filter.date_after === null || new Date(row.date).setHours(0,0,0,0) >= new Date(filter.date_after).setHours(0,0,0,0)) &&
                 (filter.date_before === null || new Date(row.date).setHours(0,0,0,0) <= new Date(filter.date_before).setHours(0,0,0,0))
             )))
-    },[filter]);
+    },[filter, matches, setFilteredMatches]);
 
     return(
             <Grid container spacing={2}>
