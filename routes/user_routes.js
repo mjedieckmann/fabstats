@@ -19,7 +19,13 @@ router.get('/teams/:id', function(req, res, next) {
 
 router.post('/register', user_controller.user_register, passport.authenticate('local', { failureRedirect: '/users/login-failure', successRedirect: '/users/current' }));
 
+router.post('/delete', isAuth, user_controller.user_delete);
+
 router.post('/login', isLoggedIn, passport.authenticate('local', { failureRedirect: '/users/login-failure', successRedirect: '/users/current' }));
+
+router.post('/forgot', user_controller.user_forgot);
+
+router.post('/reset', user_controller.user_reset);
 
 router.post('/edit', isAuth, team_controller.event_create_team, user_controller.user_edit);
 
@@ -35,17 +41,6 @@ router.get('/logout', (req, res, next) => {
 
 router.get('/login-failure', (req, res, next) => {
   res.status(401).json({ message: 'Incorrect username or password.' });
-});
-
-router.get('/login', (req, res, next) => {
-
-  const form = '<h1>Login Page</h1><form method="POST" action="/users/login">\
-    Enter Username:<br><input type="text" name="username">\
-    <br>Enter Password:<br><input type="password" name="password">\
-    <br><br><input type="submit" value="Submit"></form>';
-
-  res.send(form);
-
 });
 
 router.post('/upload',user_controller.user_file_upload);

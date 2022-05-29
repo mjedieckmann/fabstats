@@ -31,6 +31,7 @@ export function Row(props) {
                     {
                         currentUser !== null &&
                         currentUser !== 0 &&
+                        row.created_by != null &&
                         currentUser._id === row.created_by._id
                             ? <MatchDialog match_url={row.url} submitMode={'edit'}/>
                             : ''
@@ -53,6 +54,6 @@ Row.propTypes = {
         meta: PropTypes.object.isRequired,
         notes: PropTypes.string,
         date_formatted: PropTypes.string.isRequired,
-        created_by: PropTypes.object.isRequired,
+        created_by: PropTypes.object,
     }).isRequired,
 };

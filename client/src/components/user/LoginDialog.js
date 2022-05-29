@@ -7,6 +7,9 @@ import Box from "@mui/material/Box";
 import {FormFields} from "./FormFields";
 import {dialogOpenState, useLoginForm} from "./_formUtils";
 import {useRecoilState} from "recoil";
+import PasswordForgot from "./PasswordForgot";
+import {Container} from "@mui/material";
+import Stack from "@mui/material/Stack";
 
 
 export default function LoginDialog() {
@@ -32,6 +35,10 @@ export default function LoginDialog() {
                         }}
                     >
                         <FormFields fields={LOGIN_FIELDS} handleChange={handleChange}/>
+                        <Stack alignItems={"flex-end"}>
+
+                            <PasswordForgot/>
+                        </Stack>
                     </Box>
                 </DialogContent>
                 <DialogActions>

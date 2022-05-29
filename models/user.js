@@ -9,6 +9,7 @@ const UserSchema = new Schema(
         e_mail: {type: String, required: true, maxLength: 100, unique: true},
         team: {type: Schema.Types.ObjectId, ref: 'Team', default: null},
         img: {type: String},
+        token: {type: String},
     }
 );
 

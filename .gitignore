@@ -4,6 +4,9 @@
 # local environment
 .env
 
+# populate database script
+/utils/populatedb.js
+
 # user uploaded images
 /public/images/avatars
 

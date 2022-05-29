@@ -10,24 +10,10 @@ import {useState} from "react";
 import {eventsState, useSimpleDataFetch} from "../_pageUtils";
 import axios from "axios";
 import {useRecoilState} from "recoil";
+import {EVENT_TYPES} from "../../../utils/_globalState";
 
 
 const filter = createFilterOptions();
-
-const EVENT_TYPES = [
-    'On Demand',
-    'Armory',
-    'Skirmish',
-    'Road to Nationals',
-    'ProQuest',
-    'Battle Hardened',
-    'Calling',
-    'Nationals',
-    'Pro Tour',
-    'Farewell Welcome to Rathe',
-    'Pre-release',
-    'World Championship',
-];
 
 export default function EventAutocomplete(props) {
     const [open, toggleOpen] = useState(false);

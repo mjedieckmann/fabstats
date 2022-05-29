@@ -13,7 +13,7 @@ exports.team_list = function(req, res, next) {
 };
 
 exports.current_team = function (req, res, next) {
-    if (!req.isAuthenticated()) { next(); }
+    if (!req.isAuthenticated()) { return next(); }
     Team.findById(req.user.team).exec((err, team) =>{
        if (err) { next(err) }
        res.locals.team = team;

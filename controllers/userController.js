@@ -4,6 +4,9 @@ const genPassword = require('../utils/password_utils').genPassword;
 const multer = require("multer");
 const {validPassword} = require("../utils/password_utils");
 const Match = require("../models/match");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+
 const storage = multer.diskStorage(
     {
         destination: (req, file, cb) => cb(null, 'public/images/avatars'),
@@ -45,7 +48,7 @@ exports.user_file_upload = function (req, res) {
         }
         let user = req.user;
         user.img = req.file.path;
-        user.save().then(user => {
+        user.save().then(() => {
             res.status(200).json({message: 'File upload successful!'});
         });
     })
@@ -125,4 +128,71 @@ exports.user_edit = function(req, res, next){
         user.team = res.locals.team;
         user.save().then(() => {return res.status(200).json({message: 'Profile updated!'})});
     });
+}
+
+exports.user_delete = function(req, res, next){
+    User.findById(req.body._id).exec(function(err, user){
+        if (err) { return next(err)}
+        if (!validPassword(req.body.password, user.hash, user.salt)){
+            return res.status(403).json({message: 'Incorrect password!'});
+        } else {
+            User.findByIdAndRemove(req.body._id).then(() => {
+                req.logout();
+                return res.status(200).json({message: 'Account closed.'});
+            })
+        }
+    });
+}
+
+exports.user_forgot = function(req, res, next){
+    User.findOne({$or: [{nick: req.body.username }, {e_mail: new RegExp(`^${req.body.username}$`, 'i')}]})
+        .then((user) => {
+            if (user) {
+                const token = crypto.randomBytes(20).toString('hex');
+                const mail = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: process.env.E_MAIL, // Your email id
+                        pass: process.env.PASSWORD // Your password
+                    }
+                });
+
+                const mailOptions = {
+                    from: process.env.E_MAIL,
+                    to: user.e_mail,
+                    subject: 'Reset Password Link - fabstats.info',
+                    html: '<p>You requested for reset password, kindly use this <a href="http://localhost:3000/reset-password/' + token + '">link</a> to reset your password</p>'
+                };
+
+                mail.sendMail(mailOptions, function(err) {
+                    if (err) {return next(err)}
+                    user.token = token;
+                    user.save().then(() => {return res.status(200).json({message: 'Reset link sent!'})});
+                });
+            } else {
+                return res.status(401).json({message: 'The user / e-Mail is not registered with us'});
+            }
+        })
+}
+
+exports.user_reset = function(req, res){
+    User.findOne({token: req.body.token})
+        .then((user) => {
+            if (user) {
+                if (req.body.password_new !== req.body.password_repeat){
+                    return res.status(409).json({message: 'Passwords don\'t match!'});
+                }
+                const saltHash = genPassword(req.body.password_new);
+                const salt = saltHash.salt;
+                const hash = saltHash.hash;
+                user.salt = salt;
+                user.hash = hash;
+                user.token = null;
+                user.save().then(() => {
+                    res.status(200).json({message: 'Password changed!'});
+                });
+            } else {
+                return res.status(401).json({message: 'Invalid reset link!'});
+            }
+        })
 }

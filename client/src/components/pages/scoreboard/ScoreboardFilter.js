@@ -1,12 +1,13 @@
 import {useEffect, useState} from "react";
-import {Autocomplete, Grid} from "@mui/material";
+import {Autocomplete, Grid, Paper} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, matchesState, pageState} from "./ScoreboardContainer";
 import {eventsState, heroesState, useSimpleDataFetch} from "../_pageUtils";
-import {dirtyState, ROUNDS} from "../../../utils/_globalState";
+import {dirtyState, EVENT_TYPES, ROUNDS} from "../../../utils/_globalState";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
+import axios from "axios";
 
 const NO_FILTER = {hero: null, user: null, team: null, format: null, event: null, eventType: null, to: null, meta: null, round: null, date_after: null, date_before: null};
 
@@ -19,63 +20,70 @@ export const ScoreboardFilter = () =>{
 
     const [users, setUsers] = useState([]);
     const [teams, setTeams] = useState([]);
-    useEffect(() => {
-        fetch('/users')
-            .then(res => res.json())
+    useEffect(() =>{
+        axios.get('/users')
             .then(res => {
                 let users = new Set();
-                let teams = new Set();
-                res.forEach((user) => {
+                res.data.forEach(user => {
                     users.add(user.nick);
-                    if (user.team != null) {
-                        teams.add(user.team.nick)
-                    }
                 })
                 setUsers([...users]);
+            });
+    }, []);
+    useEffect(() =>{
+        axios.get('/users/teams')
+            .then(res => {
+                let teams = new Set();
+                res.data.forEach(team => {
+                    teams.add(team.nick);
+                })
                 setTeams([...teams]);
-            })
+            });
     }, []);
 
     const [events, setEvents] = useRecoilState(eventsState);
     const [ dirty, ] = useRecoilState(dirtyState);
-    const [eventTypes, setEventTypes] = useState([]);
     const [tos, setTos] = useState([]);
-    useEffect(() => {
-        fetch('/api/events')
-            .then(res => res.json())
+    useEffect(() =>{
+        axios.get('/api/events')
             .then(res => {
                 let events = new Set();
-                let eventTypes = new Set();
-                let tos = new Set();
-                res.forEach((event) => {
+                res.data.forEach(event => {
                     events.add(event);
-                    eventTypes.add(event.event_type);
-                    if (event.to != null) {
-                        tos.add(event.to.descriptor);
-                    }
                 })
                 setEvents([...events]);
-                setEventTypes([...eventTypes]);
+            });
+    }, []);
+    useEffect(() =>{
+        axios.get('/api/tos')
+            .then(res => {
+                let tos = new Set();
+                res.data.forEach(to => {
+                    tos.add(to.descriptor);
+                })
                 setTos([...tos]);
-            })
-    }, [setEvents]);
+            });
+    }, []);
 
     const [matches,] = useRecoilState(matchesState);
     const [,setPage] = useRecoilState(pageState);
-    const [filteredMatches,setFilteredMatches] = useRecoilState(filteredMatchesState);
+    const [,setFilteredMatches] = useRecoilState(filteredMatchesState);
     const [filter, setFilter] = useState(NO_FILTER);
     useEffect(() => {
         setFilter(NO_FILTER);
     }, [dirty])
 
     const [metas, setMetas] = useState([]);
-    useEffect(() => {
-        let metas = new Set();
-        filteredMatches.forEach( match => {
-            metas.add(match.meta.descriptor);
-        });
-        setMetas([...metas]);
-    }, [filteredMatches]);
+    useEffect(() =>{
+        axios.get('/api/metas')
+            .then(res => {
+                let metas = new Set();
+                res.data.forEach(meta => {
+                    metas.add(meta.descriptor);
+                })
+                setMetas([...metas]);
+            });
+    }, []);
 
     useEffect(() => {
         setFilteredMatches(
@@ -107,6 +115,7 @@ export const ScoreboardFilter = () =>{
     },[filter, matches, setFilteredMatches]);
 
     return(
+        <Paper>
             <Grid container spacing={2}>
                 <Grid item lg={6}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -223,7 +232,7 @@ export const ScoreboardFilter = () =>{
                         size={"small"}
                         disablePortal
                         id="event-type-filter"
-                        options={eventTypes}
+                        options={EVENT_TYPES}
                         sx={{ width: 1 }}
                         renderInput={(params) => <TextField {...params} label="Event Type" />}
                     />
@@ -274,5 +283,6 @@ export const ScoreboardFilter = () =>{
                     />
                 </Grid>
             </Grid>
+        </Paper>
     )
 }

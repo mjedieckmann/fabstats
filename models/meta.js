@@ -7,7 +7,8 @@ const MetaSchema = new Schema(
     {
         descriptor: {type: String, required: true, maxLength: 100, unique: true},
         date: {type: Date, required: true},
-        type: {type: String, enum: ['B \& S Announcement', 'Set Release'], default: 'Set Release'},
+        type: {type: String, enum: ['B \& S announcement', 'Set release', 'Other product release'], default: 'Set release'},
+        changes: {type: String}
     },
     {
         toJSON: { virtuals: true }

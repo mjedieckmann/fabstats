@@ -1,7 +1,7 @@
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import {Grid, ToggleButton} from "@mui/material";
+import {Grid, Paper, ToggleButton} from "@mui/material";
 
 import NavbarIcon from "./NavbarIcon";
 import {useRecoilState} from "recoil";
@@ -14,7 +14,7 @@ export default function Navbar() {
     const [currentPage, ] = useRecoilState(currentPageState);
 
     return (
-        <Box>
+        <Paper>
             <AppBar position="static" color={"transparent"}>
                 <Toolbar>
                     <Grid container alignItems={"center"}>
@@ -35,6 +35,6 @@ export default function Navbar() {
                     </Grid>
                 </Toolbar>
             </AppBar>
-        </Box>
+        </Paper>
     );
 }

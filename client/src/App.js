@@ -10,6 +10,37 @@ import {useEffect} from "react";
 import axios from "axios";
 import {Footer} from "./components/footer/Footer";
 
+import Image from './img/Seek_Enlightenment_Full_Art.width-10000.jpg';
+import {Paper} from "@mui/material";
+import {createTheme, ThemeProvider} from "@mui/material/styles"; // Import using relative path
+
+const styles = {
+    paperContainer: {
+        backgroundImage: `url(${Image})`,
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        width: '100vw',
+        minHeight: '100vh',
+        backgroundAttachment: 'fixed',
+    }
+};
+
+const theme = createTheme({
+    components: {
+        // Name of the component
+        MuiPaper: {
+            styleOverrides: {
+                // Name of the slot
+                root: {
+                    // Some CSS
+                    backgroundColor: 'rgba(255,255,255,0.8)',
+                },
+            },
+        },
+    },
+});
+
 function App() {
     const [ currentUser, setCurrentUser ] = useRecoilState(currentUserState);
     const [ dirty, ] = useRecoilState(dirtyState);
@@ -29,22 +60,25 @@ function App() {
                     <title>Flesh and Blood TCG Unofficial Statistics</title>
                 </Helmet>
             </HelmetProvider>
-            <Stack spacing={2}>
-                {/* Header */}
-                <Navbar currentUser={currentUser}/>
-                {/*Body*/}
-            <Stack sx={{minHeight: "90vH", justifyContent: "space-between"}}>
-                <Routes>
-                    <Route path="/" element={ <Navigate to="/scoreboard" /> } />
-                    {pages.map((page) => (
-                        <Route key={page.name} path={page.url} element={page.element}/>
-                    ))}
-                </Routes>
-                {/* Footer */}
-                <Footer/>
-            </Stack>
-
-            </Stack>
+            <Paper style={styles.paperContainer}>
+                <ThemeProvider theme={theme}>
+                    <Stack spacing={2}>
+                        {/* Header */}
+                        <Navbar currentUser={currentUser}/>
+                        {/*Body*/}
+                        <Stack sx={{minHeight: "90vH", justifyContent: "space-between"}}>
+                            <Routes>
+                                <Route path="/" element={ <Navigate to="/scoreboard" /> } />
+                                {pages.map((page) => (
+                                    <Route key={page.name} path={page.url} element={page.element}/>
+                                ))}
+                            </Routes>
+                            {/* Footer */}
+                            <Footer/>
+                        </Stack>
+                    </Stack>
+                </ThemeProvider>
+            </Paper>
         </div>
   );
 }

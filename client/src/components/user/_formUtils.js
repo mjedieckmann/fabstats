@@ -142,7 +142,6 @@ export const useForm = (form_state, error_state) => {
 export const useLoginForm = (form_state, error_state) => {
     const [form, formError, setFormError, handleChange, setOpen, setCurrentUser] = useAuthenticationForm(form_state, error_state);
 
-
     const loginUser = () => {
         validateForm().then(() => {
             axios.post("/users/login", form)
@@ -179,7 +178,7 @@ export const useLoginForm = (form_state, error_state) => {
         {
             handleChange: handleChange,
             loginUser: loginUser,
-            LOGIN_FIELDS: LOGIN_FIELDS(form, formError)
+            LOGIN_FIELDS: LOGIN_FIELDS(form, formError),
         }
     ]
 }

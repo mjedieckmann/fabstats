@@ -17,6 +17,8 @@ import {dialogOpenState} from "./_formUtils";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Collapse from "@mui/material/Collapse";
+import DeleteConfirmationDialog from "../pages/scoreboard/DeleteConfirmationDialog";
+import DeleteUserDialog from "./DeleteUserDialog";
 
 const Input = styled('input')({
     display: 'none',
@@ -117,7 +119,7 @@ export default function ProfileDialog() {
 
     return (
         <Box noValidate component="form" onSubmit={handleSubmit}>
-            <DialogTitle>User Profile</DialogTitle>
+            <DialogTitle>User Profile<DeleteUserDialog form={form} setForm={setForm}/></DialogTitle>
             <DialogContent>
                 <Grid container spacing={2}>
                     <Grid item xs={5}>
