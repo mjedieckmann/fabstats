@@ -49,9 +49,7 @@ root.render(
   <React.StrictMode>
       <ThemeProvider theme={theme}>
           <RecoilRoot>
-              <BrowserRouter>
-                <App />
-              </BrowserRouter>
+            <App />
           </RecoilRoot>
       </ThemeProvider>
   </React.StrictMode>

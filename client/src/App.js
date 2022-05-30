@@ -1,18 +1,18 @@
 import {Helmet, HelmetProvider} from "react-helmet-async";
-import {Routes, Route, Navigate} from "react-router-dom";
-
+import {Routes, Route, Navigate, Outlet, BrowserRouter} from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
-import {pages} from "./components/pages/_pageUtils";
 import Stack from "@mui/material/Stack";
 import {useRecoilState} from "recoil";
 import {currentUserState, dirtyState} from "./utils/_globalState";
 import {useEffect} from "react";
 import axios from "axios";
 import {Footer} from "./components/footer/Footer";
-
 import Image from './img/Seek_Enlightenment_Full_Art.width-10000.jpg';
 import {Paper} from "@mui/material";
-import {createTheme, ThemeProvider} from "@mui/material/styles"; // Import using relative path
+import {createTheme, ThemeProvider} from "@mui/material/styles";
+import ScoreboardContainer from "./components/pages/scoreboard/ScoreboardContainer";
+import About from "./components/pages/about/About";
+import {PasswordReset} from "./components/user/PasswordReset"; // Import using relative path
 
 const styles = {
     paperContainer: {
@@ -41,9 +41,10 @@ const theme = createTheme({
     },
 });
 
-function App() {
+const Layout = () => {
     const [ currentUser, setCurrentUser ] = useRecoilState(currentUserState);
     const [ dirty, ] = useRecoilState(dirtyState);
+
     useEffect(() => {
         axios.get('/users/current')
             .then(res => {
@@ -53,6 +54,22 @@ function App() {
     }, [dirty, setCurrentUser])
 
     return (
+        <Paper style={styles.paperContainer}>
+            <ThemeProvider theme={theme}>
+                <Stack spacing={2}>
+                    <Navbar currentUser={currentUser}/>
+                    <Stack sx={{minHeight: "90vH", justifyContent: "space-between"}}>
+                        <Outlet/>
+                        <Footer/>
+                    </Stack>
+                </Stack>
+            </ThemeProvider>
+        </Paper>
+    )
+}
+
+function App() {
+    return (
         <div className="App">
             <HelmetProvider>
                 <Helmet>
@@ -60,25 +77,16 @@ function App() {
                     <title>Flesh and Blood TCG Unofficial Statistics</title>
                 </Helmet>
             </HelmetProvider>
-            <Paper style={styles.paperContainer}>
-                <ThemeProvider theme={theme}>
-                    <Stack spacing={2}>
-                        {/* Header */}
-                        <Navbar currentUser={currentUser}/>
-                        {/*Body*/}
-                        <Stack sx={{minHeight: "90vH", justifyContent: "space-between"}}>
-                            <Routes>
-                                <Route path="/" element={ <Navigate to="/scoreboard" /> } />
-                                {pages.map((page) => (
-                                    <Route key={page.name} path={page.url} element={page.element}/>
-                                ))}
-                            </Routes>
-                            {/* Footer */}
-                            <Footer/>
-                        </Stack>
-                    </Stack>
-                </ThemeProvider>
-            </Paper>
+            <BrowserRouter>
+                <Routes>
+                    <Route path={"/"} element={<Layout/>}>
+                        <Route path={"/"} element={ <Navigate to="/scoreboard" /> } />
+                        <Route path={"scoreboard"} element={<ScoreboardContainer/>}/>
+                        <Route path={"about"} element={<About/>}/>
+                        <Route path={"reset-password/:token"} element={<PasswordReset/>}/>
+                    </Route>
+                </Routes>
+            </BrowserRouter>
         </div>
   );
 }
