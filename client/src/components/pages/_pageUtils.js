@@ -6,7 +6,6 @@ import ScoreboardContainer from "./scoreboard/ScoreboardContainer";
 import {atom} from "recoil";
 import {useEffect} from "react";
 import axios from "axios";
-import ProfileDialog from "../user/ProfileDialog";
 import {PasswordReset} from "../user/PasswordReset";
 
 export const pages = [

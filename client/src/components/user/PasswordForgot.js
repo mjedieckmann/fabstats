@@ -5,8 +5,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import {useState} from "react";
-import DeleteIcon from "@mui/icons-material/Delete";
-import {IconButton} from "@mui/material";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";

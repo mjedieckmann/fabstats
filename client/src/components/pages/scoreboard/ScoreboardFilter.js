@@ -3,8 +3,8 @@ import {Autocomplete, Grid, Paper} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, matchesState, pageState} from "./ScoreboardContainer";
-import {eventsState, heroesState, useSimpleDataFetch} from "../_pageUtils";
-import {dirtyState, EVENT_TYPES, ROUNDS} from "../../../utils/_globalState";
+import {heroesState, useSimpleDataFetch} from "../_pageUtils";
+import {dirtyState, EVENT_TYPES, eventsChangedState, ROUNDS, tosChangedState} from "../../../utils/_globalState";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
 import axios from "axios";
@@ -12,12 +12,13 @@ import axios from "axios";
 const NO_FILTER = {hero: null, user: null, team: null, format: null, event: null, eventType: null, to: null, meta: null, round: null, date_after: null, date_before: null};
 
 export const ScoreboardFilter = () =>{
+    const [ dirty, ] = useRecoilState(dirtyState);
     const [heroes, setHeroes] = useRecoilState(heroesState);
+
     useSimpleDataFetch(setHeroes, 'api/heroes', 'name');
-
     const [formats, setFormats] = useState([]);
-    useSimpleDataFetch(setFormats, 'api/formats', 'descriptor');
 
+    useSimpleDataFetch(setFormats, 'api/formats', 'descriptor');
     const [users, setUsers] = useState([]);
     const [teams, setTeams] = useState([]);
     useEffect(() =>{
@@ -30,6 +31,7 @@ export const ScoreboardFilter = () =>{
                 setUsers([...users]);
             });
     }, []);
+
     useEffect(() =>{
         axios.get('/users/teams')
             .then(res => {
@@ -40,10 +42,7 @@ export const ScoreboardFilter = () =>{
                 setTeams([...teams]);
             });
     }, []);
-
-    const [events, setEvents] = useRecoilState(eventsState);
-    const [ dirty, ] = useRecoilState(dirtyState);
-    const [tos, setTos] = useState([]);
+    const [ events, setEvents ] = useState([]);
     useEffect(() =>{
         axios.get('/api/events')
             .then(res => {
@@ -53,7 +52,8 @@ export const ScoreboardFilter = () =>{
                 })
                 setEvents([...events]);
             });
-    }, []);
+    }, [dirty]);
+    const [ tos, setTos ] = useState([]);
     useEffect(() =>{
         axios.get('/api/tos')
             .then(res => {
@@ -63,7 +63,7 @@ export const ScoreboardFilter = () =>{
                 })
                 setTos([...tos]);
             });
-    }, []);
+    }, [dirty]);
 
     const [matches,] = useRecoilState(matchesState);
     const [,setPage] = useRecoilState(pageState);

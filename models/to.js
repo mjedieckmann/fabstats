@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const TOSchema = new Schema(
     {
         descriptor: {type: String, required: true, maxLength: 100, unique: true},
+        created_by: {type: Schema.Types.ObjectId, ref: 'User'},
     }
 );
 

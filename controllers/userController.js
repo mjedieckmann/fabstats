@@ -4,6 +4,8 @@ const genPassword = require('../utils/password_utils').genPassword;
 const multer = require("multer");
 const {validPassword} = require("../utils/password_utils");
 const Match = require("../models/match");
+const TO = require("../models/to");
+const Event = require("../models/event");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 
@@ -30,6 +32,35 @@ exports.isMatchCreator = function(req, res, next) {
     });
 }
 
+exports.isEventCreator = function(req, res, next) {
+    Event.findOne({
+        _id: req.body._id,
+        created_by: req.user._id
+    }).exec((err, event) => {
+        if (err !== null) { return next(err)}
+        if (event === null){
+            return res.status(401).json({message: "You are not the creator of this event!"});
+        } else {
+            res.locals.event = event;
+            return next();
+        }
+    });
+}
+
+exports.isToCreator = function(req, res, next) {
+    TO.findOne({
+        _id: req.body._id,
+        created_by: req.user._id
+    }).exec((err, to) => {
+        if (err !== null) { return next(err)}
+        if (to === null){
+            return res.status(401).json({message: "You are not the creator of this to!"});
+        } else {
+            res.locals.to = to;
+            return next();
+        }
+    });
+}
 
 exports.user_current = function (req, res) {
     if (req.isAuthenticated()) {

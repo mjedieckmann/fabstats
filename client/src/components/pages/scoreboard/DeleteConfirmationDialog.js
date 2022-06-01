@@ -4,57 +4,41 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import {useState} from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {IconButton} from "@mui/material";
-import axios from "axios";
-import uuid from "react-uuid";
-import {useRecoilState} from "recoil";
-import {dirtyState} from "../../../utils/_globalState";
 
 export default function DeleteConfirmationDialog(props) {
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [ ,setDirty] = useRecoilState(dirtyState);
 
     const handleDeleteDialogOpen = () => {
-        setDeleteDialogOpen(true);
+        props.setDeleteDialogOpen(true);
     };
 
     const handleDeleteDialogClose = () => {
-        setDeleteDialogOpen(false);
+        props.setDeleteDialogOpen(false);
     };
-
-    const handleDelete = () => {
-        axios.post("/api/match/delete", props.form)
-            .then((res) => {
-                setDirty(new uuid());
-                handleDeleteDialogClose();
-            })
-            .catch(err => console.log(err));
-    }
 
     return (
         <>
-            <IconButton aria-label="delete" onClick={handleDeleteDialogOpen}>
+            <IconButton sx={props.sx} aria-label="delete" onClick={handleDeleteDialogOpen}>
                 <DeleteIcon/>
             </IconButton>
             <Dialog
-                open={deleteDialogOpen}
+                open={props.deleteDialogOpen}
                 onClose={handleDeleteDialogClose}
                 aria-labelledby="delete-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="delete-dialog-title">
-                    {"Do you really want to delete this match entry?"}
+                    Do you really want to delete this {props.entity}?
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="delete-dialog-description">
-                        Deleting the match entry cannot be undone.
+                        Deleting the {props.entity} cannot be undone.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-                    <Button onClick={handleDelete} autoFocus>
+                    <Button onClick={props.handleDelete} autoFocus>
                         Yes
                     </Button>
                 </DialogActions>

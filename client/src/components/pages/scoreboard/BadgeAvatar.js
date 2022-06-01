@@ -25,7 +25,7 @@ export default function BadgeAvatars(props) {
                     : <SmallAvatar/>
             }
         >
-            <Avatar alt={props.hero.name} src={img} />
+            <Avatar alt={props.hero.name} src={img} sx={props.winner ? {border: '2px solid green'} : {border: '2px solid red'}}/>
         </Badge>
     );
 }

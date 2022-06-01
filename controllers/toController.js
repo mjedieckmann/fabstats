@@ -1,5 +1,6 @@
 const TO = require('../models/to');
-const {body} = require("express-validator");
+const {body, validationResult} = require("express-validator");
+const Event = require("../models/event");
 
 // Display list of all Formats.
 exports.to_list = function(req, res, next) {
@@ -12,24 +13,49 @@ exports.to_list = function(req, res, next) {
         });
 };
 
-exports.event_create_to = [
-    body('to').trim().escape(),
+exports.create_to = [
+    body('descriptor', 'TO name must not be empty.').trim().isLength({ min: 1 }).escape(),
     (req, res, next) => {
-        if (req.body.to === null || req.body.to === ''){
-            next();
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/error messages.
+            return res.status(403).json(errors);
         }
-        TO.find({descriptor: req.body.to}).exec((err, to) => {
-            if (to.length === 0) {
-                const newTo = new TO({descriptor: req.body.to});
+        TO.findOne({ descriptor: req.body.descriptor}).exec((err, to) => {
+            if (to) {
+                return res.status(403).json({message: 'A TO with that name already exists!'})
+            } else {
+                const newTo = new TO({
+                    descriptor: req.body.descriptor,
+                    created_by: req.user._id
+                });
                 newTo.save((err) => {
                     if (err) { return next(err)}
-                    res.locals.to = newTo;
-                    next();
+                    return res.status(200).json(newTo);
                 })
-            } else {
-                res.locals.to = to[0];
-                next();
             }
         })
     }
 ]
+
+exports.edit_to = [
+    // Validate and sanitize fields.
+    body('descriptor', 'Event name must not be empty.').trim().isLength({ min: 1 }).escape(),
+
+    (req, res, next) => {
+        TO.findById(req.body._id).exec((err, to) => {
+            if (err) { return next(err); }
+            to.descriptor = req.body.descriptor;
+            to.save(function (err, to) {
+                if (err) { return next(err); }
+                return res.status(200).json(to);
+            });
+        })
+    }
+]
+
+exports.delete_to = function (req, res) {
+    TO.findByIdAndRemove(req.body._id).then(() => {
+        return res.status(200).json({message: "TO deleted!"});
+    });
+}

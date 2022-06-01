@@ -17,7 +17,6 @@ import {dialogOpenState} from "./_formUtils";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Collapse from "@mui/material/Collapse";
-import DeleteConfirmationDialog from "../pages/scoreboard/DeleteConfirmationDialog";
 import DeleteUserDialog from "./DeleteUserDialog";
 
 const Input = styled('input')({

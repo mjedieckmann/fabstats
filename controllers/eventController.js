@@ -1,5 +1,6 @@
 const Event = require('../models/event');
 const {body, validationResult} = require("express-validator");
+const Match = require("../models/match");
 // Display list of all events.
 exports.event_list = function(req, res, next) {
     Event.find()
@@ -12,8 +13,7 @@ exports.event_list = function(req, res, next) {
         });
 };
 
-exports.event_create_post = [
-
+exports.create_event = [
     // Validate and sanitize fields.
     body('descriptor', 'Event name must not be empty.').trim().isLength({ min: 1 }).escape(),
     body('event_type', 'Event type must not be empty.').trim().isLength({ min: 1 }).escape(),
@@ -31,12 +31,40 @@ exports.event_create_post = [
                     {
                         descriptor: req.body.descriptor,
                         event_type: req.body.event_type,
-                        to: res.locals.to
+                        to: req.body.to,
+                        created_by: req.user._id
                     });
             event.save(function (err) {
                 if (err) { return next(err); }
-                res.json(event);
+                Event.populate(event, [
+                    { path: 'to', select: 'descriptor' },
+                ]).then((populatedEvent) => res.status(200).json(populatedEvent));
             });
         }
     }
 ];
+
+exports.edit_event = [
+    // Validate and sanitize fields.
+    body('descriptor', 'Event name must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('event_type', 'Event type must not be empty.').trim().isLength({ min: 1 }).escape(),
+
+    (req, res, next) => {
+        const event = res.locals.event;
+        event.descriptor = req.body.descriptor;
+        event.event_type = req.body.event_type;
+        event.to = req.body.to;
+        event.save(function (err, event) {
+            if (err) { return next(err); }
+            Event.populate(event, [
+                { path: 'to', select: 'descriptor' },
+            ]).then((populatedEvent) => res.status(200).json(populatedEvent));
+        });
+    }
+]
+
+exports.delete_event = function (req, res) {
+    Event.findByIdAndRemove(req.body._id).then(() => {
+        return res.status(200).json({message: "Event deleted!"});
+    });
+}

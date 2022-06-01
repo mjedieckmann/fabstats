@@ -17,6 +17,9 @@ import {Row} from "./Row";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, pageState} from "./ScoreboardContainer";
 import {useState} from "react";
+import MatchDetailDialog from "./MatchDetailDialog";
+import {entityIsEditableByUser} from "../../../utils/_globalUtils";
+import {currentUserState} from "../../../utils/_globalState";
 
 function TablePaginationActions(props) {
     const theme = useTheme();
@@ -83,6 +86,7 @@ export default function Scoreboard() {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [page, setPage] = useRecoilState(pageState);
     const [filteredMatches,] = useRecoilState(filteredMatchesState);
+    const [ currentUser, ] = useRecoilState(currentUserState);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -98,30 +102,32 @@ export default function Scoreboard() {
             <Table aria-label="collapsible table" size={"small"}>
                 <TableHead>
                     <TableRow>
-                        <TableCell align="center">Event</TableCell>
-                        <TableCell align="center">Type</TableCell>
-                        <TableCell align="center">Round</TableCell>
+                        {/*<TableCell align="center">Type</TableCell>*/}
+                        {/*<TableCell align="center">Round</TableCell>*/}
+                        <TableCell align="center">Date</TableCell>
                         <TableCell align="center">Winner</TableCell>
                         <TableCell align="center"></TableCell>
                         <TableCell align="center">Loser</TableCell>
-                        <TableCell align="center">Format</TableCell>
-                        <TableCell align="center">Meta</TableCell>
-                        <TableCell align="center">TO</TableCell>
-                        <TableCell align="center">Date</TableCell>
-                        <TableCell align="center"></TableCell>
+                        <TableCell align="center">Event</TableCell>
+                        {/*<TableCell align="center">Format</TableCell>*/}
+                        {/*<TableCell align="center">Meta</TableCell>*/}
+                        {/*<TableCell align="center">TO</TableCell>*/}
+                        {/*<TableCell align="center"></TableCell>*/}
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {(rowsPerPage > 0
                             ? filteredMatches.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             : filteredMatches
-                    ).map((row) => (<Row key={row._id} row={row}/>))}
+                    ).map((row) => (
+                        <MatchDetailDialog key={row._id} row={row} matchDialogMode={entityIsEditableByUser(row, currentUser) ? 'edit' : 'view'}/>
+                    ))}
                 </TableBody>
                 <TableFooter>
                     <TableRow>
                         <TablePagination
                             rowsPerPageOptions={[10, 25, 50, { label: 'All', value: -1 }]}
-                            colSpan={11}
+                            colSpan={5}
                             count={filteredMatches.length}
                             rowsPerPage={rowsPerPage}
                             page={page}

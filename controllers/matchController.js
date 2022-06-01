@@ -54,7 +54,6 @@ exports.match_list = function(req, res, next) {
         })
         .populate({ path: 'meta', select: 'descriptor -_id' })
         .populate({ path: 'format', select: 'descriptor -_id' })
-        .populate({ path: 'created_by', select: '_id' })
         .exec(function (err, list_matches) {
             if (err) { return next(err); }
             // res.json(list_matches.sort(sortMatches));
@@ -86,7 +85,7 @@ exports.match_detail = function (req, res, next){
     })
 }
 
-exports.event_edit_match = [
+exports.edit_match = [
     body('date', 'Invalid date of birth.').optional({ checkFalsy: true }).isISO8601().toDate(),
     body('event', 'Event must not be empty.').isObject(),
     body('round', 'Round must not be empty.').isString(),
@@ -97,7 +96,7 @@ exports.event_edit_match = [
     (req, res, next) => {
         const match = res.locals.match;
         match.date = req.body.date;
-        match.event= req.body.event.id;
+        match.event= req.body.event;
         match.round= req.body.round;
         match.hero_winner= req.body.hero_winner.id;
         match.hero_loser= req.body.hero_loser.id;
@@ -120,7 +119,7 @@ exports.event_edit_match = [
     }
 ]
 
-exports.event_create_match = [
+exports.create_match = [
     body('date', 'Invalid date of birth.').optional({ checkFalsy: true }).isISO8601().toDate(),
     body('event', 'Event must not be empty.').isObject(),
     body('round', 'Round must not be empty.').isString(),
@@ -132,7 +131,7 @@ exports.event_create_match = [
         let match = new Match(
             {
                 date: req.body.date,
-                event: req.body.event.id,
+                event: req.body.event,
                 round: req.body.round,
                 hero_winner: req.body.hero_winner.id,
                 hero_loser: req.body.hero_loser.id,
@@ -157,7 +156,7 @@ exports.event_create_match = [
     }
 ]
 
-exports.event_delete_match = function (req, res) {
+exports.delete_match = function (req, res) {
     Match.findByIdAndRemove(req.body._id).then(() => {
         return res.status(200).json({message: "Match deleted!"});
     });

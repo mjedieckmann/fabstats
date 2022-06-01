@@ -20,6 +20,7 @@ const EventSchema = new Schema(
                 'Pre-release',
                 'World Championship',
             ]},
+        created_by: {type: Schema.Types.ObjectId, ref: 'User'},
     },
     {
         toJSON: { virtuals: true }

@@ -1,6 +1,6 @@
 import Typography from "@mui/material/Typography";
 import {useParams} from "react-router-dom";
-import {Divider, Grid, Link, Paper} from "@mui/material";
+import {Grid, Paper} from "@mui/material";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";

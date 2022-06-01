@@ -24,6 +24,17 @@ export const dirtyState = atom( {
     default: uuid()
 })
 
+export const tosChangedState = atom( {
+    key: 'tosChanged',
+    default: uuid()
+})
+
+export const eventsChangedState = atom( {
+    key: 'eventsChanged',
+    default: uuid()
+})
+
+
 export const ROUNDS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Quarterfinal', 'Semifinal', 'Final', 'N/A'];
 
 export const EVENT_TYPES = [

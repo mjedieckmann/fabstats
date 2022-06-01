@@ -1,6 +1,6 @@
 import Dialog from '@mui/material/Dialog';
 import AddIcon from "@mui/icons-material/Add";
-import {Fab, Grid, IconButton} from "@mui/material";
+import {Fab, Grid} from "@mui/material";
 import {useEffect, useState} from "react";
 import Box from "@mui/material/Box";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -13,14 +13,14 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import EventAutocomplete from "./EventAutocomplete";
+import EventDetailDialog from "./EventDetailDialog";
 import axios from "axios";
 import {SimpleAutocomplete} from "./SimpleAutocomplete";
-import EditIcon from '@mui/icons-material/Edit';
 import uuid from "react-uuid";
 import {dirtyState, ROUNDS} from "../../../utils/_globalState";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
-import {capitalizeFirstLetter} from "../../../utils/_globalUtils";
+import {capitalizeFirstLetter, preventSubmitOnEnter} from "../../../utils/_globalUtils";
+import {Row} from "./Row";
 
 const EMPTY_FORM = {
     _id : null,
@@ -32,15 +32,17 @@ const EMPTY_FORM = {
     user_winner: null,
     user_loser: null,
     format: null,
-    meta: null
+    meta: null,
+    created_by: null
 }
 
-export default function MatchDialog(props) {
+export default function MatchDetailDialog(props) {
     const [ open, setOpen ] = useState(false);
     const [ form, setForm ] = useState(EMPTY_FORM);
     // const [ formError, setFormError ] = useState(EMPTY_FORM);
     const [ heroes, setHeroes ] = useState([]);
     const [ ,setDirty] = useRecoilState(dirtyState);
+    const [ hasChanged, setHasChanged ] = useState(false);
     useEffect(() =>{
         axios.get('/api/heroes')
             .then(res => {
@@ -86,8 +88,8 @@ export default function MatchDialog(props) {
     }, []);
 
     const handleOpen = () => {
-        if (props.match_url){
-            axios.get(props.match_url)
+        if (props.matchDialogMode !== 'create'){
+            axios.get(props.row.url)
                 .then(res => {
                     setForm({
                         _id : res.data._id,
@@ -100,6 +102,7 @@ export default function MatchDialog(props) {
                         user_loser: res.data.user_loser !== null ? {label: res.data.user_loser.nick, id: res.data.user_loser._id} : null,
                         format: {label: res.data.format.descriptor, id: res.data.format._id},
                         meta: {label: res.data.meta.descriptor, id: res.data.meta._id},
+                        created_by: res.data.created_by
                     });
                     setOpen(true);
                 });
@@ -110,57 +113,94 @@ export default function MatchDialog(props) {
     };
 
     const handleClose = () => {
+        if (hasChanged){
+            setDirty(uuid());
+        }
         setOpen(false);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post("/api/match/" + props.submitMode, form)
-            .then(res => {
-                setDirty(uuid());
-                handleClose();
-            })
-            .catch((err) => {
-                //TODO: Better error handling, especially with axios, which seems to dislike me.
-                console.log(err);
-            });
+        e.stopPropagation();
+        if (props.matchDialogMode !== 'view') {
+            axios.post("/api/match/" + props.matchDialogMode, form)
+                .then(res => {
+                    setHasChanged(true);
+                    handleClose();
+                })
+                .catch((err) => {
+                    //TODO: Better error handling, especially with axios, which seems to dislike me.
+                    console.log(err);
+                });
+        } else {
+            handleClose();
+        }
     }
 
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const handleDeleteMatch = () => {
+        axios.post("/api/match/delete", form)
+            .then((res) => {
+                setDeleteDialogOpen(false);
+                setHasChanged(true);
+                handleClose();
+            })
+            .catch(err => console.log(err));
+    }
     return (
         <>
-            {props.submitMode === 'edit' ?
-            <IconButton aria-label="edit" onClick={handleOpen}>
-                <EditIcon />
-            </IconButton>
-                :
-            <Fab color="primary" aria-label="add" onClick={handleOpen}>
-                <AddIcon />
-            </Fab>
+            {props.matchDialogMode === 'create'
+                ? <Fab color="primary" aria-label="add" onClick={handleOpen}><AddIcon /></Fab>
+                : <Row key={props.row._id} row={props.row} handleOpen={handleOpen}/>
             }
             <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth={'sm'}>
                 <Box sx={{ width: '100%', typography: 'body1' }}>
                     <Box noValidate component="form" onSubmit={handleSubmit}>
                         <DialogTitle>
-                            Match
-                            {props.submitMode === 'edit'
-                                ? <DeleteConfirmationDialog form={form}/>
-                                : ""
-                            }
+                            {capitalizeFirstLetter(props.matchDialogMode) + " Match"}
+
+                            <DeleteConfirmationDialog
+                                sx={props.matchDialogMode === 'edit' ? {} : {display: 'none'}}
+                                deleteDialogOpen={deleteDialogOpen}
+                                setDeleteDialogOpen={setDeleteDialogOpen}
+                                handleDelete={handleDeleteMatch}
+                                entity={'match'}
+                            />
                         </DialogTitle>
                         <DialogContent>
-                            <DialogContentText>
-                                {capitalizeFirstLetter(props.submitMode)} match:
-                            </DialogContentText>
                             <Box sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
                                 <Grid container>
                                     {/*Free-solo with dialog*/}
-                                    <Grid item lg={6}>
-                                        <EventAutocomplete setForm={setForm} form={form}/>
+                                    <Grid item lg={12}>
+                                        <EventDetailDialog setHasChanged={setHasChanged} setForm={setForm} form={form} matchDialogMode={props.matchDialogMode}/>
                                     </Grid>
                                     {/*Select only*/}
                                     <Grid item lg={6}>
+                                        <TextField
+                                            disabled={true}
+                                            margin="dense"
+                                            id="event_type_view"
+                                            value={form.event !== null ? form.event.event_type : ''}
+                                            label="Even type"
+                                            type="text"
+                                            variant="standard"
+                                        />
+                                    </Grid>
+                                    <Grid item lg={6}>
+                                        <TextField
+                                            disabled={true}
+                                            margin="dense"
+                                            id="event_to_view"
+                                            value={form.event !== null && form.event.to !== null ? form.event.to.descriptor : ''}
+                                            label="TO"
+                                            type="text"
+                                            variant="standard"
+                                        />
+                                    </Grid>
+                                    <Grid item lg={6}>
                                         <Autocomplete
                                             id={"round-input"}
+                                            disabled={props.matchDialogMode === 'view'}
                                             options={ROUNDS}
                                             sx={{color:"red"}}
                                             name={"round"}
@@ -168,26 +208,26 @@ export default function MatchDialog(props) {
                                                 setForm({...form, round : newValue});
                                             }}
                                             value={form.round}
-                                            renderInput={(params) => <TextField {...params} label={"Round"} required/>}
-                                        />
+                                            renderInput={(params) => <TextField {...params} label={"Round"} required onKeyDown={preventSubmitOnEnter}/>}
+                                            />
                                     </Grid>
                                     <Grid item lg={6}>
-                                        <SimpleAutocomplete handle="hero_winner" options={heroes} label="Hero (winner)" form={form} setForm={setForm} required={true}/>
+                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="hero_winner" options={heroes} label="Hero (winner)" form={form} setForm={setForm} required={true}/>
                                     </Grid>
                                     <Grid item lg={6}>
-                                        <SimpleAutocomplete handle="hero_loser" options={heroes} label="Hero (loser)" form={form} setForm={setForm} required={true}/>
+                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="hero_loser" options={heroes} label="Hero (loser)" form={form} setForm={setForm} required={true}/>
                                     </Grid>
                                     <Grid item lg={6}>
-                                        <SimpleAutocomplete handle="user_winner" options={users} label="Player (winner)" form={form} setForm={setForm} required={false}/>
+                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="user_winner" options={users} label="Player (winner)" form={form} setForm={setForm} required={false}/>
                                     </Grid>
                                     <Grid item lg={6}>
-                                        <SimpleAutocomplete handle="user_loser" options={users} label="Player (loser)" form={form} setForm={setForm} required={false}/>
+                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="user_loser" options={users} label="Player (loser)" form={form} setForm={setForm} required={false}/>
                                     </Grid>
                                     <Grid item lg={6}>
-                                        <SimpleAutocomplete handle="format" options={formats} label="Format" form={form} setForm={setForm} required={true}/>
+                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="format" options={formats} label="Format" form={form} setForm={setForm} required={true}/>
                                     </Grid>
                                     <Grid item lg={6}>
-                                        <SimpleAutocomplete handle="meta" options={metas} label="Meta" form={form} setForm={setForm} required={true}/>
+                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="meta" options={metas} label="Meta" form={form} setForm={setForm} required={true}/>
                                     </Grid>
                                     {/*Date*/}
                                     <Grid item lg={6}>
@@ -195,6 +235,7 @@ export default function MatchDialog(props) {
                                             <DesktopDatePicker
                                                 label="Date"
                                                 value={form.date}
+                                                disabled={props.matchDialogMode === 'view'}
                                                 minDate={new Date('2017-01-01')}
                                                 onChange={(newValue) => {
                                                     setForm({...form, date: newValue});
@@ -208,8 +249,8 @@ export default function MatchDialog(props) {
                             </Box>
                         </DialogContent>
                         <DialogActions>
-                            <Button onClick={() => setOpen(false)}>Cancel</Button>
-                            <Button color={"success"} type={"submit"}>{props.submitMode}</Button>
+                            <Button sx={props.matchDialogMode !== 'view' ? {} : {display: 'none'}} onClick={handleClose}>Cancel</Button>
+                            <Button color={"success"} type={"submit"}>OK</Button>
                         </DialogActions>
                     </Box>
                 </Box>

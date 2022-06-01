@@ -5,7 +5,7 @@ import {ScoreboardFilter} from "./ScoreboardFilter";
 import {useEffect} from "react";
 import {atom, useRecoilState} from "recoil";
 import Box from "@mui/material/Box";
-import MatchDialog from "./MatchDialog";
+import MatchDetailDialog from "./MatchDetailDialog";
 
 export const matchesState = atom({
     key: 'matches',
@@ -53,7 +53,7 @@ export default function ScoreboardContainer(){
                         alignItems="center"
                         justifyContent="right"
                     >
-                        <MatchDialog submitMode={'create'}/>
+                        <MatchDetailDialog matchDialogMode={'create'}/>
                     </Box>
                 </Grid>
                 <Grid item xs={1}/>
