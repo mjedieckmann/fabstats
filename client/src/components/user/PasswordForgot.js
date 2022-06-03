@@ -8,10 +8,12 @@ import {useState} from "react";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
+import {useNotification} from "../../utils/_globalUtils";
 
 export default function PasswordForgot() {
     const [ passwordForgotDialogOpen, setPasswordForgotDialogOpen ] = useState(false);
     const [ form, setForm ] = useState({username: ''});
+    const showNotification = useNotification();
 
     const handlePasswordForgotDialogOpen = () => {
         setPasswordForgotDialogOpen(true);
@@ -23,9 +25,11 @@ export default function PasswordForgot() {
 
     const handleForgotPassword = () => {
         axios.post("/users/forgot", form)
-            .then(
-                (res) => {console.log(res); setPasswordForgotDialogOpen(false)},
-                () => console.log('Password forgot link could not be sent.'));
+            .then((res) => {
+                showNotification(res.data.message);
+                setPasswordForgotDialogOpen(false)
+            })
+            .catch(res => showNotification(res.response.data.message, 'error'));
     }
 
     return (

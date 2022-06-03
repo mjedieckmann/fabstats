@@ -7,18 +7,20 @@ import TextField from "@mui/material/TextField";
 import {useState} from "react";
 import Button from "@mui/material/Button";
 import axios from "axios";
+import {useNotification} from "../../utils/_globalUtils";
 
 export const PasswordReset = () => {
     const url_params = useParams();
     const [ form, setForm ] = useState({password_new: '', password_repeat: '', token: url_params.token});
+    const showNotification = useNotification();
 
     const resetPassword = () => {
         axios.post('/users/reset', form)
             .then(res => {
-                console.log(res);
+                showNotification(res.data.message);
                 window.location.replace('/');
             })
-            .catch(err => console.log(err));
+            .catch(res => showNotification(res.response.data.message, 'error'));
     }
 
     return (

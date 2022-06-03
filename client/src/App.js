@@ -12,7 +12,8 @@ import {Paper} from "@mui/material";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import ScoreboardContainer from "./components/pages/scoreboard/ScoreboardContainer";
 import About from "./components/pages/about/About";
-import {PasswordReset} from "./components/user/PasswordReset"; // Import using relative path
+import {PasswordReset} from "./components/user/PasswordReset";
+import Notification from "./components/pages/scoreboard/Notification"; // Import using relative path
 
 const styles = {
     paperContainer: {

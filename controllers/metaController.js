@@ -1,7 +1,7 @@
 const Meta = require('../models/meta');
 
 // Display list of all Formats.
-exports.meta_list = function(req, res, next) {
+exports.list_metas = function(req, res, next) {
     Meta.find()
         .sort([['date', 'descending']])
         .exec(function (err, list_metas) {

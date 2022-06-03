@@ -93,12 +93,13 @@ mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true}, (
 
     // error handler
     app.use(function(err, req, res, next) {
-        // set locals, only providing error in development
-        res.locals.message = err.message;
-        res.locals.error = req.app.get('env') === 'development' ? err : {};
+        // Only provide error details in development
+        if (req.app.get('env') !== 'development'){
+            err = {message: 'There was an error!', status: 500};
+        }
 
         // render the error page
-        return res.status(err.status || 500).json({message: err});
+        return res.status(err.status || 500).json({message: err.message});
     });
 
 });

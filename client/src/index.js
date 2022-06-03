@@ -7,6 +7,7 @@ import reportWebVitals from './reportWebVitals';
 
 import App from './App';
 import {RecoilRoot} from "recoil";
+import Notification from "./components/pages/scoreboard/Notification";
 
 
 /**
@@ -50,6 +51,7 @@ root.render(
       <ThemeProvider theme={theme}>
           <RecoilRoot>
             <App />
+            <Notification/>
           </RecoilRoot>
       </ThemeProvider>
   </React.StrictMode>

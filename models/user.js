@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
     {
-        nick: {type: String, required: true, maxLength: 100, unique: true},
+        nick: {type: String, required: true, minLength: 4, maxLength: 20, unique: true},
         hash: {type: String, required: true},
         salt: {type: String, required: true},
         e_mail: {type: String, required: true, maxLength: 100, unique: true},

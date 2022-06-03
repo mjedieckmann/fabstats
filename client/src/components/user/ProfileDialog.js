@@ -7,7 +7,6 @@ import axios from "axios";
 import uuid from "react-uuid";
 import {useEffect, useState} from "react";
 import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import Box from "@mui/material/Box";
@@ -18,6 +17,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Collapse from "@mui/material/Collapse";
 import DeleteUserDialog from "./DeleteUserDialog";
+import {useNotification} from "../../utils/_globalUtils";
+import {TeamDetailDialog} from "./TeamDetailDialog";
 
 const Input = styled('input')({
     display: 'none',
@@ -39,29 +40,20 @@ export default function ProfileDialog() {
     const [ currentUser, ] = useRecoilState(currentUserState);
     const [ ,setDirty ] = useRecoilState(dirtyState);
     const [ form, setForm ] = useState(EMPTY_FORM);
+    const showNotification = useNotification();
+    const [ hasChanged, setHasChanged ] = useState(false);
+
     useEffect(() => {
         setForm((prevState) => ({
             ...prevState,
             _id: currentUser._id,
             nick: currentUser.nick,
             e_mail: currentUser.e_mail,
-            team: currentUser.team !== null ? {label: currentUser.team.nick, id: currentUser.team._id} : null,
+            team: currentUser.team,
             file: currentUser.img,
         }));
     }, [currentUser])
-    const [ teams, setTeams ] = useState([]);
     const [ preview, setPreview ] = useState(null);
-    useEffect(() => {
-        axios.get('/users/teams')
-            .then(res => {
-                let teams = new Set();
-                res.data.forEach(team => {
-                    teams.add({label: team.nick, id: team._id});
-                })
-                setTeams([...teams]);
-            });
-    }, [currentUser])
-
     // create a preview as a side effect, whenever selected file is changed
     useEffect(() => {
         if (form.file === null || typeof form.file === 'string' || form.file instanceof String) {
@@ -104,23 +96,46 @@ export default function ProfileDialog() {
         if (form.file !== null && typeof form.file !== 'string' && !(form.file instanceof String)){
             const data = new FormData()
             data.append('file', form.file);
+            console.log(data);
             axios.post("/users/upload", data, {})
                 .then(res => {
+                    showNotification(res.data.message);
+                    setHasChanged(true);
+                })
+                .then(() => {
+                    axios.post("/users/edit", form, {})
+                        .then(res => {
+                            setDirty(uuid());
+                            showNotification(res.data.message);
+                            handleClose();
+                        })
+                        .catch(res => showNotification(res.response.data.message, 'error'));
+                })
+                .catch(res => showNotification(res.response.data.message, 'error'));
+
+        } else {
+            axios.post("/users/edit", form, {})
+                .then(res => {
                     setDirty(uuid());
-                });
+                    showNotification(res.data.message);
+                    handleClose();
+                })
+                .catch(res => showNotification(res.response.data.message, 'error'));
         }
-        axios.post("/users/edit", form, {})
-            .then(res => {
-                setDirty(uuid());
-                setOpen(false);
-            });
+    }
+
+    const handleClose = () => {
+        if (hasChanged) {
+            setDirty(uuid());
+        }
+        setOpen(false);
     }
 
     return (
         <Box noValidate component="form" onSubmit={handleSubmit}>
             <DialogTitle>User Profile<DeleteUserDialog form={form} setForm={setForm}/></DialogTitle>
             <DialogContent>
-                <Grid container spacing={2}>
+                <Grid container>
                     <Grid item xs={5}>
                         <Stack direction="row" alignItems="center" spacing={2}>
                             <label htmlFor="user-avatar-file">
@@ -131,65 +146,43 @@ export default function ProfileDialog() {
                             </label>
                         </Stack>
                     </Grid>
-                    <Grid item xs={5}>
-                        <TextField
-                            id="nick-input"
-                            label="Nick"
-                            value={form.nick}
-                            variant="standard"
-                            onInput={e => setForm(prevState => ({
-                                ...prevState,
-                                nick: e.target.value
-                            }))}
-                            size={"small"}
-                            autoComplete={"username"}
-                            type={"text"}
-                        />
-                        <TextField
-                            id="email-input"
-                            label="E-mail"
-                            value={form.e_mail}
-                            variant="standard"
-                            onInput={e => setForm(prevState => ({
-                                ...prevState,
-                                e_mail: e.target.value
-                            }))}
-                            size={"small"}
-                            autoComplete={"username"}
-                            type={"email"}
-                        />
-                        <Autocomplete
-                            id="team-input"
-                            freeSolo
-                            options={teams}
-                            value={form.team}
-                            onInputChange={(event, newInput) => {
-                                setForm({
-                                    ...form,
-                                    team: newInput,
-                                });
-                            }}
-                            renderInput={(params) =>
-                                <TextField {...params}
-                                           margin="dense"
-                                           label="Team"
-                                           type="text"
-                                           variant="standard"
-                                />}
-                        />
-                        <FormControlLabel
-                            control={<Switch checked={checked} onChange={handleChange} />}
-                            label="Change password"
-                        />
-                        <Box
-                            sx={{
-                                '& > :not(style)': {
-                                    display: 'flex',
-                                    justifyContent: 'space-around',
-                                },
-                            }}
-                        >
+                    <Grid item xs={7}>
+                        <Stack spacing={2}>
+                            <TextField
+                                id="nick-input"
+                                label="Nick"
+                                value={form.nick}
+                                variant="standard"
+                                onInput={e => setForm(prevState => ({
+                                    ...prevState,
+                                    nick: e.target.value
+                                }))}
+                                size={"small"}
+                                autoComplete={"username"}
+                                type={"text"}
+                            />
+                            <TextField
+                                id="email-input"
+                                label="E-mail"
+                                value={form.e_mail}
+                                variant="standard"
+                                onInput={e => setForm(prevState => ({
+                                    ...prevState,
+                                    e_mail: e.target.value
+                                }))}
+                                size={"small"}
+                                autoComplete={"username"}
+                                type={"email"}
+                            />
+                            <TeamDetailDialog userForm={form} setUserForm={setForm} setHasChanged={setHasChanged}/>
+                            <FormControlLabel
+                                control={<Switch checked={checked} onChange={handleChange}/>}
+                                label="Change password"
+                            />
+                        </Stack>
                             <Collapse in={checked}>
+                                <Stack spacing={1}>
+
                                 <TextField
                                     id="password-input"
                                     label="Old password"
@@ -229,13 +222,13 @@ export default function ProfileDialog() {
                                     type={"password"}
                                     size={"small"}
                                 />
+                                </Stack>
                             </Collapse>
-                        </Box>
                     </Grid>
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => setOpen(false)}>Cancel</Button>
+                <Button onClick={handleClose}>Cancel</Button>
                 <Button type={"submit"}>Save</Button>
             </DialogActions>
         </Box>

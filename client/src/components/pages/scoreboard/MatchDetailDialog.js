@@ -5,7 +5,6 @@ import {useEffect, useState} from "react";
 import Box from "@mui/material/Box";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import {useRecoilState} from "recoil";
@@ -19,7 +18,7 @@ import {SimpleAutocomplete} from "./SimpleAutocomplete";
 import uuid from "react-uuid";
 import {dirtyState, ROUNDS} from "../../../utils/_globalState";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
-import {capitalizeFirstLetter, preventSubmitOnEnter} from "../../../utils/_globalUtils";
+import {capitalizeFirstLetter, preventSubmitOnEnter, useNotification} from "../../../utils/_globalUtils";
 import {Row} from "./Row";
 
 const EMPTY_FORM = {
@@ -39,10 +38,17 @@ const EMPTY_FORM = {
 export default function MatchDetailDialog(props) {
     const [ open, setOpen ] = useState(false);
     const [ form, setForm ] = useState(EMPTY_FORM);
-    // const [ formError, setFormError ] = useState(EMPTY_FORM);
     const [ heroes, setHeroes ] = useState([]);
     const [ ,setDirty] = useRecoilState(dirtyState);
     const [ hasChanged, setHasChanged ] = useState(false);
+    const showNotification = useNotification();
+    useEffect(() => {
+        if (hasChanged && !open){
+            setDirty(uuid());
+            setHasChanged(false);
+        }
+    }, [hasChanged, open]);
+
     useEffect(() =>{
         axios.get('/api/heroes')
             .then(res => {
@@ -51,18 +57,16 @@ export default function MatchDetailDialog(props) {
                     heroes.add({label: hero.name, id: hero._id});
                 })
                 setHeroes([...heroes]);
-            });
+            })
+            .catch(err => showNotification(err.response.data.message, 'error'));
     }, []);
     const [ users, setUsers ] = useState([]);
     useEffect(() =>{
         axios.get('/users')
             .then(res => {
-                let users = new Set();
-                res.data.forEach(user => {
-                    users.add({label: user.nick, id: user._id});
-                })
-                setUsers([...users]);
-            });
+                setUsers(res.data);
+            })
+            .catch(err => showNotification(err.response.data.message, 'error'));
     }, []);
     const [ formats, setFormats ] = useState([]);
     useEffect(() =>{
@@ -73,7 +77,8 @@ export default function MatchDetailDialog(props) {
                     formats.add({label: format.descriptor, id: format._id});
                 })
                 setFormats([...formats]);
-            });
+            })
+            .catch(err => showNotification(err.response.data.message, 'error'));
     }, []);
     const [ metas, setMetas ] = useState([]);
     useEffect(() =>{
@@ -84,7 +89,8 @@ export default function MatchDetailDialog(props) {
                     metas.add({label: meta.descriptor, id: meta._id});
                 })
                 setMetas([...metas]);
-            });
+            })
+            .catch(err => showNotification(err.response.data.message, 'error'));
     }, []);
 
     const handleOpen = () => {
@@ -98,14 +104,15 @@ export default function MatchDetailDialog(props) {
                         round: res.data.round,
                         hero_winner: {label: res.data.hero_winner.name, id: res.data.hero_winner._id},
                         hero_loser: {label: res.data.hero_loser.name, id: res.data.hero_loser._id},
-                        user_winner: res.data.user_winner !== null ? {label: res.data.user_winner.nick, id: res.data.user_winner._id} : null,
-                        user_loser: res.data.user_loser !== null ? {label: res.data.user_loser.nick, id: res.data.user_loser._id} : null,
+                        user_winner: res.data.user_winner,
+                        user_loser: res.data.user_loser,
                         format: {label: res.data.format.descriptor, id: res.data.format._id},
                         meta: {label: res.data.meta.descriptor, id: res.data.meta._id},
                         created_by: res.data.created_by
                     });
                     setOpen(true);
-                });
+                })
+                .catch(err => showNotification(err.response.data.message, 'error'));
         } else {
             setForm(EMPTY_FORM);
             setOpen(true);
@@ -113,9 +120,6 @@ export default function MatchDetailDialog(props) {
     };
 
     const handleClose = () => {
-        if (hasChanged){
-            setDirty(uuid());
-        }
         setOpen(false);
     };
 
@@ -126,12 +130,10 @@ export default function MatchDetailDialog(props) {
             axios.post("/api/match/" + props.matchDialogMode, form)
                 .then(res => {
                     setHasChanged(true);
+                    showNotification(res.data.message);
                     handleClose();
                 })
-                .catch((err) => {
-                    //TODO: Better error handling, especially with axios, which seems to dislike me.
-                    console.log(err);
-                });
+                .catch(err => showNotification(err.response.data.message, 'error'));
         } else {
             handleClose();
         }
@@ -141,11 +143,12 @@ export default function MatchDetailDialog(props) {
     const handleDeleteMatch = () => {
         axios.post("/api/match/delete", form)
             .then((res) => {
-                setDeleteDialogOpen(false);
                 setHasChanged(true);
+                showNotification(res.data.message);
+                setDeleteDialogOpen(false);
                 handleClose();
             })
-            .catch(err => console.log(err));
+            .catch(err => showNotification(err.response.data.message, 'error'));
     }
     return (
         <>
@@ -155,7 +158,7 @@ export default function MatchDetailDialog(props) {
             }
             <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth={'sm'}>
                 <Box sx={{ width: '100%', typography: 'body1' }}>
-                    <Box noValidate component="form" onSubmit={handleSubmit}>
+                    <Box component="form" onSubmit={handleSubmit}>
                         <DialogTitle>
                             {capitalizeFirstLetter(props.matchDialogMode) + " Match"}
 
@@ -208,7 +211,11 @@ export default function MatchDetailDialog(props) {
                                                 setForm({...form, round : newValue});
                                             }}
                                             value={form.round}
-                                            renderInput={(params) => <TextField {...params} label={"Round"} required onKeyDown={preventSubmitOnEnter}/>}
+                                            renderInput={(params) =>
+                                                <TextField {...params}
+                                                           label={"Round"}
+                                                           required
+                                                           onKeyDown={preventSubmitOnEnter}/>}
                                             />
                                     </Grid>
                                     <Grid item lg={6}>
@@ -218,10 +225,48 @@ export default function MatchDetailDialog(props) {
                                         <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="hero_loser" options={heroes} label="Hero (loser)" form={form} setForm={setForm} required={true}/>
                                     </Grid>
                                     <Grid item lg={6}>
-                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="user_winner" options={users} label="Player (winner)" form={form} setForm={setForm} required={false}/>
+                                        <Autocomplete
+                                            id={"user-winner-input"}
+                                            disabled={props.matchDialogMode === 'view'}
+                                            options={users}
+                                            name={"user_winner"}
+                                            onChange={(event, newValue) => {
+                                                setForm({...form, user_winner: newValue});
+                                            }}
+                                            isOptionEqualToValue={(option, value) => {
+                                                return option._id === value._id;
+                                            }}
+                                            getOptionLabel={(option) => {
+                                                if (option.inputValue) {
+                                                    return option.inputValue;
+                                                }
+                                                return option.nick;
+                                            }}
+                                            value={form.user_winner}
+                                            renderInput={(params) => <TextField {...params} label="Player (winner)" onKeyDown={preventSubmitOnEnter}/>}
+                                        />
                                     </Grid>
                                     <Grid item lg={6}>
-                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="user_loser" options={users} label="Player (loser)" form={form} setForm={setForm} required={false}/>
+                                        <Autocomplete
+                                            id={"user-winner-input"}
+                                            disabled={props.matchDialogMode === 'view'}
+                                            options={users}
+                                            name={"user_loser"}
+                                            onChange={(event, newValue) => {
+                                                setForm({...form, user_loser: newValue});
+                                            }}
+                                            isOptionEqualToValue={(option, value) => {
+                                                return option._id === value._id;
+                                            }}
+                                            getOptionLabel={(option) => {
+                                                if (option.inputValue) {
+                                                    return option.inputValue;
+                                                }
+                                                return option.nick;
+                                            }}
+                                            value={form.user_loser}
+                                            renderInput={(params) => <TextField {...params} label="Player (loser)" onKeyDown={preventSubmitOnEnter}/>}
+                                        />
                                     </Grid>
                                     <Grid item lg={6}>
                                         <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="format" options={formats} label="Format" form={form} setForm={setForm} required={true}/>

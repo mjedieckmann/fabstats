@@ -56,3 +56,13 @@ export const contactDialogState = atom({
     key: 'contactDialogOpen',
     default: false
 })
+
+export const notificationState = atom({
+    key: 'notification',
+    default: []
+})
+
+export const notificationTypeState = atom({
+    key: 'notificationType',
+    default: 'success'
+})

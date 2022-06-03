@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {atom, useRecoilState} from "recoil";
 import {currentUserState} from "../../utils/_globalState";
 import axios from "axios";
+import {useNotification} from "../../utils/_globalUtils";
 
 export const dialogOpenState = atom({
     key: 'open',
@@ -69,12 +70,12 @@ const REGISTER_FIELDS = (form, formError) => {
     ]
 }
 
-const notEmpty = (field) => {
-    return booleanPromise(field.length !== 0, 'Required');
+const notEmpty = (label, field) => {
+    return booleanPromise(field.length !== 0, label + ' is required!');
 }
 
-const hasLength = (field, length) => {
-    return booleanPromise(field.length >= length, 'Too short (min: ' + length + ')');
+const hasLength = (label, field, minLength, maxLength) => {
+    return booleanPromise(field.length >= minLength && field.length <= maxLength, label + ' length (' + minLength + ' - ' + maxLength + ')');
 }
 
 const isEMail = (field) => {
@@ -108,15 +109,11 @@ const useAuthenticationForm = (form_state, error_state) => {
         }));
     }, [form.e_mail, setFormError])
 
-    const [, setOpen] = useRecoilState(dialogOpenState);
-    const [, setCurrentUser] = useRecoilState(currentUserState);
     return [
         form,
         formError,
         setFormError,
         handleChange,
-        setOpen,
-        setCurrentUser
     ]
 }
 
@@ -140,36 +137,42 @@ export const useForm = (form_state, error_state) => {
 }
 
 export const useLoginForm = (form_state, error_state) => {
-    const [form, formError, setFormError, handleChange, setOpen, setCurrentUser] = useAuthenticationForm(form_state, error_state);
+    const [form, formError, setFormError, handleChange] = useAuthenticationForm(form_state, error_state);
+    const [, setOpen] = useRecoilState(dialogOpenState);
+    const [, setCurrentUser] = useRecoilState(currentUserState);
+    const showNotification = useNotification();
 
     const loginUser = () => {
         validateForm().then(() => {
             axios.post("/users/login", form)
                 .then((res) => {
                     setCurrentUser(res.data.user);
+                    showNotification('Logged in!');
                     setOpen(false);
+                })
+                .catch((res) => {
+                    showNotification(res.response.data.message, 'error');
                 });
-            }, () =>
-                console.log('LOGIN validation errors')
+            }, (reason) => showNotification(reason, 'error')
         );
     }
 
     const validateForm = () => {
-        const userValid = notEmpty(form.username)
+        const userValid = notEmpty('Username', form.username)
             .catch((rejected) => {
                 setFormError(prevState => ({
                     ...prevState,
                     username: rejected,
                 }));
-                return Promise.reject();
+                return Promise.reject(rejected);
             });
-        const passwordValid = notEmpty(form.password)
+        const passwordValid = notEmpty('Password', form.password)
             .catch((rejected) => {
                 setFormError(prevState => ({
                     ...prevState,
                     password: rejected,
                 }));
-                return Promise.reject();
+                return Promise.reject(rejected);
             });
         return Promise.all([userValid, passwordValid]);
     }
@@ -183,8 +186,9 @@ export const useLoginForm = (form_state, error_state) => {
     ]
 }
 
-export const useRegisterForm = (form_state, error_state) => {
-    const [form, formError, setFormError, handleChange, setOpen, setCurrentUser] = useAuthenticationForm(form_state, error_state);
+export const useRegisterForm = (form_state, error_state, setTab) => {
+    const [form, formError, setFormError, handleChange] = useAuthenticationForm(form_state, error_state);
+    const showNotification = useNotification();
 
     useEffect(() =>{
         setFormError(prevState => ({
@@ -204,49 +208,53 @@ export const useRegisterForm = (form_state, error_state) => {
         validateForm().then(() => {
                 axios.post("/users/register", form)
                     .then((res) => {
-                        setCurrentUser(res.data.user);
-                        setOpen(false);
+                        showNotification(res.data.message)
+                        setTab('1');
+                    })
+                    .catch((res) => {
+                        showNotification(res.response.data.message, 'error');
                     });
-            }, () => console.log('REGISTER validation errors')
+            }, (reason) => showNotification(reason, 'error')
         );
     }
 
     const validateForm = () => {
-        const userValid = notEmpty(form.username)
-            .then(() => hasLength(form.username, 4))
+        setFormError(error_state);
+        const userValid = notEmpty('Username', form.username)
+            .then(() => hasLength('Username', form.username, 4, 20))
             .catch((rejected) => {
                 setFormError(prevState => ({
                     ...prevState,
                     username: rejected,
                 }));
-                return Promise.reject();
+                return Promise.reject(rejected);
             });
-        const emailValid = notEmpty(form.e_mail)
+        const emailValid = notEmpty('E-Mail', form.e_mail)
             .then(() => isEMail(form.e_mail))
             .catch((rejected) => {
                 setFormError(prevState => ({
                     ...prevState,
                     e_mail: rejected,
                 }));
-                return Promise.reject();
+                return Promise.reject(rejected);
             });
-        const passwordValid = notEmpty(form.password)
-            .then(() => hasLength(form.password, 5))
+        const passwordValid = notEmpty('Password', form.password)
+            .then(() => hasLength('Password', form.password, 8, 20))
             .catch((rejected) => {
                 setFormError(prevState => ({
                     ...prevState,
                     password: rejected,
                 }));
-                return Promise.reject();
+                return Promise.reject(rejected);
             });
-        const passwordRepeatValid = notEmpty(form.password_repeat)
+        const passwordRepeatValid = notEmpty('Password (repeat)', form.password_repeat)
             .then(() => fieldsEqual(form.password, form.password_repeat))
             .catch((rejected) => {
                 setFormError(prevState => ({
                     ...prevState,
                     password_repeat: rejected,
                 }));
-                return Promise.reject();
+                return Promise.reject(rejected);
             });
         return Promise.all([userValid, emailValid, passwordValid, passwordRepeatValid]);
     }

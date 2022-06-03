@@ -13,10 +13,12 @@ import {useRecoilState} from "recoil";
 import {dirtyState} from "../../utils/_globalState";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
+import {useNotification} from "../../utils/_globalUtils";
 
 export default function DeleteUserDialog(props) {
     const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);
     const [ ,setDirty] = useRecoilState(dirtyState);
+    const showNotification = useNotification()
 
     const handleUserDeleteDialogOpen = () => {
         setDeleteUserDialogOpen(true);
@@ -28,11 +30,12 @@ export default function DeleteUserDialog(props) {
 
     const handleUserDelete = () => {
         axios.post("/users/delete", props.form)
-            .then(() => {
-                setDirty(new uuid());
+            .then((res) => {
+                setDirty(uuid());
+                showNotification(res.data.message);
                 handleUserDeleteDialogClose();
             })
-            .catch(err => console.log(err));
+            .catch(res => showNotification(res.response.data.message, 'error'));
     }
 
     return (

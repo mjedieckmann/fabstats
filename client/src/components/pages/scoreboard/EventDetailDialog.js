@@ -8,15 +8,19 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import {useState, useEffect} from "react";
 import axios from "axios";
 import {useRecoilState} from "recoil";
-import {currentUserState,EVENT_TYPES,eventsChangedState,} from "../../../utils/_globalState";
+import {currentUserState,EVENT_TYPES} from "../../../utils/_globalState";
 import {Grid, IconButton} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import uuid from "react-uuid";
 import {TODetailDialog} from "./TODetailDialog";
-import {capitalizeFirstLetter, entityIsEditableByUser, preventSubmitOnEnter} from "../../../utils/_globalUtils";
+import {
+    capitalizeFirstLetter,
+    entityIsEditableByUser,
+    preventSubmitOnEnter,
+    useNotification
+} from "../../../utils/_globalUtils";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
-import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 
 const filter = createFilterOptions();
@@ -28,6 +32,7 @@ export default function EventDetailDialog(props) {
     const [ eventDialogMode, setEventDialogMode ] = useState('view');
     const [ eventDialogOpen, setEventDialogOpen ] = useState(false);
     const [ eventForm, setEventForm ] = useState({_id: null, descriptor: '', event_type: 'On Demand', to: ''});
+    const showNotification = useNotification();
 
     const [ events, setEvents ] = useState([]);
     useEffect(() =>{
@@ -38,7 +43,8 @@ export default function EventDetailDialog(props) {
                     events.add(event);
                 })
                 setEvents([...events]);
-            });
+            })
+            .catch(err => showNotification(err.response.data.message, 'error'));
     }, [eventsChanged]);
 
     const handleOpenEventDetail = (mode) => {
@@ -77,9 +83,11 @@ export default function EventDetailDialog(props) {
         } else {
             axios.post("/api/event/" + eventDialogMode, eventForm)
                 .then((res) => {
-                    props.setForm({...props.form, event: res.data});
+                    props.setForm({...props.form, event: res.data.event});
+                    showNotification(res.data.message);
                     handleClose();
-                });
+                })
+                .catch(err => showNotification(err.response.data.message, 'error'));
         }
     };
 
@@ -88,9 +96,11 @@ export default function EventDetailDialog(props) {
         axios.post("/api/event/delete", eventForm)
             .then((res) => {
                 props.setForm({...props.form, event: null});
+                showNotification(res.data.message);
                 setDeleteDialogOpen(false);
                 handleClose();
-            });
+            })
+            .catch(err => showNotification(err.response.data.message, 'error'));
     }
 
     return (
@@ -186,6 +196,9 @@ export default function EventDetailDialog(props) {
                             <Grid item lg={12}>
                                 <TextField
                                     autoFocus
+                                    required
+                                    error={eventForm.descriptor === ''}
+                                    helperText={eventForm.descriptor === '' ? 'Required' : ''}
                                     disabled={eventDialogMode === 'view'}
                                     margin="dense"
                                     id="event-input"
@@ -216,8 +229,8 @@ export default function EventDetailDialog(props) {
                                     renderInput={(params) =>
                                         <TextField {...params}
                                                    required
-                                            // error={dialogValue.event_type === null}
-                                            // helperText={dialogValue.event_type === null ? 'Required' : ''}
+                                                   error={eventForm.event_type === null}
+                                                   helperText={eventForm.event_type === null ? 'Required' : ''}
                                                    margin="dense"
                                                    label="Event Type"
                                                    type="text"

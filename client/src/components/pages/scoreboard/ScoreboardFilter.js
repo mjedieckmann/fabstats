@@ -4,10 +4,12 @@ import TextField from "@mui/material/TextField";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, matchesState, pageState} from "./ScoreboardContainer";
 import {heroesState, useSimpleDataFetch} from "../_pageUtils";
-import {dirtyState, EVENT_TYPES, eventsChangedState, ROUNDS, tosChangedState} from "../../../utils/_globalState";
+import {dirtyState, EVENT_TYPES, ROUNDS} from "../../../utils/_globalState";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
 import axios from "axios";
+import Button from "@mui/material/Button";
+import {useNotification} from "../../../utils/_globalUtils";
 
 const NO_FILTER = {hero: null, user: null, team: null, format: null, event: null, eventType: null, to: null, meta: null, round: null, date_after: null, date_before: null};
 
@@ -30,7 +32,7 @@ export const ScoreboardFilter = () =>{
                 })
                 setUsers([...users]);
             });
-    }, []);
+    }, [dirty]);
 
     useEffect(() =>{
         axios.get('/users/teams')
@@ -41,7 +43,7 @@ export const ScoreboardFilter = () =>{
                 })
                 setTeams([...teams]);
             });
-    }, []);
+    }, [dirty]);
     const [ events, setEvents ] = useState([]);
     useEffect(() =>{
         axios.get('/api/events')

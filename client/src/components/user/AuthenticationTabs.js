@@ -29,7 +29,7 @@ export default function AuthenticationTabs() {
                     <LoginDialog/>
                 </TabPanel>
                 <TabPanel value="2">
-                    <RegisterDialog/>
+                    <RegisterDialog setTab={setTab}/>
                 </TabPanel>
             </TabContext>
         </Box>

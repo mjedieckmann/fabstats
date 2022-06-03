@@ -8,8 +8,12 @@ import {dialogOpenState, useRegisterForm} from "./_formUtils";
 import {FormFields} from "./FormFields";
 import {useRecoilState} from "recoil";
 
-export default function RegisterDialog() {
-    const [{handleChange, registerUser, REGISTER_FIELDS}] = useRegisterForm({username: '', e_mail: '', password: '', password_repeat: ''}, {username: null, e_mail: null, password: null, password_repeat: null})
+export default function RegisterDialog(props) {
+    const [{handleChange, registerUser, REGISTER_FIELDS}] = useRegisterForm(
+        {username: '', e_mail: '', password: '', password_repeat: ''},
+        {username: null, e_mail: null, password: null, password_repeat: null},
+        props.setTab
+    )
     const [, setOpen] = useRecoilState(dialogOpenState);
 
     const handleSubmit = (e) => {

@@ -9,69 +9,69 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import {useState, useEffect} from "react";
 import axios from "axios";
-import {useRecoilState} from "recoil";
-import {currentUserState} from "../../../utils/_globalState";
 import uuid from "react-uuid";
-import {capitalizeFirstLetter, entityIsEditableByUser, useNotification} from "../../../utils/_globalUtils";
-import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import Box from "@mui/material/Box";
+import {capitalizeFirstLetter, entityIsEditableByUser, useNotification} from "../../utils/_globalUtils";
+import DeleteConfirmationDialog from "../pages/scoreboard/DeleteConfirmationDialog";
+import {useRecoilState} from "recoil";
+import {currentUserState} from "../../utils/_globalState";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const filter = createFilterOptions();
 
-export const TODetailDialog = (props) => {
-    const [ tosChanged, setTosChanged] = useState(uuid());
+export const TeamDetailDialog = (props) => {
+    const [ teamsChanged, setTeamsChanged] = useState(uuid());
     const [ currentUser, ] = useRecoilState(currentUserState);
-    let toIsEditable = entityIsEditableByUser(props.eventForm.to, currentUser);
-    const [ toDialogMode, setToDialogMode ] = useState('view');
+    let teamIsEditable = entityIsEditableByUser(props.userForm.team, currentUser);
+    const [ teamDialogMode, setTeamDialogMode ] = useState('view');
     const showNotification = useNotification();
 
-    const [ tos, setTos ] = useState([]);
+    const [ teams, setTeams ] = useState([]);
     useEffect(() => {
-        axios.get('/api/tos')
+        axios.get('/users/teams')
             .then(res => {
-                setTos(res.data);
+                setTeams(res.data);
             })
-            .catch(err => showNotification(err.response.data.message, 'error'));
-    }, [tosChanged]);
-    const [ toForm, setToForm ] = useState({_id: null, descriptor: ''});
-    const [ toDialogOpen, setToDialogOpen ] = useState(false);
+            .catch(err => showNotification(err.response.data.message));
+    }, [teamsChanged]);
+    const [ teamForm, setTeamForm ] = useState({_id: null, nick: ''});
+    const [ teamDialogOpen, setTeamDialogOpen ] = useState(false);
 
-    const handleOpenToDetail = (mode) => {
+    const handleOpenTeamDetail = (mode) => {
         switch (mode){
             case 'create':
-                props.setEventForm({
-                    ...props.eventForm,
-                    to: null
+                props.setUserForm({
+                    ...props.userForm,
+                    team: null
                 });
                 break;
             case 'view':
             case 'edit':
-                setToForm({
-                    _id : props.eventForm.to._id,
-                    descriptor: props.eventForm.to.descriptor
+                setTeamForm({
+                    _id : props.userForm.team._id,
+                    nick: props.userForm.team.nick
                 })
                 break;
         }
-        setToDialogMode(mode);
-        setToDialogOpen(true)
+        setTeamDialogMode(mode);
+        setTeamDialogOpen(true)
     }
 
     const handleClose = () => {
         props.setHasChanged(true);
-        setTosChanged(uuid());
-        setToDialogOpen(false);
+        setTeamsChanged(uuid());
+        setTeamDialogOpen(false);
     }
 
     const handleSubmit = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (toDialogMode === 'view'){
-            setToDialogOpen(false);
+        if (teamDialogMode === 'view'){
+            setTeamDialogOpen(false);
         } else {
-            axios.post('/api/to/' + toDialogMode, toForm)
+            axios.post('/users/team/' + teamDialogMode, teamForm)
                 .then(res => {
-                    props.setEventForm({...props.eventForm, to: res.data.to});
+                    props.setUserForm({...props.userForm, team: res.data.team});
                     showNotification(res.data.message);
                     handleClose();
                 })
@@ -80,10 +80,10 @@ export const TODetailDialog = (props) => {
     }
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const handleDeleteTo = () => {
-        axios.post("/api/to/delete", toForm)
+    const handleDeleteTeam = () => {
+        axios.post("/users/team/delete", teamForm)
             .then((res) => {
-                props.setEventForm({...props.eventForm, to: null});
+                props.setUserForm({...props.userForm, team: null});
                 showNotification(res.data.message);
                 setDeleteDialogOpen(false);
                 handleClose();
@@ -95,43 +95,42 @@ export const TODetailDialog = (props) => {
         <>
             <Box display={"flex"}>
                 <Autocomplete
-                    id="to-input"
+                    id="team-input"
                     sx={{m: "auto", width: 1}}
-                    disabled={props.eventDialogMode === 'view'}
                     onChange={(e, newValue) => {
                         if (typeof newValue === 'string') {
                             // timeout to avoid instant validation of the dialog's form.
                             setTimeout(() => {
-                                setToForm({
+                                setTeamForm({
                                     _id: null,
-                                    descriptor: newValue.descriptor
+                                    nick: newValue.nick
                                 });
-                                handleOpenToDetail('create');
+                                handleOpenTeamDetail('create');
                             });
                         } else if (newValue && newValue.inputValue) {
-                            setToForm({
+                            setTeamForm({
                                 _id: null,
-                                descriptor: newValue.inputValue
+                                nick: newValue.inputValue
                             });
-                            handleOpenToDetail('create');
+                            handleOpenTeamDetail('create');
                         } else {
-                            props.setEventForm({
-                                ...props.eventForm,
-                                to: newValue
+                            props.setUserForm({
+                                ...props.userForm,
+                                team: newValue
                             });
                         }
                     }}
                     filterOptions={(options, params) => {
                         const filtered = filter(options, params);
-                        if (params.inputValue !== '' && !filtered.some(e => e.descriptor === params.inputValue)) {
+                        if (params.inputValue !== '' && !filtered.some(e => e.nick === params.inputValue)) {
                             filtered.push({
                                 inputValue: `${params.inputValue} `,
-                                descriptor: `create "${params.inputValue}"`,
+                                nick: `create "${params.inputValue}"`,
                             });
                         }
                         return filtered;
                     }}
-                    options={tos}
+                    options={teams}
                     getOptionLabel={(option) => {
                         // e.g value selected with enter, right from the input
                         if (typeof option === 'string') {
@@ -140,62 +139,62 @@ export const TODetailDialog = (props) => {
                         if (option.inputValue) {
                             return option.inputValue;
                         }
-                        return option.descriptor;
+                        return option.nick;
                     }}
                     selectOnFocus
                     clearOnBlur
                     handleHomeEndKeys
-                    renderOption={(props, option) => <li {...props}>{option.descriptor}</li>}
+                    renderOption={(props, option) => <li {...props}>{option.nick}</li>}
                     freeSolo
                     isOptionEqualToValue={(option, value) => {
                         return option._id === value._id;
                     }}
-                    value={props.eventForm.to}
+                    value={props.userForm.team}
                     renderInput={(params) =>
-                        <TextField {...params} label="TO" />}
+                        <TextField {...params} label="Team" />}
                 />
-                <IconButton sx={props.eventForm.to !== null ? {my: "auto", ml: 1} : {display: 'none'}} onClick={() => handleOpenToDetail(toIsEditable ? 'edit' : 'view')}>
-                    {toIsEditable
+                <IconButton sx={props.userForm.team !== null ? {my: "auto", ml: 1} : {display: 'none'}} onClick={() => handleOpenTeamDetail(teamIsEditable ? 'edit' : 'view')}>
+                    {teamIsEditable
                         ? <EditIcon />
                         : <VisibilityIcon />
                     }
                 </IconButton>
             </Box>
-            <Dialog open={toDialogOpen} onClose={() => setToDialogOpen(false)}>
+            <Dialog open={teamDialogOpen} onClose={() => setTeamDialogOpen(false)}>
                 <form onSubmit={handleSubmit}>
                     <DialogTitle>
-                        {capitalizeFirstLetter(toDialogMode) + " TO" }
+                        {capitalizeFirstLetter(teamDialogMode) + " Team" }
                         <DeleteConfirmationDialog
-                            sx={toDialogMode === 'edit' ? {} : {display: 'none'}}
+                            sx={teamDialogMode === 'edit' ? {} : {display: 'none'}}
                             deleteDialogOpen={deleteDialogOpen}
                             setDeleteDialogOpen={setDeleteDialogOpen}
-                            handleDelete={handleDeleteTo}
-                            entity={'to'}
+                            handleDelete={handleDeleteTeam}
+                            entity={'team'}
                         />
                     </DialogTitle>
                     <DialogContent>
                         <TextField
                             autoFocus
-                            disabled={toDialogMode === 'view'}
                             required
-                            error={toForm.descriptor === ''}
-                            helperText={toForm.descriptor === '' ? 'Required' : ''}
+                            error={teamForm.nick === ''}
+                            helperText={teamForm.nick === '' ? 'Required' : ''}
+                            disabled={teamDialogMode === 'view'}
                             margin="dense"
-                            id="event-input"
-                            value={toForm.descriptor}
+                            id="team-input"
+                            value={teamForm.nick}
                             onChange={(event) =>
-                                setToForm({
-                                    ...toForm,
-                                    descriptor: event.target.value,
+                                setTeamForm({
+                                    ...teamForm,
+                                    nick: event.target.value,
                                 })
                             }
-                            label="TO name"
+                            label="Team name"
                             type="text"
                             variant="standard"
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button sx={toDialogMode !== 'view' ? {} : {display: 'none'}} onClick={() => setToDialogOpen(false)}>Cancel</Button>
+                        <Button sx={teamDialogMode !== 'view' ? {} : {display: 'none'}} onClick={() => setTeamDialogOpen(false)}>Cancel</Button>
                         <Button type="submit">OK</Button>
                     </DialogActions>
                 </form>

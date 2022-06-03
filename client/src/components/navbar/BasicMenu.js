@@ -6,12 +6,14 @@ import {currentUserState, dirtyState} from "../../utils/_globalState";
 import {useState} from "react";
 import axios from "axios";
 import uuid from "react-uuid";
+import {useNotification} from "../../utils/_globalUtils";
 
 export default function BasicMenu (props) {
     const [ userMenuAnchor, setUserMenuAnchor ] = useState(null);
     const [ currentUser, ] = useRecoilState(currentUserState);
     const [ ,setDirty ] = useRecoilState(dirtyState);
     const userMenuOpen = Boolean(userMenuAnchor);
+    const showNotification = useNotification();
 
     const handleMenuClick = (event) => {
         setUserMenuAnchor(event.currentTarget);
@@ -26,6 +28,7 @@ export default function BasicMenu (props) {
         axios.get("/users/logout")
             .then(res => {
                 setDirty(uuid());
+                showNotification(res.data.message);
                 handleMenuClose();
             });
     }

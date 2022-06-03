@@ -1,9 +1,24 @@
 const TO = require('../models/to');
-const {body, validationResult} = require("express-validator");
-const Event = require("../models/event");
+const {body} = require("express-validator");
+const {getValidationResult} = require("../utils/_helpers");
+
+exports.isToCreator = function(req, res, next) {
+    TO.findOne({
+        _id: req.body._id,
+        created_by: req.user._id
+    }).exec((err, to) => {
+        if (err !== null) { return next(err)}
+        if (to === null){
+            return res.status(401).json({message: "You are not the creator of this TO!"});
+        } else {
+            res.locals.to = to;
+            return next();
+        }
+    });
+}
 
 // Display list of all Formats.
-exports.to_list = function(req, res, next) {
+exports.list_tos = function(req, res, next) {
     TO.find()
         .sort([['descriptor']])
         .exec(function (err, list_tos) {
@@ -16,41 +31,45 @@ exports.to_list = function(req, res, next) {
 exports.create_to = [
     body('descriptor', 'TO name must not be empty.').trim().isLength({ min: 1 }).escape(),
     (req, res, next) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            // There are errors. Render form again with sanitized values/error messages.
-            return res.status(403).json(errors);
+        const validation = getValidationResult(req);
+        if (validation.hasErrors) {
+            return res.status(409).json({message: validation.message});
+        } else {
+            TO.findOne({descriptor: req.body.descriptor}).exec((err, to) => {
+                if (to) {
+                    return res.status(403).json({message: 'A TO with that name already exists!'})
+                } else {
+                    const newTo = new TO({
+                        descriptor: req.body.descriptor,
+                        created_by: req.user
+                    });
+                    newTo.save((err) => {
+                        if (err) {return next(err)}
+                        return res.status(200).json({message: 'TO "' + newTo.descriptor + '" created!', to: newTo});
+                    })
+                }
+            })
         }
-        TO.findOne({ descriptor: req.body.descriptor}).exec((err, to) => {
-            if (to) {
-                return res.status(403).json({message: 'A TO with that name already exists!'})
-            } else {
-                const newTo = new TO({
-                    descriptor: req.body.descriptor,
-                    created_by: req.user._id
-                });
-                newTo.save((err) => {
-                    if (err) { return next(err)}
-                    return res.status(200).json(newTo);
-                })
-            }
-        })
     }
 ]
 
 exports.edit_to = [
     // Validate and sanitize fields.
-    body('descriptor', 'Event name must not be empty.').trim().isLength({ min: 1 }).escape(),
-
+    body('descriptor', 'TO name must not be empty.').trim().isLength({ min: 1 }).escape(),
     (req, res, next) => {
-        TO.findById(req.body._id).exec((err, to) => {
-            if (err) { return next(err); }
-            to.descriptor = req.body.descriptor;
-            to.save(function (err, to) {
+        const validation = getValidationResult(req);
+        if (validation.hasErrors) {
+            return res.status(409).json({message: validation.message});
+        } else {
+            TO.findById(req.body._id).exec((err, to) => {
                 if (err) { return next(err); }
-                return res.status(200).json(to);
-            });
-        })
+                to.descriptor = req.body.descriptor;
+                to.save(function (err, to) {
+                    if (err) { return next(err); }
+                    return res.status(200).json({message: 'TO updated!', to: to});
+                });
+            })
+        }
     }
 ]
 

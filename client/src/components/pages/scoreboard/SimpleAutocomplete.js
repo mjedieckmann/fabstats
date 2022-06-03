@@ -17,7 +17,7 @@ export const SimpleAutocomplete = (props) =>{
                     return option.id === value.id;
                 }}
                 value={props.form[props.handle]}
-                renderInput={(params) => <TextField {...params} label={props.label} required={props.required} onKeyDown={preventSubmitOnEnter}/>}
+                renderInput={(params) => <TextField {...params} error={props.error} helperText={props.error ? 'Required' : ''} label={props.label} required={props.required} onKeyDown={preventSubmitOnEnter}/>}
             />
         </>
     )
