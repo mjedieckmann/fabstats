@@ -1,6 +1,8 @@
 import {atom, useRecoilState} from "recoil";
 import {useEffect} from "react";
 import uuid from 'react-uuid'
+import EclipseImage from '../img/Eclipse_Full_Art.width-10000.jpg';
+import EnlightenmentImage from '../img/Seek_Enlightenment_Full_Art.width-10000.jpg';
 
 export const currentPageState = atom({
     key: 'currentPage',
@@ -8,6 +10,17 @@ export const currentPageState = atom({
 });
 
 export function useCurrentPage(page){
+    const [ ,setBackgroundImg ] = useRecoilState(backgroundImgState);
+    useEffect(() => {
+        switch (page){
+            case 'About':
+                setBackgroundImg(EclipseImage);
+                break;
+            case 'Scoreboard':
+                setBackgroundImg(EnlightenmentImage);
+                break;
+        }
+    }, [page]);
     const [, setCurrentPage] = useRecoilState(currentPageState);
     useEffect(() => {
         setCurrentPage(page);
@@ -24,16 +37,10 @@ export const dirtyState = atom( {
     default: uuid()
 })
 
-export const tosChangedState = atom( {
-    key: 'tosChanged',
-    default: uuid()
+export const backgroundImgState = atom( {
+    key: 'backgroundImg',
+    default: null,
 })
-
-export const eventsChangedState = atom( {
-    key: 'eventsChanged',
-    default: uuid()
-})
-
 
 export const ROUNDS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Quarterfinal', 'Semifinal', 'Final', 'N/A'];
 

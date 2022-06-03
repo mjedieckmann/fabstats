@@ -13,7 +13,7 @@ export default function About(){
         <Grid container spacing={3}>
             <Grid item xs={1}/>
             <Grid item xs={10} textAlign={"center"}>
-                <Paper sx={{py: 1}}>
+                <Paper sx={{py: 1}} variant={"opacity-0.9"}>
                 <Typography variant="h4" fontWeight={"bold"} gutterBottom component="div">
                     Flesh and Blood™ TCG Unofficial Statistics
                 </Typography>
@@ -22,7 +22,7 @@ export default function About(){
             <Grid item xs={1}/>
             <Grid item xs={1}/>
             <Grid item xs={5} sx={{textAlign:"center", mx: "auto"}}>
-                <Paper sx={{py: 3}}>
+                <Paper sx={{py: 3}} variant={"opacity-0.9"}>
                     <Box sx={{mx: 3, my: 2}}>
                         <Stack spacing={1}>
                             <Typography variant="h5" fontWeight={"bold"} gutterBottom component="div">
@@ -66,7 +66,7 @@ export default function About(){
                 </Paper>
             </Grid>
             <Grid item xs={5} sx={{textAlign:"center", mx: "auto" }}>
-                <Paper sx={{py: 3}}>
+                <Paper sx={{py: 3}} variant={"opacity-0.9"}>
                     <Box sx={{mx: 3, my: 2}}>
                         <Stack spacing={1}>
                             <Typography variant="h5" fontWeight={"bold"} gutterBottom component="div">

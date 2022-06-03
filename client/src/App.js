@@ -3,49 +3,55 @@ import {Routes, Route, Navigate, Outlet, BrowserRouter} from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
 import Stack from "@mui/material/Stack";
 import {useRecoilState} from "recoil";
-import {currentUserState, dirtyState} from "./utils/_globalState";
+import {backgroundImgState, currentUserState, dirtyState} from "./utils/_globalState";
 import {useEffect} from "react";
 import axios from "axios";
 import {Footer} from "./components/footer/Footer";
-import Image from './img/Seek_Enlightenment_Full_Art.width-10000.jpg';
+import Image from './img/Eclipse_Full_Art.width-10000.jpg';
 import {Paper} from "@mui/material";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
 import ScoreboardContainer from "./components/pages/scoreboard/ScoreboardContainer";
 import About from "./components/pages/about/About";
 import {PasswordReset} from "./components/user/PasswordReset";
-import Notification from "./components/pages/scoreboard/Notification"; // Import using relative path
 
-const styles = {
-    paperContainer: {
-        backgroundImage: `url(${Image})`,
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        width: '100vw',
-        minHeight: '100vh',
-        backgroundAttachment: 'fixed',
-    }
-};
 
 const theme = createTheme({
     components: {
-        // Name of the component
         MuiPaper: {
-            styleOverrides: {
-                // Name of the slot
-                root: {
-                    // Some CSS
-                    backgroundColor: 'rgba(255,255,255,0.8)',
+            variants: [
+                {
+                    props: { variant: 'opacity-0.8' },
+                    style: {
+                        backgroundColor: 'rgba(255,255,255,0.8)',
+                    },
                 },
+                {
+                    props: { variant: 'opacity-0.9'},
+                    style: {
+                        backgroundColor: 'rgba(255,255,255,0.9)',
+                    },
+                },
+                ],
             },
         },
     },
-});
+);
 
 const Layout = () => {
     const [ currentUser, setCurrentUser ] = useRecoilState(currentUserState);
     const [ dirty, ] = useRecoilState(dirtyState);
-
+    const [ backgroundImg, ] = useRecoilState(backgroundImgState);
+    const styles = {
+        paperContainer: {
+            backgroundImage: `url(${backgroundImg})`,
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            width: '100vw',
+            minHeight: '100vh',
+            backgroundAttachment: 'fixed',
+        }
+    };
     useEffect(() => {
         axios.get('/users/current')
             .then(res => {

@@ -13,7 +13,6 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import {Row} from "./Row";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, pageState} from "./ScoreboardContainer";
 import {useState} from "react";
@@ -98,21 +97,15 @@ export default function Scoreboard() {
     };
 
     return (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} variant={"opacity-0.9"}>
             <Table aria-label="collapsible table" size={"small"}>
                 <TableHead>
                     <TableRow>
-                        {/*<TableCell align="center">Type</TableCell>*/}
-                        {/*<TableCell align="center">Round</TableCell>*/}
                         <TableCell align="center">Date</TableCell>
                         <TableCell align="center">Winner</TableCell>
                         <TableCell align="center"></TableCell>
                         <TableCell align="center">Loser</TableCell>
                         <TableCell align="center">Event</TableCell>
-                        {/*<TableCell align="center">Format</TableCell>*/}
-                        {/*<TableCell align="center">Meta</TableCell>*/}
-                        {/*<TableCell align="center">TO</TableCell>*/}
-                        {/*<TableCell align="center"></TableCell>*/}
                     </TableRow>
                 </TableHead>
                 <TableBody>

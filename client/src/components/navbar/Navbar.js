@@ -13,7 +13,7 @@ export default function Navbar() {
     const [currentPage, ] = useRecoilState(currentPageState);
 
     return (
-        <Paper>
+        <Paper variant={"opacity-0.8"}>
             <AppBar position="static" color={"transparent"}>
                 <Toolbar>
                     <Grid container alignItems={"center"}>

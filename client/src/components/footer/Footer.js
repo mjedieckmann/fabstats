@@ -5,7 +5,7 @@ import PrivacyPolicyDialog from "./PrivacyPolicyDialog";
 
 export const Footer = () => {
     return(
-        <Paper sx={{bottom: 0}} elevation={3}>
+        <Paper variant={"opacity-0.8"} sx={{bottom: 0}} elevation={3}>
             <Grid container>
                 <Grid item xs={12} textAlign={"center"}>
                     <ContactDialog/>

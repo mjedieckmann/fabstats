@@ -8,8 +8,6 @@ import {dirtyState, EVENT_TYPES, ROUNDS} from "../../../utils/_globalState";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
 import axios from "axios";
-import Button from "@mui/material/Button";
-import {useNotification} from "../../../utils/_globalUtils";
 
 const NO_FILTER = {hero: null, user: null, team: null, format: null, event: null, eventType: null, to: null, meta: null, round: null, date_after: null, date_before: null};
 
@@ -117,8 +115,8 @@ export const ScoreboardFilter = () =>{
     },[filter, matches, setFilteredMatches]);
 
     return(
-        <Paper>
-            <Grid container spacing={2}>
+        <Paper variant={"opacity-0.9"} sx={{p: 1}}>
+            <Grid container spacing={2} sx={{p:1}}>
                 <Grid item lg={6}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DesktopDatePicker
