@@ -1,9 +1,9 @@
-import {Divider, Grid, Link, Paper} from "@mui/material";
-import {contactDialogState, useCurrentPage} from "../../../utils/_globalState";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
+/**
+ * Static page that gives background information on the project.
+ */
 import {useRecoilState} from "recoil";
+import {Divider, Grid, Link, Paper, Typography, Box, Stack} from "@mui/material";
+import {contactDialogState, useCurrentPage} from "../../../utils/_globalState";
 
 export default function About(){
     const [ ,setContactDialogOpen ] = useRecoilState(contactDialogState);

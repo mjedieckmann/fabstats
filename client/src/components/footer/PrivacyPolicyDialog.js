@@ -1,12 +1,9 @@
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
+/**
+ * Static privacy policy that is displayed on every page in the footer.
+ */
+
 import {useState} from "react";
-import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
-import {Link} from "@mui/material";
+import {Dialog, DialogActions, DialogContent, DialogTitle, Button, Typography, Stack, Link} from "@mui/material";
 
 export default function PrivacyPolicyDialog() {
     const [privacyPolicyDialogOpen, setPrivacyPolicyDialogOpen] = useState(false);

@@ -45,7 +45,7 @@ mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true}, (
     const client = db.getClient();
     /**
      * --------------------------- SESSION SETUP ------------------------------
-     * Sessions are required for our authentication method (local user / password).
+     * Sessions are required for our authentication method (local authentication / password).
      */
     //
     const session = require('express-session');

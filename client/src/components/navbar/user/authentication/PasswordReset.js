@@ -1,13 +1,12 @@
-import Typography from "@mui/material/Typography";
-import {useParams} from "react-router-dom";
-import {Grid, Paper} from "@mui/material";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
+/**
+ * Page that appears when the user follows the link they received in their "forgot password?" e-Mail.
+ * The form can be used to set a new password.
+ */
 import {useState} from "react";
-import Button from "@mui/material/Button";
+import {useParams} from "react-router-dom";
 import axios from "axios";
-import {useNotification} from "../../utils/_globalUtils";
+import {Button, Typography, TextField, Stack, Box, Grid, Paper} from '@mui/material';
+import {useNotification} from "../../../../utils/_globalUtils";
 
 export const PasswordReset = () => {
     const url_params = useParams();

@@ -10,7 +10,7 @@ const {body} = require("express-validator");
 const {getValidationResult} = require("../utils/_helpers");
 
 /**
- * Check if the current user is the creator of the Event they are trying to manipulate.
+ * Check if the current authentication is the creator of the Event they are trying to manipulate.
  */
 exports.isEventCreator = function(req, res, next) {
     Event.findOne({
@@ -42,7 +42,7 @@ exports.list_events = function(req, res, next) {
 
 /**
  * Create a new Event.
- * Sets the current user as the creator of the Event.
+ * Sets the current authentication as the creator of the Event.
  */
 exports.create_event = [
     body('descriptor', 'Event name must not be empty.').trim().isLength({ min: 1 }).escape(),

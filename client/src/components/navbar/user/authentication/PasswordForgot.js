@@ -1,14 +1,11 @@
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+/**
+ * Dialog that appears when the user clicks "forgot password?" in the login form.
+ * Entering an e-Mail address and clicking "OK" will trigger the backend to send a password reset e-Mail.
+ */
 import {useState} from "react";
 import axios from "axios";
-import TextField from "@mui/material/TextField";
-import Stack from "@mui/material/Stack";
-import {useNotification} from "../../utils/_globalUtils";
+import {Dialog, Button, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Stack} from '@mui/material';
+import {useNotification} from "../../../../utils/_globalUtils";
 
 export default function PasswordForgot() {
     const [ passwordForgotDialogOpen, setPasswordForgotDialogOpen ] = useState(false);

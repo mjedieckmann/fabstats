@@ -1,6 +1,10 @@
+/**
+ * Wrapper for autocompletes that reduces boilerplate to set its properties.
+ */
+
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import {preventSubmitOnEnter} from "../../../utils/_globalUtils";
+import {preventSubmitOnEnter} from "../../../../utils/_globalUtils";
 
 export const SimpleAutocomplete = (props) =>{
     return (

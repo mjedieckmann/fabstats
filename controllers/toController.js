@@ -10,7 +10,7 @@ const {body} = require("express-validator");
 const {getValidationResult} = require("../utils/_helpers");
 
 /**
- * Check if the current user is the creator of the TO they are trying to manipulate.
+ * Check if the current authentication is the creator of the TO they are trying to manipulate.
  */
 exports.isToCreator = function(req, res, next) {
     TO.findOne({
@@ -41,7 +41,7 @@ exports.list_tos = function(req, res, next) {
 
 /**
  * Create a new TO.
- * Sets the current user as the creator of the TO.
+ * Sets the current authentication as the creator of the TO.
  */
 exports.create_to = [
     body('descriptor', 'TO name must not be empty.').trim().isLength({ min: 1 }).escape(),

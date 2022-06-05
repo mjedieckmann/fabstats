@@ -1,5 +1,8 @@
-import {Grid, Paper} from "@mui/material";
-import Typography from "@mui/material/Typography";
+/**
+ * Static footer that is displayed on every page.
+ */
+
+import {Grid, Paper, Typography} from "@mui/material";
 import ContactDialog from "./ContactDialog";
 import PrivacyPolicyDialog from "./PrivacyPolicyDialog";
 

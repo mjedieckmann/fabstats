@@ -23,7 +23,7 @@ function sortMatches(a, b) {
 }
 
 /**
- * Check if the current user is the creator of the Match they are trying to manipulate.
+ * Check if the current authentication is the creator of the Match they are trying to manipulate.
  */
 exports.isMatchCreator = function(req, res, next) {
     Match.findOne({
@@ -120,7 +120,7 @@ exports.get_match = function (req, res, next){
 
 /**
  * Create a new Match.
- * Sets the current user as the creator of the Match.
+ * Sets the current authentication as the creator of the Match.
  */
 exports.create_match = [
     body('date', 'Invalid date of birth.').optional({ checkFalsy: true }).isISO8601().toDate(),

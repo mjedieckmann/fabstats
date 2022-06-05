@@ -1,24 +1,21 @@
-import Dialog from '@mui/material/Dialog';
-import AddIcon from "@mui/icons-material/Add";
-import {Fab, Grid} from "@mui/material";
+/**
+ * Handles viewing, creating, and editing matches.
+ * Only the creator of a match can edit it.
+ */
+
 import {useEffect, useState} from "react";
-import Box from "@mui/material/Box";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
 import {useRecoilState} from "recoil";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
+import uuid from "react-uuid";
+import axios from "axios";
+import {Fab, Grid, Dialog, Box, DialogTitle, DialogActions, DialogContent, Button, Autocomplete, TextField} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import EventDetailDialog from "./EventDetailDialog";
-import axios from "axios";
 import {SimpleAutocomplete} from "./SimpleAutocomplete";
-import uuid from "react-uuid";
-import {dirtyState, ROUNDS} from "../../../utils/_globalState";
+import {dirtyState, ROUNDS} from "../../../../utils/_globalState";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
-import {capitalizeFirstLetter, preventSubmitOnEnter, useNotification} from "../../../utils/_globalUtils";
+import {capitalizeFirstLetter, preventSubmitOnEnter, useNotification} from "../../../../utils/_globalUtils";
 import {Row} from "./Row";
 
 const EMPTY_FORM = {
@@ -42,6 +39,8 @@ export default function MatchDetailDialog(props) {
     const [ ,setDirty] = useRecoilState(dirtyState);
     const [ hasChanged, setHasChanged ] = useState(false);
     const showNotification = useNotification();
+
+    // Make sure that affected components are reloaded if we made changes in the database.
     useEffect(() => {
         if (hasChanged && !open){
             setDirty(uuid());
@@ -49,6 +48,7 @@ export default function MatchDetailDialog(props) {
         }
     }, [hasChanged, open]);
 
+    // Fetch data from the database
     useEffect(() =>{
         axios.get('/api/heroes')
             .then(res => {
@@ -93,6 +93,7 @@ export default function MatchDetailDialog(props) {
             .catch(err => showNotification(err.response.data.message, 'error'));
     }, []);
 
+    // Load the match detail data if in "edit" or "view" mode.
     const handleOpen = () => {
         if (props.matchDialogMode !== 'create'){
             axios.get(props.row.url)
@@ -123,6 +124,7 @@ export default function MatchDetailDialog(props) {
         setOpen(false);
     };
 
+    // Create / edit handler.
     const handleSubmit = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -139,6 +141,7 @@ export default function MatchDetailDialog(props) {
         }
     }
 
+    // Delete handler.
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const handleDeleteMatch = () => {
         axios.post("/api/match/delete", form)
@@ -152,6 +155,8 @@ export default function MatchDetailDialog(props) {
     }
     return (
         <>
+            {/* For create mode, the dialog is controlled by a big plus button in the center of the application. */}
+            {/* Editing and viewing is controlled by the scoreboard table rows. */}
             {props.matchDialogMode === 'create'
                 ? <Fab color="primary" aria-label="add" onClick={handleOpen}><AddIcon /></Fab>
                 : <Row key={props.row._id} row={props.row} handleOpen={handleOpen}/>
@@ -161,7 +166,6 @@ export default function MatchDetailDialog(props) {
                     <Box component="form" onSubmit={handleSubmit}>
                         <DialogTitle>
                             {capitalizeFirstLetter(props.matchDialogMode) + " Match"}
-
                             <DeleteConfirmationDialog
                                 sx={props.matchDialogMode === 'edit' ? {} : {display: 'none'}}
                                 deleteDialogOpen={deleteDialogOpen}
@@ -173,11 +177,11 @@ export default function MatchDetailDialog(props) {
                         <DialogContent>
                             <Box sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
                                 <Grid container>
-                                    {/*Free-solo with dialog*/}
+                                    {/* Dialog to view / edit the event. */}
                                     <Grid item lg={12}>
                                         <EventDetailDialog setHasChanged={setHasChanged} setForm={setForm} form={form} matchDialogMode={props.matchDialogMode}/>
                                     </Grid>
-                                    {/*Select only*/}
+                                    {/* Readonly event details. */}
                                     <Grid item lg={6}>
                                         <TextField
                                             disabled={true}
@@ -200,6 +204,7 @@ export default function MatchDetailDialog(props) {
                                             variant="standard"
                                         />
                                     </Grid>
+                                    {/* 'Simple', select-only autocomplete fields. */}
                                     <Grid item lg={6}>
                                         <Autocomplete
                                             id={"round-input"}
@@ -226,16 +231,18 @@ export default function MatchDetailDialog(props) {
                                     </Grid>
                                     <Grid item lg={6}>
                                         <Autocomplete
-                                            id={"user-winner-input"}
+                                            id={"authentication-winner-input"}
                                             disabled={props.matchDialogMode === 'view'}
                                             options={users}
                                             name={"user_winner"}
                                             onChange={(event, newValue) => {
                                                 setForm({...form, user_winner: newValue});
                                             }}
+                                            // We are working with objects. This ensures that the right property is used for comparison.
                                             isOptionEqualToValue={(option, value) => {
                                                 return option._id === value._id;
                                             }}
+                                            // We are working with objects. This ensures that the right property gets displayed.
                                             getOptionLabel={(option) => {
                                                 if (option.inputValue) {
                                                     return option.inputValue;
@@ -243,21 +250,24 @@ export default function MatchDetailDialog(props) {
                                                 return option.nick;
                                             }}
                                             value={form.user_winner}
+                                            // We are working with objects. This ensures that the right property gets displayed.
                                             renderInput={(params) => <TextField {...params} label="Player (winner)" onKeyDown={preventSubmitOnEnter}/>}
                                         />
                                     </Grid>
                                     <Grid item lg={6}>
                                         <Autocomplete
-                                            id={"user-winner-input"}
+                                            id={"authentication-winner-input"}
                                             disabled={props.matchDialogMode === 'view'}
                                             options={users}
                                             name={"user_loser"}
                                             onChange={(event, newValue) => {
                                                 setForm({...form, user_loser: newValue});
                                             }}
+                                            // We are working with objects. This ensures that the right property is used for comparison.
                                             isOptionEqualToValue={(option, value) => {
                                                 return option._id === value._id;
                                             }}
+                                            // We are working with objects. This ensures that the right property gets displayed.
                                             getOptionLabel={(option) => {
                                                 if (option.inputValue) {
                                                     return option.inputValue;
@@ -265,6 +275,7 @@ export default function MatchDetailDialog(props) {
                                                 return option.nick;
                                             }}
                                             value={form.user_loser}
+                                            // We are working with objects. This ensures that the right property gets displayed.
                                             renderInput={(params) => <TextField {...params} label="Player (loser)" onKeyDown={preventSubmitOnEnter}/>}
                                         />
                                     </Grid>

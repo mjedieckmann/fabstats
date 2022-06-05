@@ -1,11 +1,9 @@
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+/**
+ * Confirmation dialog that gets displayed when the user tries to delete a match, event, or TO.
+ * Accepting the dialog will tell the backend to go through with the deletion.
+ */
+import {IconButton, Button, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {IconButton} from "@mui/material";
 
 export default function DeleteConfirmationDialog(props) {
 

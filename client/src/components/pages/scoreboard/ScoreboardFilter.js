@@ -3,7 +3,7 @@ import {Autocomplete, Grid, Paper} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import {useRecoilState} from "recoil";
 import {filteredMatchesState, matchesState, pageState} from "./ScoreboardContainer";
-import {heroesState, useSimpleDataFetch} from "../_pageUtils";
+import {useSimpleDataFetch} from "../_pageUtils";
 import {dirtyState, EVENT_TYPES, ROUNDS} from "../../../utils/_globalState";
 import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
 import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
@@ -13,11 +13,10 @@ const NO_FILTER = {hero: null, user: null, team: null, format: null, event: null
 
 export const ScoreboardFilter = () =>{
     const [ dirty, ] = useRecoilState(dirtyState);
-    const [heroes, setHeroes] = useRecoilState(heroesState);
 
+    const [heroes, setHeroes] = useState([]);
     useSimpleDataFetch(setHeroes, 'api/heroes', 'name');
     const [formats, setFormats] = useState([]);
-
     useSimpleDataFetch(setFormats, 'api/formats', 'descriptor');
     const [users, setUsers] = useState([]);
     const [teams, setTeams] = useState([]);

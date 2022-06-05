@@ -1,29 +1,26 @@
-import {Avatar, Grid, IconButton} from "@mui/material";
-import {styled} from "@mui/material/styles";
-import Stack from "@mui/material/Stack";
-import {useRecoilState} from "recoil";
-import {currentUserState, dirtyState} from "../../utils/_globalState";
-import axios from "axios";
-import uuid from "react-uuid";
-import {useEffect, useState} from "react";
-import TextField from "@mui/material/TextField";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import Box from "@mui/material/Box";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import {dialogOpenState} from "./_formUtils";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import Collapse from "@mui/material/Collapse";
-import DeleteUserDialog from "./DeleteUserDialog";
-import {useNotification} from "../../utils/_globalUtils";
-import {TeamDetailDialog} from "./TeamDetailDialog";
+/**
+ * User profile dialog that can be accessed from the profile menu in the navbar.
+ * The user can edit their avatar, nick, team, and password.
+ */
 
+import {useEffect, useState} from "react";
+import {useRecoilState} from "recoil";
+import uuid from "react-uuid";
+import axios from "axios";
+import {Avatar, Grid, IconButton, Stack, TextField, DialogTitle, DialogContent, DialogActions, Button, Box, FormControlLabel, Switch, Collapse} from "@mui/material";
+import {styled} from "@mui/material/styles";
+import {currentUserState, dirtyState} from "../../../../utils/_globalState";
+import {dialogOpenState} from "../_userUtils";
+import DeleteUserDialog from "./DeleteUserDialog";
+import {TeamDetailDialog} from "./TeamDetailDialog";
+import {useNotification} from "../../../../utils/_globalUtils";
+
+/* Hidden element used for file upload. */
 const Input = styled('input')({
     display: 'none',
 });
 
+/* Initial form state */
 const EMPTY_FORM = {
     _id : null,
     nick: '',
@@ -43,6 +40,7 @@ export default function ProfileDialog() {
     const showNotification = useNotification();
     const [ hasChanged, setHasChanged ] = useState(false);
 
+    /* Set the form to contain the current user's data. */
     useEffect(() => {
         setForm((prevState) => ({
             ...prevState,
@@ -67,12 +65,11 @@ export default function ProfileDialog() {
         return () => URL.revokeObjectURL(objectUrl);
     }, [form.file])
 
+    /* Used to hide the "reset password" part of the form. */
     const [checked, setChecked] = useState(false);
-
     const handleChange = () => {
         setChecked((prev) => !prev);
     };
-
     useEffect(() => {
         if (!checked) {
             setForm((prevState) => ({
@@ -91,6 +88,7 @@ export default function ProfileDialog() {
         }));
     }
 
+    /* If the avatar has changed, first upload the file to the database, then save the user. Otherwise, just save the user. */
     const handleSubmit = (e) => {
         e.preventDefault();
         if (form.file !== null && typeof form.file !== 'string' && !(form.file instanceof String)){
@@ -174,15 +172,16 @@ export default function ProfileDialog() {
                                 autoComplete={"username"}
                                 type={"email"}
                             />
+                            {/* Dialog to view / edit the team the user is part of. */}
                             <TeamDetailDialog userForm={form} setUserForm={setForm} setHasChanged={setHasChanged}/>
                             <FormControlLabel
                                 control={<Switch checked={checked} onChange={handleChange}/>}
                                 label="Change password"
                             />
                         </Stack>
+                        {/* "Change password" part of the form, hidden by default. */}
                             <Collapse in={checked}>
                                 <Stack spacing={1}>
-
                                 <TextField
                                     id="password-input"
                                     label="Old password"

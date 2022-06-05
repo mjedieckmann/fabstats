@@ -26,18 +26,18 @@ function validPassword(password, hash, salt) {
 }
 
 /**
- * Checks if the user is authenticated and throws and error if they are not.
+ * Checks if the authentication is authenticated and throws and error if they are not.
  */
 function isAuth(req, res, next){
     if (req.isAuthenticated()) {
         return next();
     } else {
-        return res.status(401).json({ message: 'You are not authorized to view this resource' });
+        return res.status(401).json({ message: 'You need to be logged in to do this!' });
     }
 }
 
 /**
- * Checks if the user is already logged in and throws an error if they are (preventing multiple attempts to log in).
+ * Checks if the authentication is already logged in and throws an error if they are (preventing multiple attempts to log in).
  */
 function isLoggedIn(req, res, next){
     if (req.isAuthenticated()) {

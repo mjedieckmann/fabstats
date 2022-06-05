@@ -1,25 +1,23 @@
+/**
+ * Scoreboard where matches are displayed.
+ * Each row of the table is a match, clicking a match will open the match detail dialog.
+ */
+import {useState} from "react";
+import {useRecoilState} from "recoil";
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import {TableFooter, TablePagination, useTheme} from "@mui/material";
+import {Box, IconButton, Table, TableBody, TableContainer, TableCell, TableRow, Paper, TableFooter, TablePagination, TableHead, useTheme} from '@mui/material';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import {useRecoilState} from "recoil";
 import {filteredMatchesState, pageState} from "./ScoreboardContainer";
-import {useState} from "react";
-import MatchDetailDialog from "./MatchDetailDialog";
+import MatchDetailDialog from "./match/MatchDetailDialog";
 import {entityIsEditableByUser} from "../../../utils/_globalUtils";
 import {currentUserState} from "../../../utils/_globalState";
 
+/**
+ * Handle pagination that is displayed in the bottom of the table.
+ */
 function TablePaginationActions(props) {
     const theme = useTheme();
     const { count, page, rowsPerPage, onPageChange } = props;

@@ -1,7 +1,7 @@
 import Snackbar from '@mui/material/Snackbar';
 import {useRecoilState} from "recoil";
 import MuiAlert from '@mui/material/Alert';
-import {notificationState, notificationTypeState} from "../../../utils/_globalState";
+import {notificationState, notificationTypeState} from "../utils/_globalState";
 import {forwardRef, useEffect, useState} from "react";
 
 const Alert = forwardRef(function Alert(props, ref) {

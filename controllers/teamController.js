@@ -10,7 +10,7 @@ const Team = require("../models/team");
 const {getValidationResult} = require("../utils/_helpers");
 
 /**
- * Sets res.locals to the team the current user belongs to (if any).
+ * Sets res.locals to the team the current authentication belongs to (if any).
  */
 exports.current_team = function (req, res, next) {
     if (!req.isAuthenticated()) { return next(); }
@@ -22,7 +22,7 @@ exports.current_team = function (req, res, next) {
 }
 
 /**
- * Check if the current user is the creator of the Team they are trying to manipulate.
+ * Check if the current authentication is the creator of the Team they are trying to manipulate.
  */
 exports.isTeamCreator = function(req, res, next) {
     Team.findOne({
@@ -53,7 +53,7 @@ exports.list_teams = function(req, res, next) {
 
 /**
  * Create a new Team.
- * Sets the current user as the creator of the Team.
+ * Sets the current authentication as the creator of the Team.
  */
 exports.create_team = [
     body('nick', 'Team name must not be empty.').trim().isLength({ min: 1 }).escape(),

@@ -1,11 +1,14 @@
-import {Grid} from "@mui/material";
+/**
+ * Entry point container for the scoreboard page.
+ * Initially loads matches from the database and makes sure that the filter is applied to them.
+ */
+import {useEffect} from "react";
+import {atom, useRecoilState} from "recoil";
+import {Grid, Box} from "@mui/material";
 import {dirtyState, useCurrentPage} from "../../../utils/_globalState";
 import Scoreboard from "./Scoreboard";
 import {ScoreboardFilter} from "./ScoreboardFilter";
-import {useEffect} from "react";
-import {atom, useRecoilState} from "recoil";
-import Box from "@mui/material/Box";
-import MatchDetailDialog from "./MatchDetailDialog";
+import MatchDetailDialog from "./match/MatchDetailDialog";
 
 export const matchesState = atom({
     key: 'matches',

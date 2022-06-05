@@ -1,13 +1,16 @@
+/**
+ * Entry point for the frontend React application.
+ */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import PropTypes from "prop-types";
-import { Link as RouterLink, BrowserRouter } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import reportWebVitals from './reportWebVitals';
-
-import App from './App';
 import {RecoilRoot} from "recoil";
-import Notification from "./components/pages/scoreboard/Notification";
+
+import reportWebVitals from './reportWebVitals';
+import App from './App';
+import Notification from "./components/Notification";
 
 
 /**
@@ -45,12 +48,20 @@ const theme = createTheme({
     },
 });
 
+/**
+ * React root.
+ */
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  //  Strict mode is only applied in development
   <React.StrictMode>
+      {/* Set the theme that controls the links */}
       <ThemeProvider theme={theme}>
+          {/* Recoil is mostly used to handle global state. Every component below it can see this state. */}
           <RecoilRoot>
+            {/* The main application */}
             <App />
+            {/* Notification component to give feedback to the authentication. */}
             <Notification/>
           </RecoilRoot>
       </ThemeProvider>

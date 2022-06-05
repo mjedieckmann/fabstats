@@ -1,3 +1,7 @@
+/**
+ * A row of the scoreboard table that represents a single match.
+ */
+
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import PropTypes from "prop-types";

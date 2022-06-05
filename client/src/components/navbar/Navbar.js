@@ -1,13 +1,13 @@
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import {Grid, Paper, ToggleButton} from "@mui/material";
+/**
+ * Navbar that is displayed at the top of all pages.
+ */
 
-import NavbarIcon from "./NavbarIcon";
 import {useRecoilState} from "recoil";
-import {nav_buttons} from "../pages/_pageUtils";
+import {Grid, Paper, ToggleButton, Stack, Toolbar, AppBar} from "@mui/material";
+import NavbarIcon from "./NavbarIcon";
 import {currentPageState} from "../../utils/_globalState";
-import DialogContainer from "../user/DialogContainer";
-import Stack from "@mui/material/Stack";
+import UserDialogContainer from "./user/UserDialogContainer";
+import {nav_buttons} from "./_navbarUtils";
 
 export default function Navbar() {
     const [currentPage, ] = useRecoilState(currentPageState);
@@ -29,7 +29,7 @@ export default function Navbar() {
                             </Stack>
                         </Grid>
                         <Grid item xs={3} textAlign={"center"}>
-                            <DialogContainer/>
+                            <UserDialogContainer/>
                         </Grid>
                     </Grid>
                 </Toolbar>

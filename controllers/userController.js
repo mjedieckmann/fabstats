@@ -28,22 +28,24 @@ const upload = multer({storage: storage, limits: { fileSize: MAX_FILE_SIZE }}).s
 /**
  * Take the file from the request and save it to the disk at the directory specified in the "storage" variable.
  * Then save the file URL to the User model.
- * Last, delete the file the user previously used as their avatar.
+ * Last, delete the file the authentication previously used as their avatar.
  */
 exports.upload_user_avatar = function (req, res, next) {
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError || err) {
             return res.status(500).json({message: err.message})
         }
-        // Gets the current user
+        // Gets the current authentication
         let user = req.user;
         const old_img = user.img;
         user.img = req.file.path;
         user.save().then(() => {
             // Delete old file
-            unlink(old_img, (err) => {
-                if (err) {return next(err)}
-            });
+            if (old_img){
+                unlink(old_img, (err) => {
+                    if (err) {return next(err)}
+                });
+            }
             res.status(200).json({message: 'File upload successful!'});
         }, (err => {return next(err)}));
     })
@@ -65,7 +67,7 @@ exports.list_users = function(req, res, next) {
 };
 
 /**
- * Returns the currently logged-in user or null if not logged in.
+ * Returns the currently logged-in authentication or null if not logged in.
  */
 exports.current_user = function (req, res) {
     if (req.isAuthenticated()) {
@@ -117,7 +119,7 @@ exports.edit_user = [
     }]
 
 /**
- * Close the user account.
+ * Close the authentication account.
  */
 exports.delete_user = function(req, res, next){
     User.findById(req.body._id).exec(function(err, user){
@@ -151,12 +153,12 @@ exports.register_user = [
                 .exec((err, user) => {
                     if (err) {return next(err)}
                     if (user){
-                        return res.status(409).json({message: 'A user with that name or e-mail already exists.'})
+                        return res.status(409).json({message: 'A authentication with that name or e-mail already exists.'})
                     } else {
                         if (req.body.password !== req.body.password_repeat){
                             return res.status(409).json({message: 'Passwords don\'t match!'});
                         }
-                        // Validation successful, register the new user.
+                        // Validation successful, register the new authentication.
                         /*
                          * Create hash and salt from provided password to save in the database.
                          * See related file for more info on how passwords are handled:
@@ -232,7 +234,7 @@ exports.forgot_password = function(req, res, next){
                         user.save().then(() => {return res.status(200).json({message: 'Reset link sent!'})});
                     }).catch((err) => {return next(err)});
             } else {
-                return res.status(401).json({message: 'The user / e-Mail is not registered with us'});
+                return res.status(401).json({message: 'The authentication / e-Mail is not registered with us'});
             }
         })
 }

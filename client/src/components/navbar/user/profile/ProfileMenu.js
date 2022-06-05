@@ -1,14 +1,17 @@
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import {Avatar, IconButton} from "@mui/material";
-import {useRecoilState} from "recoil";
-import {currentUserState, dirtyState} from "../../utils/_globalState";
+/**
+ * User menu from which the user profile dialog can be opened and the user can log out.
+ * Clicking on the user avatar will open the menu.
+ */
+
 import {useState} from "react";
 import axios from "axios";
 import uuid from "react-uuid";
-import {useNotification} from "../../utils/_globalUtils";
+import {useRecoilState} from "recoil";
+import {Menu, MenuItem, Avatar, IconButton} from "@mui/material";
+import {currentUserState, dirtyState} from "../../../../utils/_globalState";
+import {useNotification} from "../../../../utils/_globalUtils";
 
-export default function BasicMenu (props) {
+export default function ProfileMenu (props) {
     const [ userMenuAnchor, setUserMenuAnchor ] = useState(null);
     const [ currentUser, ] = useRecoilState(currentUserState);
     const [ ,setDirty ] = useRecoilState(dirtyState);
@@ -41,7 +44,7 @@ export default function BasicMenu (props) {
         <>
             <IconButton
                 id="user-menu-button"
-                aria-controls={userMenuOpen ? 'user-menu' : undefined}
+                aria-controls={userMenuOpen ? 'authentication-menu' : undefined}
                 aria-haspopup="true"
                 aria-expanded={userMenuOpen ? 'true' : undefined}
                 onClick={handleMenuClick}
@@ -54,7 +57,7 @@ export default function BasicMenu (props) {
                 open={userMenuOpen}
                 onClose={handleMenuClose}
                 MenuListProps={{
-                    'aria-labelledby': 'user-menu-button',
+                    'aria-labelledby': 'authentication-menu-button',
                 }}
             >
                 <MenuItem onClick={handleProfileClick}>Profile</MenuItem>

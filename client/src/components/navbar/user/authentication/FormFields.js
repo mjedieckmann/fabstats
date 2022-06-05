@@ -1,3 +1,7 @@
+/**
+ * Wrapper for text fields that reduces boilerplate to set its properties.
+ */
+
 import TextField from "@mui/material/TextField";
 
 export const FormFields = (props) => {

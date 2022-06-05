@@ -1,12 +1,10 @@
-import Button from '@mui/material/Button';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Box from "@mui/material/Box";
-import {dialogOpenState, useRegisterForm} from "./_formUtils";
-import {FormFields} from "./FormFields";
+/**
+ * Dialog that handles user registration.
+ */
 import {useRecoilState} from "recoil";
+import {Button, DialogActions, DialogContent, DialogContentText, DialogTitle, Box} from '@mui/material';
+import {dialogOpenState, useRegisterForm} from "../_userUtils";
+import {FormFields} from "./FormFields";
 
 export default function RegisterDialog(props) {
     const [{handleChange, registerUser, REGISTER_FIELDS}] = useRegisterForm(

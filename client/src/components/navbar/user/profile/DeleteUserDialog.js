@@ -1,19 +1,15 @@
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+/**
+ * Confirmation dialog that is opened when the user tries to delete their account from the user profile.
+ * Accepting the dialog will tell the backend to close the account.
+ */
 import {useState} from "react";
-import DeleteIcon from "@mui/icons-material/Delete";
-import {IconButton} from "@mui/material";
-import axios from "axios";
-import uuid from "react-uuid";
 import {useRecoilState} from "recoil";
-import {dirtyState} from "../../utils/_globalState";
-import TextField from "@mui/material/TextField";
-import Stack from "@mui/material/Stack";
-import {useNotification} from "../../utils/_globalUtils";
+import uuid from "react-uuid";
+import axios from "axios";
+import {Button, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, TextField} from '@mui/material';
+import DeleteIcon from "@mui/icons-material/Delete";
+import {dirtyState} from "../../../../utils/_globalState";
+import {useNotification} from "../../../../utils/_globalUtils";
 
 export default function DeleteUserDialog(props) {
     const [deleteUserDialogOpen, setDeleteUserDialogOpen] = useState(false);

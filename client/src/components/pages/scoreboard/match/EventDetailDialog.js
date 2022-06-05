@@ -1,31 +1,27 @@
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+/**
+ * Handles viewing, creating, and editing events.
+ * To create a new event, the freeform autocomplete gives an option if the input does not match any existing event.
+ * If the current user is the creator of the currently selected event, they can edit it by using the respective button.
+ * Otherwise, the detail form can be viewed instead.
+ */
+
 import {useState, useEffect} from "react";
-import axios from "axios";
 import {useRecoilState} from "recoil";
-import {currentUserState,EVENT_TYPES} from "../../../utils/_globalState";
-import {Grid, IconButton} from "@mui/material";
+import uuid from "react-uuid";
+import axios from "axios";
+import {IconButton, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button, Box} from "@mui/material";
+import Autocomplete, {createFilterOptions} from "@mui/material/Autocomplete";
+import {currentUserState,EVENT_TYPES} from "../../../../utils/_globalState";
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import uuid from "react-uuid";
 import {TODetailDialog} from "./TODetailDialog";
-import {
-    capitalizeFirstLetter,
-    entityIsEditableByUser,
-    preventSubmitOnEnter,
-    useNotification
-} from "../../../utils/_globalUtils";
+import {capitalizeFirstLetter, entityIsEditableByUser, preventSubmitOnEnter, useNotification} from "../../../../utils/_globalUtils";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
-import Box from "@mui/material/Box";
 
 const filter = createFilterOptions();
 
 export default function EventDetailDialog(props) {
+    /* When the team detail dialog is closed, the list of events needs to be reloaded from the database. */
     const [ eventsChanged, setEventsChanged] = useState(uuid());
     const [ currentUser, ] = useRecoilState(currentUserState);
     let eventIsEditable = entityIsEditableByUser(props.form.event, currentUser);
@@ -106,9 +102,11 @@ export default function EventDetailDialog(props) {
     return (
         <>
             <Box display={"flex"}>
+                {/* This autocomplete component is displayed in the match detail dialog. It can only be edited if the current user can edit the match. */}
                 <Autocomplete
                     id="event-autocomplete"
                     disabled={props.matchDialogMode === 'view'}
+                    // Typing a new team and selecting "create [input]..." will open the team detail dialog in "create" mode.
                     onChange={(e, newValue) => {
                         if (typeof newValue === 'string') {
                             // timeout to avoid instant validation of the dialog's form.
@@ -136,6 +134,7 @@ export default function EventDetailDialog(props) {
                             });
                         }
                     }}
+                    // Makes the autocomplete display the "create [input]..." option depending on the user input.
                     filterOptions={(options, params) => {
                         const filtered = filter(options, params);
                         if (params.inputValue !== '' && !filtered.some(e => e.descriptor === params.inputValue)) {
@@ -147,8 +146,8 @@ export default function EventDetailDialog(props) {
                         return filtered;
                     }}
                     options={events}
+                    // We are working with objects. This ensures that the right property gets displayed.
                     getOptionLabel={(option) => {
-                        // e.g value selected with enter, right from the input
                         if (typeof option === 'string') {
                             return option;
                         }
@@ -160,8 +159,10 @@ export default function EventDetailDialog(props) {
                     selectOnFocus
                     clearOnBlur
                     handleHomeEndKeys
+                    // We are working with objects. This ensures that the right property gets displayed.
                     renderOption={(props, option) => <li {...props}>{option.descriptor}</li>}
                     freeSolo
+                    // We are working with objects. This ensures that the right property is used for comparison.
                     isOptionEqualToValue={(option, value) => {
                         return option._id === value._id;
                     }}
@@ -172,6 +173,9 @@ export default function EventDetailDialog(props) {
                                    onKeyDown={preventSubmitOnEnter}
                         />}
                 />
+                {/* Display the edit or view icon, depending on whether the user is the creator of the event.
+                Clicking the button will open the event detail dialog.
+                Only displays an icon if a event is selected. */}
                 <IconButton sx={props.form.event !== null ? {my: "auto"} : {display: 'none'}} onClick={() => handleOpenEventDetail(eventIsEditable ? 'edit' : 'view')}>
                     {eventIsEditable
                         ? <EditIcon />
@@ -179,6 +183,7 @@ export default function EventDetailDialog(props) {
                     }
                 </IconButton>
             </Box>
+            {/* Event detail dialog to edit or delete an existing event. */}
             <Dialog open={eventDialogOpen} onClose={() => setEventDialogOpen(false)}>
                 <form onSubmit={handleSubmit}>
                     <DialogTitle>
@@ -238,6 +243,7 @@ export default function EventDetailDialog(props) {
                                         />}
                                 />
                             </Grid>
+                            {/* Dialog to view / edit the TO of the event. */}
                             <Grid item lg={12}>
                                 <TODetailDialog setHasChanged={props.setHasChanged} eventDialogMode={eventDialogMode} eventForm={eventForm} setEventForm={setEventForm}/>
                             </Grid>

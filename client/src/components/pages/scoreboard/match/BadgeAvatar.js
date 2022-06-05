@@ -1,4 +1,7 @@
-import * as React from 'react';
+/**
+ * Display hero and user together in a combined avatar.
+ */
+
 import { styled } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';

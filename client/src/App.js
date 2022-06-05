@@ -1,20 +1,25 @@
-import {Helmet, HelmetProvider} from "react-helmet-async";
-import {Routes, Route, Navigate, Outlet, BrowserRouter} from "react-router-dom";
-import Navbar from "./components/navbar/Navbar";
-import Stack from "@mui/material/Stack";
-import {useRecoilState} from "recoil";
-import {backgroundImgState, currentUserState, dirtyState} from "./utils/_globalState";
+/**
+ * The main application.
+ * Defines the structure of our single-page application.
+ */
 import {useEffect} from "react";
+import {Routes, Route, Navigate, Outlet, BrowserRouter} from "react-router-dom";
 import axios from "axios";
-import {Footer} from "./components/footer/Footer";
-import Image from './img/Eclipse_Full_Art.width-10000.jpg';
+import {useRecoilState} from "recoil";
+import Stack from "@mui/material/Stack";
 import {Paper} from "@mui/material";
 import {createTheme, ThemeProvider} from "@mui/material/styles";
+import Navbar from "./components/navbar/Navbar";
+import {backgroundImgState, currentUserState, dirtyState} from "./utils/_globalState";
+import {Footer} from "./components/footer/Footer";
 import ScoreboardContainer from "./components/pages/scoreboard/ScoreboardContainer";
 import About from "./components/pages/about/About";
-import {PasswordReset} from "./components/user/PasswordReset";
+import {PasswordReset} from "./components/navbar/user/authentication/PasswordReset";
 
-
+/**
+ * Define two different variants for the paper component (a container component) that control its opacity.
+ * Each paper component can then control its opacity by setting the "variant" property to one of styles that defined here.
+ */
 const theme = createTheme({
     components: {
         MuiPaper: {
@@ -37,10 +42,16 @@ const theme = createTheme({
     },
 );
 
+/**
+ * The page layout.
+ * "Outlet" refers to the child element that will be displayed, which depends on the current URL (see App).
+ */
 const Layout = () => {
+    /* Recoil State variables can be manipulated anywhere in the application. */
     const [ currentUser, setCurrentUser ] = useRecoilState(currentUserState);
     const [ dirty, ] = useRecoilState(dirtyState);
     const [ backgroundImg, ] = useRecoilState(backgroundImgState);
+    /* Set the background image. The image state depends on the current URL. */
     const styles = {
         paperContainer: {
             backgroundImage: `url(${backgroundImg})`,
@@ -52,6 +63,7 @@ const Layout = () => {
             backgroundAttachment: 'fixed',
         }
     };
+    /* Load the current authentication from the database (defaults to "null"). */
     useEffect(() => {
         axios.get('/users/current')
             .then(res => {
@@ -75,15 +87,15 @@ const Layout = () => {
     )
 }
 
+/**
+ * The application sets the displayed page based on the current URL.
+ * The "Layout" Component always gets displayed, with the children depending on the rest of the URL.
+ * Calling "/" will redirect to the scoreboard page.
+ */
 function App() {
     return (
         <div className="App">
-            <HelmetProvider>
-                <Helmet>
-                    <meta name="viewport" content="initial-scale=1, width=device-width" />
-                    <title>Flesh and Blood TCG Unofficial Statistics</title>
-                </Helmet>
-            </HelmetProvider>
+            <title>Flesh and Blood TCG Unofficial Statistics</title>
             <BrowserRouter>
                 <Routes>
                     <Route path={"/"} element={<Layout/>}>

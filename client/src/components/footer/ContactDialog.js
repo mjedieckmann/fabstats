@@ -1,11 +1,8 @@
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
+/**
+ * Static contact dialog that can be opened from the footer and the about page.
+ */
+
+import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Typography, Stack} from "@mui/material";
 import {useRecoilState} from "recoil";
 import {contactDialogState} from "../../utils/_globalState";
 
