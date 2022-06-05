@@ -1,3 +1,10 @@
+/**
+ * Controller for the Match model.
+ * Handles interactions with the database.
+ * Related:
+ *  ../routes/api.js
+ */
+
 const Match = require("../models/match");
 const {body} = require("express-validator");
 const {getValidationResult} = require("../utils/_helpers");
@@ -15,6 +22,9 @@ function sortMatches(a, b) {
     return 0;
 }
 
+/**
+ * Check if the current user is the creator of the Match they are trying to manipulate.
+ */
 exports.isMatchCreator = function(req, res, next) {
     Match.findOne({
         _id: req.body._id,
@@ -30,10 +40,13 @@ exports.isMatchCreator = function(req, res, next) {
     });
 }
 
-// Display list of all Heroes.
+/**
+ * Returns a list of all Matches.
+ * Populate to include more details than just the id of referenced objects.
+ */
 exports.list_matches = function(req, res, next) {
     Match.find()
-        .sort([['event']])
+        .sort('event')
         .populate({ path: 'hero_winner', select: 'name img -_id' })
         .populate({ path: 'hero_loser', select: 'name img -_id' })
         .populate({
@@ -77,6 +90,10 @@ exports.list_matches = function(req, res, next) {
         });
 };
 
+/**
+ * Returns a single Match.
+ * Populate to include more details than just the id of referenced objects.
+ */
 exports.get_match = function (req, res, next){
     Match.findById(req.params.id)
         .populate({ path: 'hero_winner', select: 'name' })
@@ -101,6 +118,10 @@ exports.get_match = function (req, res, next){
     })
 }
 
+/**
+ * Create a new Match.
+ * Sets the current user as the creator of the Match.
+ */
 exports.create_match = [
     body('date', 'Invalid date of birth.').optional({ checkFalsy: true }).isISO8601().toDate(),
     body('round', 'Round must not be empty.').isString(),
@@ -113,6 +134,7 @@ exports.create_match = [
         if (validation.hasErrors) {
             return res.status(409).json({message: validation.message});
         } else {
+            // Validation successful, create and save the new Match.
             let match = new Match(
                 {
                     date: req.body.date,
@@ -134,6 +156,11 @@ exports.create_match = [
     }
 ]
 
+/**
+ * Edit an existing Match.
+ * In middleware chain after isMatchCreator to ensure that only authorized users can call this function.
+ * We use res.locals to pass information between functions in the middleware chain.
+ */
 exports.edit_match = [
     body('date', 'Invalid date of birth.').optional({ checkFalsy: true }).isISO8601().toDate(),
     body('round', 'Round must not be empty.').isString(),
@@ -146,6 +173,7 @@ exports.edit_match = [
         if (validation.hasErrors) {
             return res.status(409).json({message: validation.message});
         } else {
+            // Validation successful, edit the Match.
             const match = res.locals.match;
             match.date = req.body.date;
             match.event= req.body.event;
@@ -164,6 +192,11 @@ exports.edit_match = [
     }
 ]
 
+/**
+ * Delete an existing Match.
+ * In middleware chain after isMatchCreator to ensure that only authorized users can call this function.
+ * We use res.locals to pass information between functions in the middleware chain.
+ */
 exports.delete_match = function (req, res, next) {
     Match.findByIdAndRemove(req.body._id).exec((err) => {
         if (err) {return next(err)}

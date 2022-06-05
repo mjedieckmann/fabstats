@@ -1,3 +1,9 @@
+/**
+ * Defines a database model.
+ * This model represents the different heroes that can be played.
+ * The data for this model is maintained by the administrator.
+ */
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -9,12 +15,10 @@ const HeroSchema = new Schema(
     }
 );
 
-// Virtual for author's URL
 HeroSchema
     .virtual('url')
     .get(function () {
         return '/api/hero/' + this._id;
     });
 
-//Export model
 module.exports = mongoose.model('Hero', HeroSchema);

@@ -1,5 +1,12 @@
+/**
+ * Utility functions related to authentication and passwords.
+ */
+
 const crypto = require('crypto');
 
+/**
+ * Generate salt and hash from a password, which is what we end up storing in the database.
+ */
 function genPassword(password) {
     const salt = crypto.randomBytes(32).toString('hex');
     const genHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
@@ -10,11 +17,17 @@ function genPassword(password) {
     };
 }
 
+/**
+ * Checks if a password is valid by comparing it to the salt and hash that is taken from the database.
+ */
 function validPassword(password, hash, salt) {
     const hashVerify = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
     return hash === hashVerify;
 }
 
+/**
+ * Checks if the user is authenticated and throws and error if they are not.
+ */
 function isAuth(req, res, next){
     if (req.isAuthenticated()) {
         return next();
@@ -23,6 +36,9 @@ function isAuth(req, res, next){
     }
 }
 
+/**
+ * Checks if the user is already logged in and throws an error if they are (preventing multiple attempts to log in).
+ */
 function isLoggedIn(req, res, next){
     if (req.isAuthenticated()) {
         return res.status(200).json({ message: 'You are already logged in' });

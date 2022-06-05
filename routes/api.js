@@ -1,7 +1,11 @@
+/**
+ * Routes that handle requests from the frontend client.
+ * They all represent interactions with the database.
+ */
+
 const express = require('express');
 const router = express.Router();
 
-// Require controller modules.
 const format_controller = require('../controllers/formatController');
 const event_controller = require('../controllers/eventController');
 const meta_controller = require('../controllers/metaController');
@@ -34,7 +38,6 @@ router.get('/tos', to_controller.list_tos);
 router.post('/to/create', isAuth, to_controller.create_to);
 router.post('/to/edit', isAuth, to_controller.isToCreator, to_controller.edit_to);
 router.post('/to/delete', isAuth, to_controller.isToCreator, to_controller.delete_to);
-
 
 /// META CHANGES ROUTE ///
 router.get('/metas', meta_controller.list_metas);

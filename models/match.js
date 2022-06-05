@@ -1,3 +1,11 @@
+/**
+ * Defines a database model.
+ * This model is the backbone of the application and represents a match that was played between two players.
+ * It contains the result of the match, the event that it was played in (if any), the date the match took place, the
+ * format and meta, as well as notes taken by the creator of the match (optional).
+ * The data for this model comes from the users.
+ */
+
 const mongoose = require('mongoose');
 const {DateTime} = require("luxon");
 
@@ -22,7 +30,6 @@ const MatchSchema = new Schema(
     }
 );
 
-// Virtual for book's URL
 MatchSchema
     .virtual('url')
     .get(function () {
@@ -35,5 +42,4 @@ MatchSchema
         return DateTime.fromJSDate(this.date).toLocaleString(DateTime.DATE_MED);
     });
 
-//Export model
 module.exports = mongoose.model('Match', MatchSchema);

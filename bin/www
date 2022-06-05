@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+/**
+ * Entry point for the backend.
+ * Includes all necessary files and starts the server.
+ */
+
 
 /**
  * Module dependencies.

@@ -1,7 +1,17 @@
+/**
+ * Controller for the Event model.
+ * Handles interactions with the database.
+ * Related:
+ *  ../routes/api.js
+ */
+
 const Event = require('../models/event');
-const {body, validationResult} = require("express-validator");
+const {body} = require("express-validator");
 const {getValidationResult} = require("../utils/_helpers");
 
+/**
+ * Check if the current user is the creator of the Event they are trying to manipulate.
+ */
 exports.isEventCreator = function(req, res, next) {
     Event.findOne({
         _id: req.body._id,
@@ -17,10 +27,12 @@ exports.isEventCreator = function(req, res, next) {
     });
 }
 
-// Display list of all events.
+/**
+ * Returns a list of all Events.
+ */
 exports.list_events = function(req, res, next) {
     Event.find()
-        .sort([['descriptor']])
+        .sort('descriptor')
         .populate('to')
         .exec(function (err, list_events) {
             if (err) { return next(err); }
@@ -28,12 +40,13 @@ exports.list_events = function(req, res, next) {
         });
 };
 
+/**
+ * Create a new Event.
+ * Sets the current user as the creator of the Event.
+ */
 exports.create_event = [
-    // Validate and sanitize fields.
     body('descriptor', 'Event name must not be empty.').trim().isLength({ min: 1 }).escape(),
     body('event_type', 'Event type must not be empty.').trim().isLength({ min: 1 }).escape(),
-
-    // Process request after validation and sanitization.
     (req, res, next) => {
         const validation = getValidationResult(req);
         if (validation.hasErrors) {
@@ -44,6 +57,7 @@ exports.create_event = [
                 if (event) {
                     return res.status(403).json({message: 'An Event with that name already exists!'})
                 } else {
+                    // Validation successful, create and save the new Event.
                     const newEvent = new Event(
                         {
                             descriptor: req.body.descriptor,
@@ -53,6 +67,7 @@ exports.create_event = [
                         });
                     newEvent.save((err) => {
                         if (err) { return next(err); }
+                        // Populate to include more details than just the id of referenced object.
                         Event.populate(newEvent, [
                             { path: 'to', select: 'descriptor' },
                         ]).then((populatedEvent) => res.status(200).json({message: 'Event "' + populatedEvent.descriptor + '" created!', event: populatedEvent})
@@ -64,8 +79,12 @@ exports.create_event = [
     }
 ];
 
+/**
+ * Edit an existing Event.
+ * In middleware chain after isEventCreator to ensure that only authorized users can call this function.
+ * We use res.locals to pass information between functions in the middleware chain.
+ */
 exports.edit_event = [
-    // Validate and sanitize fields.
     body('descriptor', 'Event name must not be empty.').trim().isLength({ min: 1 }).escape(),
     body('event_type', 'Event type must not be empty.').trim().isLength({ min: 1 }).escape(),
 
@@ -74,12 +93,14 @@ exports.edit_event = [
         if (validation.hasErrors) {
             return res.status(409).json({message: validation.message});
         } else {
+            // Validation successful, edit the Event.
             const event = res.locals.event;
             event.descriptor = req.body.descriptor;
             event.event_type = req.body.event_type;
             event.to = req.body.to;
             event.save(function (err, event) {
                 if (err) { return next(err); }
+                // Populate to include more details than just the id of referenced object.
                 Event.populate(event, [
                     { path: 'to', select: 'descriptor' },
                 ]).then((populatedEvent) => res.status(200).json({message: 'Event updated!', event: populatedEvent})
@@ -89,8 +110,14 @@ exports.edit_event = [
     }
 ]
 
-exports.delete_event = function (req, res) {
-    Event.findByIdAndRemove(req.body._id).then(() => {
+/**
+ * Delete an existing Event.
+ * In middleware chain after isEventCreator to ensure that only authorized users can call this function.
+ * We use res.locals to pass information between functions in the middleware chain.
+ */
+exports.delete_event = function (req, res, next) {
+    Event.findByIdAndRemove(res.locals.event._id).exec((err) => {
+        if (err) {return next(err)}
         return res.status(200).json({message: 'Event deleted!'});
     });
 }

@@ -1,3 +1,9 @@
+/**
+ * Defines a database model.
+ * This model represents the different official formats that can be played.
+ * The data for this model is maintained by the administrator.
+ */
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -8,5 +14,4 @@ const FormatSchema = new Schema(
     },
 );
 
-//Export model
 module.exports = mongoose.model('Format', FormatSchema);

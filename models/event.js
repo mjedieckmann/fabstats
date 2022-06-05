@@ -1,5 +1,10 @@
+/**
+ * Defines a database model.
+ * This model represents a sanctioned Event of a specific type that was organized by a tournament organizer (TO).
+ * The data for this model comes from the users.
+ */
+
 const mongoose = require('mongoose');
-const {DateTime} = require("luxon");
 const Schema = mongoose.Schema;
 
 const EventSchema = new Schema(
@@ -27,12 +32,10 @@ const EventSchema = new Schema(
     }
 );
 
-// Virtual for author's URL
 EventSchema
     .virtual('url')
     .get(function () {
         return '/api/event/' + this._id;
     });
 
-//Export model
 module.exports = mongoose.model('Event', EventSchema);

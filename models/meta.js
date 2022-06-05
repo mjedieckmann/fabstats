@@ -1,3 +1,12 @@
+/**
+ * Defines a database model.
+ * This model represents the meta that a game is played in.
+ * We define a meta change to be either:
+ *  1. the introduction of new cards (e.g. set releases)
+ *  2. changes in legality of existing cards (e.g. bans, suspensions, unbans etc.)
+ * The data for this model is maintained by the administrator.
+ */
+
 const mongoose = require('mongoose');
 const {DateTime} = require("luxon");
 
@@ -15,7 +24,6 @@ const MetaSchema = new Schema(
     }
 );
 
-// Virtual for author's URL
 MetaSchema
     .virtual('url')
     .get(function () {
@@ -28,5 +36,4 @@ MetaSchema
         return DateTime.fromJSDate(this.date).toLocaleString(DateTime.DATE_MED);
     });
 
-//Export model
 module.exports = mongoose.model('Meta', MetaSchema);

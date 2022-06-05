@@ -1,12 +1,20 @@
+/**
+ * Controller for the Hero model.
+ * Handles interactions with the database.
+ * Related:
+ *  ../routes/api.js
+ */
+
 const Hero = require('../models/hero');
 
-// Display list of all Heroes.
+/**
+ * Returns a list of all Heroes.
+ */
 exports.list_heroes = function(req, res, next) {
     Hero.find()
-        .sort([['name']])
+        .sort('name')
         .exec(function (err, list_formats) {
             if (err) { return next(err); }
-            //Successful, so return
             res.json(list_formats);
         });
 };

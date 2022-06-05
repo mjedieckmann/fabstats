@@ -1,3 +1,8 @@
+/**
+ * Routes that handle requests from the frontend client.
+ * They all represent interactions with the database.
+ */
+
 const express = require("express");
 const user_controller = require("../controllers/userController");
 const passport = require("passport");
@@ -24,7 +29,7 @@ router.post('/reset', user_controller.reset_password);
 /// TEAM ROUTES ///
 router.get('/teams', team_controller.list_teams);
 router.post('/team/create', team_controller.create_team);
-router.post('/team/edit', team_controller.edit_team);
-router.post('/team/delete', team_controller.delete_team);
+router.post('/team/edit', team_controller.isTeamCreator, team_controller.edit_team);
+router.post('/team/delete',  team_controller.isTeamCreator, team_controller.delete_team);
 
 module.exports = router;
