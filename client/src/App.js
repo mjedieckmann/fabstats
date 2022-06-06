@@ -95,7 +95,6 @@ const Layout = () => {
 function App() {
     return (
         <div className="App">
-            <title>Flesh and Blood TCG Unofficial Statistics</title>
             <BrowserRouter>
                 <Routes>
                     <Route path={"/"} element={<Layout/>}>
