@@ -25,9 +25,9 @@ export const TODetailDialog = (props) => {
     let toIsEditable = entityIsEditableByUser(props.eventForm.to, currentUser);
     const [ toDialogMode, setToDialogMode ] = useState('view');
     const [ tos, setTos ] = useState([]);
+    const showNotification = useNotification();
 
     useEffect(() => {
-        const showNotification = useNotification();
         axios.get('/api/tos')
             .then(res => {
                 setTos(res.data);
