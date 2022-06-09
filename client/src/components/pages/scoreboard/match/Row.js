@@ -12,17 +12,19 @@ export function Row(props) {
 
     return (
         <>
-            <TableRow hover sx={{ '& > *': { borderBottom: 'unset', cursor: 'pointer'} }} onClick={props.handleOpen}>
-                <TableCell align="center">{row.date_formatted}</TableCell>
-                <TableCell align="center">
-                    <BadgeAvatars hero={row.hero_winner} user={row.user_winner} winner={true}/>
-                </TableCell>
-                <TableCell align="center">Vs.</TableCell>
-                <TableCell align="center">
-                    <BadgeAvatars hero={row.hero_loser} user={row.user_loser} winner={false}/>
-                </TableCell>
-                <TableCell align="center">{row.event !== null ? row.event.descriptor : '(none)'}</TableCell>
-            </TableRow>
+
+                <TableRow hover sx={{ '& > *': { borderBottom: 'unset', cursor: 'pointer'} }} onClick={props.handleOpen}>
+                    <TableCell align="center">{row.date_formatted}</TableCell>
+                    <TableCell align="center">
+                        <BadgeAvatars hero={row.hero_winner} user={row.user_winner} winner={true}/>
+                    </TableCell>
+                    <TableCell align="center">Vs.</TableCell>
+                    <TableCell align="center">
+                        <BadgeAvatars hero={row.hero_loser} user={row.user_loser} winner={false}/>
+                    </TableCell>
+                    <TableCell align="center">{row.event !== null ? row.event.descriptor : '(none)'}</TableCell>
+                </TableRow>
+
         </>
     );
 }
