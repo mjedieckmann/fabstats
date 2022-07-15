@@ -4,6 +4,7 @@
 
 import InfoIcon from "@mui/icons-material/Info";
 import ScoreboardIcon from "@mui/icons-material/Scoreboard";
+import ElderlyIcon from '@mui/icons-material/Elderly';
 
 export const nav_buttons = [
     {
@@ -16,9 +17,9 @@ export const nav_buttons = [
         name: 'Scoreboard',
         icon: <ScoreboardIcon/>
     },
-    /*{
+    {
         url: '/heroes',
         name: 'Heroes',
         icon: <ElderlyIcon/>
-    },*/
+    },
 ]
