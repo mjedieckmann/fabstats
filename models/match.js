@@ -22,7 +22,7 @@ const MatchSchema = new Schema(
         user_loser: {type: Schema.Types.ObjectId, ref: 'User'},
         format: {type: Schema.Types.ObjectId, required: true, ref: 'Format'},
         meta: {type: Schema.Types.ObjectId, required: true, ref: 'Meta'},
-        notes: {type: String},
+        notes: {type: String, default: ''},
         created_by: {type: Schema.Types.ObjectId, ref: 'User'},
     },
     {

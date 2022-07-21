@@ -44,7 +44,8 @@ const EMPTY_FORM = {
     user_loser: null,
     format: null,
     meta: null,
-    created_by: null
+    created_by: null,
+    notes: ''
 }
 
 const UserAvatar = styled(Avatar)(({ theme }) => ({
@@ -116,7 +117,8 @@ export default function MatchDetailDialog(props) {
                         user_loser: res.data.user_loser,
                         format: res.data.format,
                         meta: res.data.meta,
-                        created_by: res.data.created_by
+                        created_by: res.data.created_by,
+                        notes: res.data.notes === null ? '' : res.data.notes
                     });
                     setOpen(true);
                 })
@@ -182,9 +184,9 @@ export default function MatchDetailDialog(props) {
                             />
                         </DialogTitle>
                         <DialogContent>
-                            <Box sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
+                            <Box >
                                 <Grid container spacing={2} justifyContent={"center"} alignItems={"center"}>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} >
                                         <Stack direction={"row"} justifyContent={"center"} alignItems={"center"} spacing={10}>
                                             <Badge
                                                 overlap="circular"
@@ -205,7 +207,7 @@ export default function MatchDetailDialog(props) {
                                             </Badge>
                                         </Stack>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
                                         <Stack direction={"row"} justifyContent={"center"}>
                                             <Autocomplete
                                                 id={"user-winner-input"}
@@ -257,7 +259,7 @@ export default function MatchDetailDialog(props) {
                                             />
                                         </Stack>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
                                         <Stack direction={"row"} justifyContent={"center"}>
                                             {/*Round*/}
                                             <Autocomplete
@@ -295,7 +297,7 @@ export default function MatchDetailDialog(props) {
                                             </LocalizationProvider>
                                         </Stack>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={12} sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
                                         <Stack direction={"row"} justifyContent={"center"}>
                                             {/*Dialog to view / edit the event.*/}
                                             <EventDetailDialog setHasChanged={setHasChanged} setForm={setForm} form={form} matchDialogMode={props.matchDialogMode}/>
@@ -320,8 +322,24 @@ export default function MatchDetailDialog(props) {
                                             />
                                         </Stack>
                                     </Grid>
+                                    <Grid item xs={3}/>
+                                    <Grid item xs={6}>
+                                        {/*(Notes)*/}
+                                        <TextField
+                                            fullWidth={true}
+                                            id="notes-input"
+                                            label="Notes"
+                                            multiline
+                                            minRows={3}
+                                            value={form.notes}
+                                            onChange={(newValue) => {
+                                                setForm({...form, notes: newValue.target.value});
+                                            }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={3}/>
                                 </Grid>
-                                    {/*(Notes)*/}
+
                             </Box>
                         </DialogContent>
                         <DialogActions>

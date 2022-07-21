@@ -33,7 +33,7 @@ export const TeamDetailDialog = (props) => {
                 setTeams(res.data);
             })
             .catch(err => showNotification(err.response.data.message));
-    }, [teamsChanged, showNotification]);
+    }, [teamsChanged]);
     const [ teamForm, setTeamForm ] = useState({_id: null, nick: ''});
     const [ teamDialogOpen, setTeamDialogOpen ] = useState(false);
 

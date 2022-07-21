@@ -147,6 +147,7 @@ exports.create_match = [
                     format: req.body.format._id,
                     meta: req.body.meta._id,
                     created_by: req.user,
+                    notes: req.body.notes
                 });
             match.save((err) => {
                 if (err) { return next(err) }
@@ -176,14 +177,15 @@ exports.edit_match = [
             // Validation successful, edit the Match.
             const match = res.locals.match;
             match.date = req.body.date;
-            match.event= req.body.event;
-            match.round= req.body.round;
-            match.hero_winner= req.body.hero_winner._id;
-            match.hero_loser= req.body.hero_loser._id;
-            match.user_winner= req.body.user_winner;
-            match.user_loser= req.body.user_loser;
-            match.format= req.body.format._id;
-            match.meta= req.body.meta._id;
+            match.event = req.body.event;
+            match.round = req.body.round;
+            match.hero_winner = req.body.hero_winner._id;
+            match.hero_loser = req.body.hero_loser._id;
+            match.user_winner = req.body.user_winner;
+            match.user_loser = req.body.user_loser;
+            match.format = req.body.format._id;
+            match.meta = req.body.meta._id;
+            match.notes = req.body.notes;
             match.save(function (err) {
                 if (err) { return next(err); }
                 res.status(200).json({message: 'Match updated!'});

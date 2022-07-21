@@ -45,7 +45,7 @@ export default function Heroes(){
             });
     }, []);
 
-    const [formatFilter, setFormatFilter] = useState('both');
+    const [formatFilter, setFormatFilter] = useState('Classic Constructed');
     const handleChange = (event) => {
         setFormatFilter(event.target.value);
     };
