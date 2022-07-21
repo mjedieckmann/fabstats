@@ -7,7 +7,19 @@ import {useEffect, useState} from "react";
 import {useRecoilState} from "recoil";
 import uuid from "react-uuid";
 import axios from "axios";
-import {Fab, Grid, Dialog, Box, DialogTitle, DialogActions, DialogContent, Button, Autocomplete, TextField} from "@mui/material";
+import {
+    Fab,
+    Grid,
+    Dialog,
+    Box,
+    DialogTitle,
+    DialogActions,
+    DialogContent,
+    Button,
+    Autocomplete,
+    TextField,
+    Typography, Stack
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import {DesktopDatePicker, LocalizationProvider} from "@mui/lab";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -17,6 +29,9 @@ import {dirtyState, ROUNDS} from "../../../../utils/_globalState";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import {capitalizeFirstLetter, preventSubmitOnEnter, useNotification} from "../../../../utils/_globalUtils";
 import {Row} from "./Row";
+import Badge from "@mui/material/Badge";
+import Avatar from "@mui/material/Avatar";
+import {styled} from "@mui/material/styles";
 
 const EMPTY_FORM = {
     _id : null,
@@ -29,8 +44,13 @@ const EMPTY_FORM = {
     user_loser: null,
     format: null,
     meta: null,
-    created_by: null
+    created_by: null,
+    notes: ''
 }
+
+const UserAvatar = styled(Avatar)(({ theme }) => ({
+    border: `2px solid ${theme.palette.background.paper}`,
+}));
 
 export default function MatchDetailDialog(props) {
     const [ open, setOpen ] = useState(false);
@@ -52,14 +72,10 @@ export default function MatchDetailDialog(props) {
     useEffect(() =>{
         axios.get('/api/heroes')
             .then(res => {
-                let heroes = new Set();
-                res.data.forEach(hero => {
-                    heroes.add({label: hero.name, id: hero._id});
-                })
-                setHeroes([...heroes]);
+                setHeroes(res.data);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, [showNotification]);
+    }, []);
     const [ users, setUsers ] = useState([]);
     useEffect(() =>{
         axios.get('/users')
@@ -67,31 +83,23 @@ export default function MatchDetailDialog(props) {
                 setUsers(res.data);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, [showNotification]);
+    }, []);
     const [ formats, setFormats ] = useState([]);
     useEffect(() =>{
         axios.get('/api/formats')
             .then(res => {
-                let formats = new Set();
-                res.data.forEach(format => {
-                    formats.add({label: format.descriptor, id: format._id});
-                })
-                setFormats([...formats]);
+                setFormats(res.data);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, [showNotification]);
+    }, []);
     const [ metas, setMetas ] = useState([]);
     useEffect(() =>{
         axios.get('/api/metas')
             .then(res => {
-                let metas = new Set();
-                res.data.forEach(meta => {
-                    metas.add({label: meta.descriptor, id: meta._id});
-                })
-                setMetas([...metas]);
+                setMetas(res.data);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, [showNotification]);
+    }, []);
 
     // Load the match detail data if in "edit" or "view" mode.
     const handleOpen = () => {
@@ -103,13 +111,14 @@ export default function MatchDetailDialog(props) {
                         date: res.data.date,
                         event: res.data.event,
                         round: res.data.round,
-                        hero_winner: {label: res.data.hero_winner.name, id: res.data.hero_winner._id},
-                        hero_loser: {label: res.data.hero_loser.name, id: res.data.hero_loser._id},
+                        hero_winner: res.data.hero_winner,
+                        hero_loser: res.data.hero_loser,
                         user_winner: res.data.user_winner,
                         user_loser: res.data.user_loser,
-                        format: {label: res.data.format.descriptor, id: res.data.format._id},
-                        meta: {label: res.data.meta.descriptor, id: res.data.meta._id},
-                        created_by: res.data.created_by
+                        format: res.data.format,
+                        meta: res.data.meta,
+                        created_by: res.data.created_by,
+                        notes: res.data.notes === null ? '' : res.data.notes
                     });
                     setOpen(true);
                 })
@@ -161,7 +170,7 @@ export default function MatchDetailDialog(props) {
                 ? <Fab color="primary" aria-label="add" onClick={handleOpen}><AddIcon /></Fab>
                 : <Row key={props.row._id} row={props.row} handleOpen={handleOpen}/>
             }
-            <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth={'sm'}>
+            <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth={'lg'}>
                 <Box sx={{ width: '100%', typography: 'body1' }}>
                     <Box component="form" onSubmit={handleSubmit}>
                         <DialogTitle>
@@ -175,133 +184,162 @@ export default function MatchDetailDialog(props) {
                             />
                         </DialogTitle>
                         <DialogContent>
-                            <Box sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
-                                <Grid container>
-                                    {/* Dialog to view / edit the event. */}
-                                    <Grid item lg={12}>
-                                        <EventDetailDialog setHasChanged={setHasChanged} setForm={setForm} form={form} matchDialogMode={props.matchDialogMode}/>
+                            <Box >
+                                <Grid container spacing={2} justifyContent={"center"} alignItems={"center"}>
+                                    <Grid item xs={12} >
+                                        <Stack direction={"row"} justifyContent={"center"} alignItems={"center"} spacing={10}>
+                                            <Badge
+                                                overlap="circular"
+                                                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                                badgeContent={<UserAvatar alt={form.user_winner?.nick} src={form.user_winner?.img} />}
+                                            >
+                                                <Avatar alt={form.hero_winner?.name} src={form.hero_winner?.img} sx={{width: 100, height: 100, border: '2px solid green'}}/>
+                                            </Badge>
+                                            <Typography variant={"h3"}>
+                                                Vs.
+                                            </Typography>
+                                            <Badge
+                                                overlap="circular"
+                                                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                                badgeContent={<UserAvatar alt={form.user_loser?.nick} src={form.user_loser?.img} />}
+                                            >
+                                                <Avatar alt={form.hero_loser?.name} src={form.hero_loser?.img} sx={{width: 100, height: 100, border: '2px solid red'}}/>
+                                            </Badge>
+                                        </Stack>
                                     </Grid>
-                                    {/* Readonly event details. */}
-                                    <Grid item lg={6}>
-                                        <TextField
-                                            disabled={true}
-                                            margin="dense"
-                                            id="event_type_view"
-                                            value={form.event !== null ? form.event.event_type : ''}
-                                            label="Even type"
-                                            type="text"
-                                            variant="standard"
-                                        />
-                                    </Grid>
-                                    <Grid item lg={6}>
-                                        <TextField
-                                            disabled={true}
-                                            margin="dense"
-                                            id="event_to_view"
-                                            value={form.event !== null && form.event.to !== null ? form.event.to.descriptor : ''}
-                                            label="TO"
-                                            type="text"
-                                            variant="standard"
-                                        />
-                                    </Grid>
-                                    {/* 'Simple', select-only autocomplete fields. */}
-                                    <Grid item lg={6}>
-                                        <Autocomplete
-                                            id={"round-input"}
-                                            disabled={props.matchDialogMode === 'view'}
-                                            options={ROUNDS}
-                                            sx={{color:"red"}}
-                                            name={"round"}
-                                            onChange={(event, newValue) => {
-                                                setForm({...form, round : newValue});
-                                            }}
-                                            value={form.round}
-                                            renderInput={(params) =>
-                                                <TextField {...params}
-                                                           label={"Round"}
-                                                           required
-                                                           onKeyDown={preventSubmitOnEnter}/>}
-                                            />
-                                    </Grid>
-                                    <Grid item lg={6}>
-                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="hero_winner" options={heroes} label="Hero (winner)" form={form} setForm={setForm} required={true}/>
-                                    </Grid>
-                                    <Grid item lg={6}>
-                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="hero_loser" options={heroes} label="Hero (loser)" form={form} setForm={setForm} required={true}/>
-                                    </Grid>
-                                    <Grid item lg={6}>
-                                        <Autocomplete
-                                            id={"authentication-winner-input"}
-                                            disabled={props.matchDialogMode === 'view'}
-                                            options={users}
-                                            name={"user_winner"}
-                                            onChange={(event, newValue) => {
-                                                setForm({...form, user_winner: newValue});
-                                            }}
-                                            // We are working with objects. This ensures that the right property is used for comparison.
-                                            isOptionEqualToValue={(option, value) => {
-                                                return option._id === value._id;
-                                            }}
-                                            // We are working with objects. This ensures that the right property gets displayed.
-                                            getOptionLabel={(option) => {
-                                                if (option.inputValue) {
-                                                    return option.inputValue;
-                                                }
-                                                return option.nick;
-                                            }}
-                                            value={form.user_winner}
-                                            // We are working with objects. This ensures that the right property gets displayed.
-                                            renderInput={(params) => <TextField {...params} label="Player (winner)" onKeyDown={preventSubmitOnEnter}/>}
-                                        />
-                                    </Grid>
-                                    <Grid item lg={6}>
-                                        <Autocomplete
-                                            id={"authentication-winner-input"}
-                                            disabled={props.matchDialogMode === 'view'}
-                                            options={users}
-                                            name={"user_loser"}
-                                            onChange={(event, newValue) => {
-                                                setForm({...form, user_loser: newValue});
-                                            }}
-                                            // We are working with objects. This ensures that the right property is used for comparison.
-                                            isOptionEqualToValue={(option, value) => {
-                                                return option._id === value._id;
-                                            }}
-                                            // We are working with objects. This ensures that the right property gets displayed.
-                                            getOptionLabel={(option) => {
-                                                if (option.inputValue) {
-                                                    return option.inputValue;
-                                                }
-                                                return option.nick;
-                                            }}
-                                            value={form.user_loser}
-                                            // We are working with objects. This ensures that the right property gets displayed.
-                                            renderInput={(params) => <TextField {...params} label="Player (loser)" onKeyDown={preventSubmitOnEnter}/>}
-                                        />
-                                    </Grid>
-                                    <Grid item lg={6}>
-                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="format" options={formats} label="Format" form={form} setForm={setForm} required={true}/>
-                                    </Grid>
-                                    <Grid item lg={6}>
-                                        <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="meta" options={metas} label="Meta" form={form} setForm={setForm} required={true}/>
-                                    </Grid>
-                                    {/*Date*/}
-                                    <Grid item lg={6}>
-                                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                            <DesktopDatePicker
-                                                label="Date"
-                                                value={form.date}
+                                    <Grid item xs={12} sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
+                                        <Stack direction={"row"} justifyContent={"center"}>
+                                            <Autocomplete
+                                                id={"user-winner-input"}
                                                 disabled={props.matchDialogMode === 'view'}
-                                                minDate={new Date('2017-01-01')}
-                                                onChange={(newValue) => {
-                                                    setForm({...form, date: newValue});
+                                                options={users}
+                                                name={"user_winner"}
+                                                onChange={(event, newValue) => {
+                                                    setForm({...form, user_winner: newValue});
                                                 }}
-                                                renderInput={(params) => <TextField {...params} error={false} required />}
+                                                // We are working with objects. This ensures that the right property is used for comparison.
+                                                isOptionEqualToValue={(option, value) => {
+                                                    return option._id === value._id;
+                                                }}
+                                                // We are working with objects. This ensures that the right property gets displayed.
+                                                getOptionLabel={(option) => {
+                                                    if (option.inputValue) {
+                                                        return option.inputValue;
+                                                    }
+                                                    return option.nick;
+                                                }}
+                                                value={form.user_winner}
+                                                // We are working with objects. This ensures that the right property gets displayed.
+                                                renderInput={(params) => <TextField {...params} label="Player (winner)" onKeyDown={preventSubmitOnEnter}/>}
                                             />
-                                        </LocalizationProvider>
+                                            <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="hero_winner" options={heroes} label="Hero (winner)" form={form} setForm={setForm} required={true}/>
+                                            <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="hero_loser" options={heroes} label="Hero (loser)" form={form} setForm={setForm} required={true}/>
+                                            <Autocomplete
+                                                id={"user-loser-input"}
+                                                disabled={props.matchDialogMode === 'view'}
+                                                options={users}
+                                                name={"user_loser"}
+                                                onChange={(event, newValue) => {
+                                                    setForm({...form, user_loser: newValue});
+                                                }}
+                                                // We are working with objects. This ensures that the right property is used for comparison.
+                                                isOptionEqualToValue={(option, value) => {
+                                                    return option._id === value._id;
+                                                }}
+                                                // We are working with objects. This ensures that the right property gets displayed.
+                                                getOptionLabel={(option) => {
+                                                    if (option.inputValue) {
+                                                        return option.inputValue;
+                                                    }
+                                                    return option.nick;
+                                                }}
+                                                value={form.user_loser}
+                                                // We are working with objects. This ensures that the right property gets displayed.
+                                                renderInput={(params) => <TextField {...params} label="Player (loser)" onKeyDown={preventSubmitOnEnter}/>}
+                                            />
+                                        </Stack>
                                     </Grid>
-                                    {/*(Notes)*/}
+                                    <Grid item xs={12} sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
+                                        <Stack direction={"row"} justifyContent={"center"}>
+                                            {/*Round*/}
+                                            <Autocomplete
+                                                id={"round-input"}
+                                                disabled={props.matchDialogMode === 'view'}
+                                                options={ROUNDS}
+                                                sx={{color:"red"}}
+                                                name={"round"}
+                                                onChange={(event, newValue) => {
+                                                    setForm({...form, round : newValue});
+                                                }}
+                                                value={form.round}
+                                                renderInput={(params) =>
+                                                    <TextField {...params}
+                                                               label={"Round"}
+                                                               required
+                                                               onKeyDown={preventSubmitOnEnter}/>}
+                                            />
+                                            {/*Format*/}
+                                            <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="format" options={formats} label="Format" form={form} setForm={setForm} required={true}/>
+                                            {/*Meta*/}
+                                            <SimpleAutocomplete disabled={props.matchDialogMode === 'view'} handle="meta" options={metas} label="Meta" form={form} setForm={setForm} required={true}/>
+                                            {/*Date*/}
+                                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                <DesktopDatePicker
+                                                    label="Date"
+                                                    value={form.date}
+                                                    disabled={props.matchDialogMode === 'view'}
+                                                    minDate={new Date('2017-01-01')}
+                                                    onChange={(newValue) => {
+                                                        setForm({...form, date: newValue});
+                                                    }}
+                                                    renderInput={(params) => <TextField {...params} error={false} required />}
+                                                />
+                                            </LocalizationProvider>
+                                        </Stack>
+                                    </Grid>
+                                    <Grid item xs={12} sx={{'& .MuiTextField-root': { m: 1, width: '25ch' },}}>
+                                        <Stack direction={"row"} justifyContent={"center"}>
+                                            {/*Dialog to view / edit the event.*/}
+                                            <EventDetailDialog setHasChanged={setHasChanged} setForm={setForm} form={form} matchDialogMode={props.matchDialogMode}/>
+                                            {/*Readonly event details.*/}
+                                            <TextField
+                                                disabled={true}
+                                                margin="dense"
+                                                id="event_type_view"
+                                                value={form.event !== null ? form.event.event_type : ''}
+                                                label="Even type"
+                                                type="text"
+                                                variant="standard"
+                                            />
+                                            <TextField
+                                                disabled={true}
+                                                margin="dense"
+                                                id="event_to_view"
+                                                value={form.event !== null && form.event.to !== null ? form.event.to.descriptor : ''}
+                                                label="TO"
+                                                type="text"
+                                                variant="standard"
+                                            />
+                                        </Stack>
+                                    </Grid>
+                                    <Grid item xs={3}/>
+                                    <Grid item xs={6}>
+                                        {/*(Notes)*/}
+                                        <TextField
+                                            fullWidth={true}
+                                            id="notes-input"
+                                            label="Notes"
+                                            multiline
+                                            minRows={3}
+                                            value={form.notes}
+                                            onChange={(newValue) => {
+                                                setForm({...form, notes: newValue.target.value});
+                                            }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={3}/>
                                 </Grid>
+
                             </Box>
                         </DialogContent>
                         <DialogActions>

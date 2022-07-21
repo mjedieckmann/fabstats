@@ -33,7 +33,7 @@ export const TODetailDialog = (props) => {
                 setTos(res.data);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, [tosChanged, showNotification]);
+    }, [tosChanged]);
     const [ toForm, setToForm ] = useState({_id: null, descriptor: ''});
     const [ toDialogOpen, setToDialogOpen ] = useState(false);
 

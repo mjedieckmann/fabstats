@@ -34,7 +34,6 @@ export default function Heroes(){
         axios.get('/api/matches')
             .then(res => {
                 setMatches(res.data);
-                console.log(res.data);
             });
     }, [dirty, setMatches]);
     const [ metas, setMetas] = useState([]);
@@ -46,7 +45,7 @@ export default function Heroes(){
             });
     }, []);
 
-    const [formatFilter, setFormatFilter] = useState('both');
+    const [formatFilter, setFormatFilter] = useState('Classic Constructed');
     const handleChange = (event) => {
         setFormatFilter(event.target.value);
     };
@@ -115,59 +114,6 @@ export default function Heroes(){
                 </Paper>
             </Grid>
             <Grid item xs={3}></Grid>
-
-            {/*<Grid item xs={5}></Grid>
-            <Grid item xs={2} textAlign={"center"}>
-                <Paper>
-                    <FormControl>
-                        <FormLabel id="format-radio-label">Format</FormLabel>
-                        <RadioGroup
-                            row
-                            aria-labelledby="format-radio-label"
-                            name="format-radio-buttons"
-                            value={formatFilter}
-                            onChange={handleChange}
-                        >
-                            <FormControlLabel labelPlacement={"top"} value="Classic Constructed" control={<Radio />} label="CC" />
-                            <FormControlLabel labelPlacement={"top"} value="Blitz" control={<Radio />} label="Blitz" />
-                            <FormControlLabel labelPlacement={"top"} value="both" control={<Radio />} label="Both" />
-                        </RadioGroup>
-                    </FormControl>
-                    <Autocomplete
-                        id={"events-input"}
-                        options={events}
-                        name={"events"}
-                        onChange={(event, newValue) => {
-                            setEventFilter(newValue);
-                        }}
-                        getOptionLabel={(option) => {
-                            return option.descriptor;
-                        }}
-                        isOptionEqualToValue={(option, value) => {
-                            return option.id === value.id;
-                        }}
-                        value={eventFilter}
-                        renderInput={(params) => <TextField {...params} label={"Event"}/>}
-                    />
-                    <Autocomplete
-                        id={"metas-input"}
-                        options={metas}
-                        name={"metas"}
-                        onChange={(event, newValue) => {
-                            setMetaFilter(newValue);
-                        }}
-                        getOptionLabel={(option) => {
-                            return option.descriptor;
-                        }}
-                        isOptionEqualToValue={(option, value) => {
-                            return option.id === value.id;
-                        }}
-                        value={metaFilter}
-                        renderInput={(params) => <TextField {...params} label={"Meta"}/>}
-                    />
-                </Paper>
-            </Grid>
-            <Grid item xs={5}></Grid>*/}
             {heroes.filter((hero) => formatFilter === "both" || hero.formats.filter((format) => format.descriptor === formatFilter).length !== 0).map((hero) => (
                 <Grid key={hero._id} item xs={2}>
                     <HeroCard hero={hero} matches={matches.filter((match) =>

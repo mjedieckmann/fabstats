@@ -5,7 +5,7 @@
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import PropTypes from "prop-types";
-import BadgeAvatars from "./BadgeAvatar";
+import BadgeAvatar from "./BadgeAvatar";
 
 export function Row(props) {
     const { row } = props;
@@ -15,11 +15,11 @@ export function Row(props) {
             <TableRow hover sx={{ '& > *': { borderBottom: 'unset', cursor: 'pointer'} }} onClick={props.handleOpen}>
                 <TableCell align="center">{row.date_formatted}</TableCell>
                 <TableCell align="center">
-                    <BadgeAvatars hero={row.hero_winner} user={row.user_winner} winner={true}/>
+                    <BadgeAvatar hero={row.hero_winner} user={row.user_winner} winner={true}/>
                 </TableCell>
                 <TableCell align="center">Vs.</TableCell>
                 <TableCell align="center">
-                    <BadgeAvatars hero={row.hero_loser} user={row.user_loser} winner={false}/>
+                    <BadgeAvatar hero={row.hero_loser} user={row.user_loser} winner={false}/>
                 </TableCell>
                 <TableCell align="center">{row.event !== null ? row.event.descriptor : '(none)'}</TableCell>
             </TableRow>
