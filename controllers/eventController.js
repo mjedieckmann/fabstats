@@ -34,6 +34,7 @@ exports.list_events = function(req, res, next) {
     Event.find()
         .sort('descriptor')
         .populate('to')
+        .populate('created_by')
         .exec(function (err, list_events) {
             if (err) { return next(err); }
             res.json(list_events);

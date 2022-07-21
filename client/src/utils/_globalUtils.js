@@ -15,7 +15,7 @@ export const capitalizeFirstLetter = (string) => {
 }
 
 /**
- * Can the authentication edit the entity?
+ * Can the user edit the entity?
  * @param entity
  * @param user
  * @returns {boolean}
