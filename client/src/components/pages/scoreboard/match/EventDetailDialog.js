@@ -41,7 +41,7 @@ export default function EventDetailDialog(props) {
                 setEvents([...events]);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, [eventsChanged]);
+    }, [eventsChanged, showNotification]);
 
     const handleOpenEventDetail = (mode) => {
         switch (mode){
@@ -60,6 +60,11 @@ export default function EventDetailDialog(props) {
                     to: props.form.event.to,
                 });
                 break;
+            default:
+                props.setForm({
+                    ...props.form,
+                    event: null
+                });
         }
         setEventDialogMode(mode);
         setEventDialogOpen(true);

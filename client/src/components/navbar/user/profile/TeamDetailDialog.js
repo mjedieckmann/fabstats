@@ -33,7 +33,7 @@ export const TeamDetailDialog = (props) => {
                 setTeams(res.data);
             })
             .catch(err => showNotification(err.response.data.message));
-    }, [teamsChanged]);
+    }, [teamsChanged, showNotification]);
     const [ teamForm, setTeamForm ] = useState({_id: null, nick: ''});
     const [ teamDialogOpen, setTeamDialogOpen ] = useState(false);
 
@@ -52,6 +52,11 @@ export const TeamDetailDialog = (props) => {
                     nick: props.userForm.team.nick
                 })
                 break;
+            default:
+                props.setUserForm({
+                    ...props.userForm,
+                    team: null
+                });
         }
         setTeamDialogMode(mode);
         setTeamDialogOpen(true)

@@ -33,7 +33,7 @@ export const TODetailDialog = (props) => {
                 setTos(res.data);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, [tosChanged]);
+    }, [tosChanged, showNotification]);
     const [ toForm, setToForm ] = useState({_id: null, descriptor: ''});
     const [ toDialogOpen, setToDialogOpen ] = useState(false);
 
@@ -52,6 +52,11 @@ export const TODetailDialog = (props) => {
                     descriptor: props.eventForm.to.descriptor
                 })
                 break;
+            default:
+                props.setEventForm({
+                    ...props.eventForm,
+                    to: null
+                });
         }
         setToDialogMode(mode);
         setToDialogOpen(true)

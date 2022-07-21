@@ -81,7 +81,7 @@ exports.list_matches = function(req, res, next) {
                 }
             ]
         })
-        .populate({ path: 'meta', select: 'descriptor -_id' })
+        .populate({ path: 'meta', select: 'descriptor' })
         .populate({ path: 'format', select: 'descriptor -_id' })
         .exec(function (err, list_matches) {
             if (err) { return next(err); }

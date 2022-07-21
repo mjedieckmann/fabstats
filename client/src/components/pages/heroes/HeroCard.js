@@ -7,37 +7,46 @@ import {
     CardActionArea, Dialog, DialogActions,
     DialogContent,
     DialogTitle,
-    Divider, Grid
+    Divider, Grid, Stack, Tooltip
 } from '@mui/material';
 import {useEffect, useState} from "react";
 import {BarChart} from "./BarChart";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
 
 export default function HeroCard(props) {
-    // state for winrate, state for filteredMatches
+    const [ eventFilter, setEventFilter ] = useState(null);
+    const [ metaFilter, setMetaFilter ] = useState(null);
     const [ filteredMatches, setFilteredMatches ] = useState([]);
     useEffect(() => {
-        setFilteredMatches(props.matches.filter((match) => ((props.hero._id === match.hero_winner._id) || (props.hero._id === match.hero_loser._id))));
-    }, [props.matches])
-    const [ winPercent, setWinPercent ] = useState(0);
+        setFilteredMatches(props.matches.filter((match) =>
+            (
+                (props.hero._id === match.hero_winner._id) ||
+                (props.hero._id === match.hero_loser._id)
+            ) &&
+            (
+                (eventFilter === null || eventFilter?._id === match.event?._id) &&
+                (metaFilter === null || metaFilter?._id === match.meta?._id)
+            )
+        ));
+    }, [props.matches, eventFilter, metaFilter, props.hero._id])
     const [ wins, setWins ] = useState(0);
     const [ losses, setLosses ] = useState(0);
     useEffect(() => {
         setWins(filteredMatches.filter((match) => match.hero_winner.name === props.hero.name).length)
         setLosses(filteredMatches.filter((match) => match.hero_loser.name === props.hero.name).length)
-        let total = wins + losses
-        if (total === 0){
-            setWinPercent(-1)
-        } else {
-            setWinPercent(Math.round((wins / total) * 100));
-        }
-    }, [filteredMatches])
+    }, [filteredMatches, props.hero.name])
     const [ heroDialogOpen, setHeroDialogOpen ] = useState(false);
 
     const handleClose = () => {
+        setMetaFilter(null);
+        setEventFilter(null);
         setHeroDialogOpen(false);
     }
 
     const handleOpen = () => {
+        setMetaFilter(props.metaFilter);
+        setEventFilter(props.eventFilter);
         setHeroDialogOpen(true);
     }
     return (
@@ -55,26 +64,69 @@ export default function HeroCard(props) {
                             {props.hero.name}
                         </Typography>
                         <Divider/>
-                        <Typography variant="subtitle1" color="text.secondary" textAlign={"center"}>
-                            Wins: {wins} / {wins + losses} ({winPercent === -1 ? "N/A" : winPercent + " %"})
-                        </Typography>
+                        <Tooltip title={wins + " / " + (wins + losses)} arrow>
+                            <Typography variant="subtitle1" color="text.secondary" textAlign={"center"}>
+                                {(wins + losses) === 0 ? "N/A" : Math.round((wins / (wins + losses)) * 100) + " %"}
+                            </Typography>
+                        </Tooltip>
                     </CardContent>
                 </CardActionArea>
             </Card>
-            <Dialog open={heroDialogOpen} onClose={handleClose} fullWidth={true} maxWidth={false}>
+            <Dialog open={heroDialogOpen} onClose={handleClose} fullWidth={true} maxWidth={"md"}>
                 <DialogTitle>
-                    <Box>
-                        <Avatar alt={props.hero.name} src={props.hero.img} sx={{ width: 156, height: 156 }} />
-                        Hero Details
+                    <Box display={"flex"} alignItems={"center"}>
+                        <Avatar alt={props.hero.name} src={props.hero.img} sx={{ width: 56, height: 56 }} />
+                        <Typography textAlign={"center"} width={1} variant="h5">
+                            {props.hero.name}
+                        </Typography>
                     </Box>
                 </DialogTitle>
+                <Divider/>
                 <DialogContent>
-                    <Grid container>
-                        <Grid item xs={5}>
-                            {/*<Avatar alt={props.hero.name} src={props.hero.img} sx={{ width: 156, height: 156 }} />*/}
-                        </Grid>
-                        <Grid item xs={7}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={8}>
                             <BarChart matches={filteredMatches} hero={props.hero}/>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Stack spacing={2} height={1} justifyContent={"flex-end"}>
+                                <Autocomplete
+                                    id={"events-input"}
+                                    options={props.events}
+                                    name={"events"}
+                                    onChange={(event, newValue) => {
+                                        setEventFilter(newValue);
+                                    }}
+                                    getOptionLabel={(option) => {
+                                        return option.descriptor;
+                                    }}
+                                    isOptionEqualToValue={(option, value) => {
+                                        return option.id === value.id;
+                                    }}
+                                    value={eventFilter}
+                                    renderInput={(params) => <TextField {...params} label={"Event"}/>}
+                                />
+                                <Autocomplete
+                                    id={"metas-input"}
+                                    options={props.metas}
+                                    name={"metas"}
+                                    onChange={(event, newValue) => {
+                                        setMetaFilter(newValue);
+                                    }}
+                                    getOptionLabel={(option) => {
+                                        return option.descriptor;
+                                    }}
+                                    isOptionEqualToValue={(option, value) => {
+                                        return option.id === value.id;
+                                    }}
+                                    value={metaFilter}
+                                    renderInput={(params) => <TextField {...params} label={"Meta"}/>}
+                                />
+                                <Tooltip title={wins + " / " + (wins + losses)} arrow>
+                                    <Typography variant="h3" color="text.secondary" textAlign={"center"}>
+                                        {(wins + losses) === 0 ? "N/A" : Math.round((wins / (wins + losses)) * 100) + " %"}
+                                    </Typography>
+                                </Tooltip>
+                            </Stack>
                         </Grid>
                     </Grid>
                 </DialogContent>

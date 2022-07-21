@@ -46,7 +46,7 @@ export default function MatchDetailDialog(props) {
             setDirty(uuid());
             setHasChanged(false);
         }
-    }, [hasChanged, open]);
+    }, [hasChanged, open, setDirty]);
 
     // Fetch data from the database
     useEffect(() =>{
@@ -59,7 +59,7 @@ export default function MatchDetailDialog(props) {
                 setHeroes([...heroes]);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, []);
+    }, [showNotification]);
     const [ users, setUsers ] = useState([]);
     useEffect(() =>{
         axios.get('/users')
@@ -67,7 +67,7 @@ export default function MatchDetailDialog(props) {
                 setUsers(res.data);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, []);
+    }, [showNotification]);
     const [ formats, setFormats ] = useState([]);
     useEffect(() =>{
         axios.get('/api/formats')
@@ -79,7 +79,7 @@ export default function MatchDetailDialog(props) {
                 setFormats([...formats]);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, []);
+    }, [showNotification]);
     const [ metas, setMetas ] = useState([]);
     useEffect(() =>{
         axios.get('/api/metas')
@@ -91,7 +91,7 @@ export default function MatchDetailDialog(props) {
                 setMetas([...metas]);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
-    }, []);
+    }, [showNotification]);
 
     // Load the match detail data if in "edit" or "view" mode.
     const handleOpen = () => {
