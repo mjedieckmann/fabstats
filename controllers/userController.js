@@ -196,9 +196,11 @@ exports.login_failure = (req, res) => {
 /**
  * Log the User out.
  */
-exports.logout = (req, res) => {
-    req.logout();
-    res.status(200).json({message: 'Logged out!'});
+exports.logout = (req, res, next) => {
+    req.logout((err) => {
+        if (err) { return next(err); }
+        res.status(200).json({message: 'Logged out!'});
+    });
 }
 
 /**

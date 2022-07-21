@@ -24,7 +24,6 @@ export default function EventDetailDialog(props) {
     /* When the team detail dialog is closed, the list of events needs to be reloaded from the database. */
     const [ eventsChanged, setEventsChanged] = useState(uuid());
     const [ currentUser, ] = useRecoilState(currentUserState);
-    let eventIsEditable = entityIsEditableByUser(props.form.event, currentUser);
     const [ eventDialogMode, setEventDialogMode ] = useState('view');
     const [ eventDialogOpen, setEventDialogOpen ] = useState(false);
     const [ eventForm, setEventForm ] = useState({_id: null, descriptor: '', event_type: 'On Demand', to: ''});
@@ -34,11 +33,7 @@ export default function EventDetailDialog(props) {
     useEffect(() =>{
         axios.get('/api/events')
             .then(res => {
-                let events = new Set();
-                res.data.forEach(event => {
-                    events.add(event);
-                })
-                setEvents([...events]);
+                setEvents(res.data);
             })
             .catch(err => showNotification(err.response.data.message, 'error'));
     }, [eventsChanged]);
@@ -181,8 +176,8 @@ export default function EventDetailDialog(props) {
                 {/* Display the edit or view icon, depending on whether the user is the creator of the event.
                 Clicking the button will open the event detail dialog.
                 Only displays an icon if a event is selected. */}
-                <IconButton sx={props.form.event !== null ? {my: "auto"} : {display: 'none'}} onClick={() => handleOpenEventDetail(eventIsEditable ? 'edit' : 'view')}>
-                    {eventIsEditable
+                <IconButton sx={props.form.event !== null ? {my: "auto"} : {display: 'none'}} onClick={() => handleOpenEventDetail((props.form.event?.created_by?._id === currentUser?._id) ? 'edit' : 'view')}>
+                    {props.form.event?.created_by?._id === currentUser?._id
                         ? <EditIcon />
                         : <VisibilityIcon />
                     }

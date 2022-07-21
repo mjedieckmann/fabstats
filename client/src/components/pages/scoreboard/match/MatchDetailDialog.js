@@ -327,6 +327,7 @@ export default function MatchDetailDialog(props) {
                                         {/*(Notes)*/}
                                         <TextField
                                             fullWidth={true}
+                                            disabled={props.matchDialogMode === 'view'}
                                             id="notes-input"
                                             label="Notes"
                                             multiline
