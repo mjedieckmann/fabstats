@@ -14,7 +14,7 @@ const SmallAvatar = styled(Avatar)(({ theme }) => ({
     border: `2px solid ${theme.palette.background.paper}`,
 }));
 
-export default function BadgeAvatars(props) {
+export default function BadgeAvatar(props) {
     const [img, setImg] = useState(null);
     const [ heroTooltipOpen, setHeroTooltipOpen ] = useState(false);
     const [ userTooltipOpen, setUserTooltipOpen ] = useState(false);
@@ -34,17 +34,17 @@ export default function BadgeAvatars(props) {
     }
 
     return (
-        <Tooltip title={props.hero.name} arrow open={!userTooltipOpen && heroTooltipOpen} onOpen={() => setHeroTooltipOpen(true)} onClose={handleHeroTooltipClose}>
+        <Tooltip title={props.hero?.name} arrow open={!userTooltipOpen && heroTooltipOpen} onOpen={() => setHeroTooltipOpen(true)} onClose={handleHeroTooltipClose}>
             <Badge
                 overlap="circular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 badgeContent={
                     props.user !== null
-                        ? <Tooltip title={props.user.nick} arrow open={userTooltipOpen} onOpen={() => setUserTooltipOpen(true)} onClose={handleUserTooltipClose}><SmallAvatar alt={props.user.nick} src={props.user.img} /></Tooltip>
+                        ? <Tooltip title={props.user?.nick} arrow open={userTooltipOpen} onOpen={() => setUserTooltipOpen(true)} onClose={handleUserTooltipClose}><SmallAvatar alt={props.user?.nick} src={props.user?.img} /></Tooltip>
                         : <SmallAvatar/>
                 }
             >
-                <Avatar alt={props.hero.name} src={img} sx={props.winner ? {border: '2px solid green'} : {border: '2px solid red'}}/>
+                <Avatar alt={props.hero?.name} src={img} sx={props.winner ? {border: '2px solid green'} : {border: '2px solid red'}}/>
             </Badge>
         </Tooltip>
     );

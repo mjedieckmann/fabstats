@@ -17,8 +17,17 @@ export const SimpleAutocomplete = (props) =>{
                 onChange={(event, newValue) => {
                     props.setForm({...props.form, [props.handle]: newValue});
                 }}
+                getOptionLabel={(option) => {
+                    if (option.descriptor !== undefined){
+                        return option.descriptor;
+                    } else if (option.name !== undefined){
+                        return option.name;
+                    } else {
+                        return null;
+                    }
+                }}
                 isOptionEqualToValue={(option, value) => {
-                    return option.id === value.id;
+                    return option._id === value._id;
                 }}
                 value={props.form[props.handle]}
                 renderInput={(params) => <TextField {...params} error={props.error} helperText={props.error ? 'Required' : ''} label={props.label} required={props.required} onKeyDown={preventSubmitOnEnter}/>}

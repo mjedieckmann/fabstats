@@ -13,6 +13,7 @@ import {useEffect, useState} from "react";
 import {BarChart} from "./BarChart";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 export default function HeroCard(props) {
     const [ eventFilter, setEventFilter ] = useState(null);
@@ -64,11 +65,19 @@ export default function HeroCard(props) {
                             {props.hero.name}
                         </Typography>
                         <Divider/>
-                        <Tooltip title={wins + " / " + (wins + losses)} arrow>
-                            <Typography variant="subtitle1" color="text.secondary" textAlign={"center"}>
-                                {(wins + losses) === 0 ? "N/A" : Math.round((wins / (wins + losses)) * 100) + " %"}
-                            </Typography>
-                        </Tooltip>
+                        <Stack direction={"row"} justifyContent={"center"} alignItems={"center"} pt={1}>
+                            {(wins + losses) !== 0 && (wins + losses) < 5
+                                ? <Tooltip title={"Not much data!"}><WarningAmberIcon color={"warning"} sx={{ fontSize: 15 }} /></Tooltip>
+                                : null
+                            }
+                            <Tooltip title={wins + " / " + (wins + losses)} arrow>
+                                <Typography variant="subtitle1" color="text.secondary" textAlign={"center"}>
+
+                                    {(wins + losses) === 0 ? "N/A" : Math.round((wins / (wins + losses)) * 100) + " %"}
+                                </Typography>
+                            </Tooltip>
+                        </Stack>
+
                     </CardContent>
                 </CardActionArea>
             </Card>
@@ -121,11 +130,23 @@ export default function HeroCard(props) {
                                     value={metaFilter}
                                     renderInput={(params) => <TextField {...params} label={"Meta"}/>}
                                 />
-                                <Tooltip title={wins + " / " + (wins + losses)} arrow>
+                                <Stack direction={"row"} justifyContent={"center"} alignItems={"center"} pt={1}>
+                                    {(wins + losses) !== 0 && (wins + losses) < 5
+                                        ? <Tooltip title={"Not much data!"}><WarningAmberIcon color={"warning"} fontSize={"medium"} /></Tooltip>
+                                        : null
+                                    }
+                                    <Tooltip title={wins + " / " + (wins + losses)} arrow>
+                                        <Typography variant="h3" color="text.secondary" textAlign={"center"}>
+
+                                            {(wins + losses) === 0 ? "N/A" : Math.round((wins / (wins + losses)) * 100) + " %"}
+                                        </Typography>
+                                    </Tooltip>
+                                </Stack>
+                                {/*<Tooltip title={wins + " / " + (wins + losses)} arrow>
                                     <Typography variant="h3" color="text.secondary" textAlign={"center"}>
                                         {(wins + losses) === 0 ? "N/A" : Math.round((wins / (wins + losses)) * 100) + " %"}
                                     </Typography>
-                                </Tooltip>
+                                </Tooltip>*/}
                             </Stack>
                         </Grid>
                     </Grid>

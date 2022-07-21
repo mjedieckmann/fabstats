@@ -96,10 +96,10 @@ exports.list_matches = function(req, res, next) {
  */
 exports.get_match = function (req, res, next){
     Match.findById(req.params.id)
-        .populate({ path: 'hero_winner', select: 'name' })
-        .populate({ path: 'hero_loser', select: 'name' })
-        .populate({ path: 'user_winner', select: 'nick' } )
-        .populate({ path: 'user_loser', select: 'nick' } )
+        .populate({ path: 'hero_winner', select: 'name img' })
+        .populate({ path: 'hero_loser', select: 'name img' })
+        .populate({ path: 'user_winner', select: 'nick img' } )
+        .populate({ path: 'user_loser', select: 'nick img' } )
         .populate({
             path: 'event',
             populate:
@@ -140,12 +140,12 @@ exports.create_match = [
                     date: req.body.date,
                     event: req.body.event,
                     round: req.body.round,
-                    hero_winner: req.body.hero_winner.id,
-                    hero_loser: req.body.hero_loser.id,
+                    hero_winner: req.body.hero_winner._id,
+                    hero_loser: req.body.hero_loser._id,
                     user_winner: req.body.user_winner,
                     user_loser: req.body.user_loser,
-                    format: req.body.format.id,
-                    meta: req.body.meta.id,
+                    format: req.body.format._id,
+                    meta: req.body.meta._id,
                     created_by: req.user,
                 });
             match.save((err) => {
@@ -178,12 +178,12 @@ exports.edit_match = [
             match.date = req.body.date;
             match.event= req.body.event;
             match.round= req.body.round;
-            match.hero_winner= req.body.hero_winner.id;
-            match.hero_loser= req.body.hero_loser.id;
+            match.hero_winner= req.body.hero_winner._id;
+            match.hero_loser= req.body.hero_loser._id;
             match.user_winner= req.body.user_winner;
             match.user_loser= req.body.user_loser;
-            match.format= req.body.format.id;
-            match.meta= req.body.meta.id;
+            match.format= req.body.format._id;
+            match.meta= req.body.meta._id;
             match.save(function (err) {
                 if (err) { return next(err); }
                 res.status(200).json({message: 'Match updated!'});
