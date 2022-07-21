@@ -13,6 +13,7 @@ const Hero = require('../models/hero');
 exports.list_heroes = function(req, res, next) {
     Hero.find()
         .sort('name')
+        .populate({ path: 'formats' })
         .exec(function (err, list_formats) {
             if (err) { return next(err); }
             res.json(list_formats);

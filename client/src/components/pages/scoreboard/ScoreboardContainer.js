@@ -9,6 +9,7 @@ import {dirtyState, useCurrentPage} from "../../../utils/_globalState";
 import Scoreboard from "./Scoreboard";
 import {ScoreboardFilter} from "./ScoreboardFilter";
 import MatchDetailDialog from "./match/MatchDetailDialog";
+import axios from "axios";
 
 export const matchesState = atom({
     key: 'matches',
@@ -30,10 +31,9 @@ export default function ScoreboardContainer(){
     const [ matches, setMatches ] = useRecoilState(matchesState);
     const [ dirty, ] = useRecoilState(dirtyState);
     useEffect(() => {
-        fetch('/api/matches')
-            .then(response => response.json())
-            .then(data => {
-                setMatches(data);
+        axios.get('/api/matches')
+            .then(res => {
+                setMatches(res.data);
             });
     }, [dirty, setMatches]);
 

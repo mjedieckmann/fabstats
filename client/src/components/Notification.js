@@ -24,7 +24,7 @@ export default function Notification() {
             // Close an active snack when a new one is added
             setOpen(false);
         }
-    }, [notification, messageInfo, open]);
+    }, [notification, messageInfo, open, setNotification]);
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {

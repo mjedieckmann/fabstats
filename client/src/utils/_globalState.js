@@ -7,6 +7,7 @@ import {useEffect} from "react";
 import uuid from 'react-uuid'
 import EclipseImage from '../img/sm_Eclipse.jpg';
 import EnlightenmentImage from '../img/sm_Seek_Enlightenment.jpg';
+import ExudeImage from '../img/sm_exude.jpg';
 
 /**
  * The currently active page
@@ -28,6 +29,9 @@ export function useCurrentPage(page){
                 break;
             case 'Scoreboard':
                 setBackgroundImg(EnlightenmentImage);
+                break;
+            case 'Heroes':
+                setBackgroundImg(ExudeImage);
                 break;
             default:
                 setBackgroundImg(EclipseImage);

@@ -15,6 +15,7 @@ import {Footer} from "./components/footer/Footer";
 import ScoreboardContainer from "./components/pages/scoreboard/ScoreboardContainer";
 import About from "./components/pages/about/About";
 import {PasswordReset} from "./components/navbar/user/authentication/PasswordReset";
+import Heroes from "./components/pages/heroes/Heroes";
 
 /**
  * Define two different variants for the paper component (a container component) that control its opacity.
@@ -101,6 +102,7 @@ function App() {
                         <Route path={"/"} element={ <Navigate to="/scoreboard" /> } />
                         <Route path={"scoreboard"} element={<ScoreboardContainer/>}/>
                         <Route path={"about"} element={<About/>}/>
+                        <Route path={"heroes"} element={<Heroes/>}/>
                         <Route path={"reset-password/:token"} element={<PasswordReset/>}/>
                     </Route>
                 </Routes>

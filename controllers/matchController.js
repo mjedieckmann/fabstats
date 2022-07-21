@@ -47,8 +47,8 @@ exports.isMatchCreator = function(req, res, next) {
 exports.list_matches = function(req, res, next) {
     Match.find()
         .sort('event')
-        .populate({ path: 'hero_winner', select: 'name img -_id' })
-        .populate({ path: 'hero_loser', select: 'name img -_id' })
+        .populate({ path: 'hero_winner', select: 'name img' })
+        .populate({ path: 'hero_loser', select: 'name img' })
         .populate({
             path: 'user_winner',
             select: 'nick e_mail img _id',
@@ -81,7 +81,7 @@ exports.list_matches = function(req, res, next) {
                 }
             ]
         })
-        .populate({ path: 'meta', select: 'descriptor -_id' })
+        .populate({ path: 'meta', select: 'descriptor' })
         .populate({ path: 'format', select: 'descriptor -_id' })
         .exec(function (err, list_matches) {
             if (err) { return next(err); }
