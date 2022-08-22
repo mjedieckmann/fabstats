@@ -62,27 +62,26 @@ export const options = {
         }
     }
 };
-export function BarChart(props) {
+export function SummaryChart(props) {
     const [ labels, setLabels ] = useState([]);
     const [ barData, setBarData ] = useState([]);
 
     useEffect(() => {
         let bar_data = [];
         for (let match of props.matches){
-            if (match.hero_winner._id === props.hero._id) {
-                if (match.hero_loser.name in bar_data){
-                    bar_data[match.hero_loser.name].wins += 1;
-                    bar_data[match.hero_loser.name].matches += 1;
-                } else {
-                    bar_data[match.hero_loser.name] = {wins: 1, matches: 1}
-                }
+            if (match.hero_winner._id === match.hero_loser._id){
+                continue;
             }
-            if (match.hero_loser._id === props.hero._id) {
-                if (match.hero_winner.name in bar_data){
-                    bar_data[match.hero_winner.name].matches += 1;
-                } else {
-                    bar_data[match.hero_winner.name] = {wins: 0, matches: 1}
-                }
+            if (match.hero_loser.name in bar_data){
+                bar_data[match.hero_loser.name].matches += 1;
+            } else {
+                bar_data[match.hero_loser.name] = {wins: 0, matches: 1}
+            }
+            if (match.hero_winner.name in bar_data){
+                bar_data[match.hero_winner.name].wins += 1;
+                bar_data[match.hero_winner.name].matches += 1;
+            } else {
+                bar_data[match.hero_winner.name] = {wins: 1, matches: 1}
             }
         }
         let sortable = [];
@@ -105,7 +104,7 @@ export function BarChart(props) {
         }
         setBarData(sortable);
         setLabels(labels);
-    }, [props.matches, props.hero._id]);
+    }, [props.matches]);
 
     useHeroImagePlugin();
 

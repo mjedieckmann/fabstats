@@ -1,13 +1,12 @@
 /**
  * Under construction, come back later!
  */
-import {Divider, FormControl, FormControlLabel, FormLabel, Grid, Paper, Radio, RadioGroup, Stack} from "@mui/material";
+import {Divider, FormControl, FormControlLabel, Grid, Paper, Radio, RadioGroup, Stack} from "@mui/material";
 import {dirtyState, useCurrentPage} from "../../../utils/_globalState";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import HeroCard from "./HeroCard";
 import {useRecoilState} from "recoil";
-import {matchesState} from "../scoreboard/ScoreboardContainer";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 
@@ -28,7 +27,7 @@ export default function Heroes(){
                 setEvents(res.data);
             });
     }, []);
-    const [ matches, setMatches ] = useRecoilState(matchesState);
+    const [ matches, setMatches ] = useState([]);
     const [ dirty, ] = useRecoilState(dirtyState);
     useEffect(() => {
         axios.get('/api/matches')
@@ -52,11 +51,10 @@ export default function Heroes(){
 
     return (
         <Grid container spacing={2} paddingBottom={2} paddingX={2}>
-            <Grid item xs={3}></Grid>
-            <Grid item xs={3} textAlign={"center"}>
+            <Grid item xs={4}></Grid>
+            <Grid item xs={2} textAlign={"center"}>
                     <Paper>
                         <FormControl>
-                            <FormLabel id="format-radio-label">Format</FormLabel>
                             <RadioGroup
                                 row
                                 aria-labelledby="format-radio-label"
@@ -64,9 +62,8 @@ export default function Heroes(){
                                 value={formatFilter}
                                 onChange={handleChange}
                             >
-                                <FormControlLabel labelPlacement={"top"} value="Classic Constructed" control={<Radio />} label="CC" />
-                                <FormControlLabel labelPlacement={"top"} value="Blitz" control={<Radio />} label="Blitz" />
-                                <FormControlLabel labelPlacement={"top"} value="both" control={<Radio />} label="Both" />
+                                <FormControlLabel labelPlacement={"top"} value="Classic Constructed" control={<Radio />} label="Adult" />
+                                <FormControlLabel labelPlacement={"top"} value="Blitz" control={<Radio />} label="Young" />
                             </RadioGroup>
                         </FormControl>
                     </Paper>
@@ -114,12 +111,12 @@ export default function Heroes(){
                 </Paper>
             </Grid>
             <Grid item xs={3}></Grid>
-            {heroes.filter((hero) => formatFilter === "both" || hero.formats.filter((format) => format.descriptor === formatFilter).length !== 0).map((hero) => (
+            {heroes.filter((hero) => hero.formats.filter((format) => format.descriptor === formatFilter).length !== 0).map((hero) => (
                 <Grid key={hero._id} item xs={2}>
                     <HeroCard hero={hero} matches={matches.filter((match) =>
                         (eventFilter === null || (match.event?._id === eventFilter?._id)) &&
                         (metaFilter === null || (match.meta?._id === metaFilter?._id))
-                    )} events={events} metas={metas} eventFilter={eventFilter} metaFilter={metaFilter}/>
+                    )} events={events} metas={metas} eventFilter={eventFilter} metaFilter={metaFilter} heroes={heroes}/>
                 </Grid>
             ))}
         </Grid>

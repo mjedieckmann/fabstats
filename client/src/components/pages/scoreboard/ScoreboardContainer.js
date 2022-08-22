@@ -2,14 +2,15 @@
  * Entry point container for the scoreboard page.
  * Initially loads matches from the database and makes sure that the filter is applied to them.
  */
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {atom, useRecoilState} from "recoil";
-import {Grid, Box} from "@mui/material";
+import {Grid, Box, Stack, Paper} from "@mui/material";
 import {dirtyState, useCurrentPage} from "../../../utils/_globalState";
 import Scoreboard from "./Scoreboard";
 import {ScoreboardFilter} from "./ScoreboardFilter";
 import MatchDetailDialog from "./match/MatchDetailDialog";
 import axios from "axios";
+import {SummaryChart} from "./SummaryChart";
 
 export const matchesState = atom({
     key: 'matches',
@@ -37,10 +38,17 @@ export default function ScoreboardContainer(){
             });
     }, [dirty, setMatches]);
 
-    const [, setFilteredMatches] = useRecoilState(filteredMatchesState);
+    const [filteredMatches, setFilteredMatches] = useRecoilState(filteredMatchesState);
     useEffect(() => {
         setFilteredMatches(matches);
     }, [matches, setFilteredMatches]);
+    const [ heroes, setHeroes ] = useState([]);
+    useEffect(() =>{
+        axios.get('/api/heroes')
+            .then(res => {
+                setHeroes(res.data);
+            });
+    }, []);
 
     return (
             <Grid container spacing={2}>
@@ -49,15 +57,20 @@ export default function ScoreboardContainer(){
                     <ScoreboardFilter/>
                 </Grid>
                 <Grid item xs={7}>
-                    <Scoreboard/>
-                    <Box
-                        display="flex"
-                        marginY={2}
-                        alignItems="center"
-                        justifyContent="right"
-                    >
-                        <MatchDetailDialog matchDialogMode={'create'}/>
-                    </Box>
+                    <Stack>
+                        <Paper variant={"opacity-0.9"}>
+                            <SummaryChart matches={filteredMatches} heroes={heroes}/>
+                        </Paper>
+                        <Scoreboard/>
+                        <Box
+                            display="flex"
+                            marginY={2}
+                            alignItems="center"
+                            justifyContent="right"
+                        >
+                            <MatchDetailDialog matchDialogMode={'create'}/>
+                        </Box>
+                    </Stack>
                 </Grid>
                 <Grid item xs={1}/>
             </Grid>

@@ -81,7 +81,7 @@ export default function HeroCard(props) {
                     </CardContent>
                 </CardActionArea>
             </Card>
-            <Dialog open={heroDialogOpen} onClose={handleClose} fullWidth={true} maxWidth={"md"}>
+            <Dialog open={heroDialogOpen} onClose={handleClose} fullWidth={true} maxWidth={"lg"}>
                 <DialogTitle>
                     <Box display={"flex"} alignItems={"center"}>
                         <Avatar alt={props.hero.name} src={props.hero.img} sx={{ width: 56, height: 56 }} />
@@ -94,7 +94,7 @@ export default function HeroCard(props) {
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={8}>
-                            <BarChart matches={filteredMatches} hero={props.hero}/>
+                            <BarChart matches={filteredMatches} hero={props.hero} heroes={props.heroes}/>
                         </Grid>
                         <Grid item xs={4}>
                             <Stack spacing={2} height={1} justifyContent={"flex-end"}>
@@ -142,11 +142,6 @@ export default function HeroCard(props) {
                                         </Typography>
                                     </Tooltip>
                                 </Stack>
-                                {/*<Tooltip title={wins + " / " + (wins + losses)} arrow>
-                                    <Typography variant="h3" color="text.secondary" textAlign={"center"}>
-                                        {(wins + losses) === 0 ? "N/A" : Math.round((wins / (wins + losses)) * 100) + " %"}
-                                    </Typography>
-                                </Tooltip>*/}
                             </Stack>
                         </Grid>
                     </Grid>
