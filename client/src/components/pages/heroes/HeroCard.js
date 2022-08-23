@@ -93,11 +93,11 @@ export default function HeroCard(props) {
                 <Divider/>
                 <DialogContent>
                     <Grid container spacing={2}>
-                        <Grid item xs={8}>
+                        <Grid item xs={8} height={"70vH"}>
                             <BarChart matches={filteredMatches} hero={props.hero} heroes={props.heroes}/>
                         </Grid>
                         <Grid item xs={4}>
-                            <Stack spacing={2} height={1} justifyContent={"flex-end"}>
+                            <Stack spacing={2} height={1} justifyContent={"center"}>
                                 <Autocomplete
                                     id={"events-input"}
                                     options={props.events}

@@ -4,7 +4,7 @@
  */
 import {useEffect, useState} from "react";
 import {atom, useRecoilState} from "recoil";
-import {Grid, Box, Stack, Paper} from "@mui/material";
+import {Box, Stack, Paper} from "@mui/material";
 import {dirtyState, useCurrentPage} from "../../../utils/_globalState";
 import Scoreboard from "./Scoreboard";
 import {ScoreboardFilter} from "./ScoreboardFilter";
@@ -29,7 +29,7 @@ export const pageState = atom({
 
 export default function ScoreboardContainer(){
     useCurrentPage('Scoreboard');
-    const [ matches, setMatches ] = useRecoilState(matchesState);
+    const [ ,setMatches ] = useRecoilState(matchesState);
     const [ dirty, ] = useRecoilState(dirtyState);
     useEffect(() => {
         axios.get('/api/matches')
@@ -38,10 +38,7 @@ export default function ScoreboardContainer(){
             });
     }, [dirty, setMatches]);
 
-    const [filteredMatches, setFilteredMatches] = useRecoilState(filteredMatchesState);
-    useEffect(() => {
-        setFilteredMatches(matches);
-    }, [matches, setFilteredMatches]);
+    const [filteredMatches,] = useRecoilState(filteredMatchesState);
     const [ heroes, setHeroes ] = useState([]);
     useEffect(() =>{
         axios.get('/api/heroes')
@@ -51,28 +48,26 @@ export default function ScoreboardContainer(){
     }, []);
 
     return (
-            <Grid container spacing={2}>
-                <Grid item xs={1}/>
-                <Grid item xs={3} >
-                    <ScoreboardFilter/>
-                </Grid>
-                <Grid item xs={7}>
-                    <Stack>
-                        <Paper variant={"opacity-0.9"}>
-                            <SummaryChart matches={filteredMatches} heroes={heroes}/>
-                        </Paper>
-                        <Scoreboard/>
-                        <Box
-                            display="flex"
-                            marginY={2}
-                            alignItems="center"
-                            justifyContent="right"
-                        >
-                            <MatchDetailDialog matchDialogMode={'create'}/>
-                        </Box>
-                    </Stack>
-                </Grid>
-                <Grid item xs={1}/>
-            </Grid>
+        <Stack spacing={1}>
+            <Paper variant={"opacity-0.9"} sx={{p: 1, mx: 3}}>
+                <ScoreboardFilter/>
+            </Paper>
+            <Stack direction={"row"} spacing={2} height={"60vH"} paddingX={3}>
+                <Paper variant={"opacity-0.9"} sx={{width: 0.5}}>
+                    <SummaryChart matches={filteredMatches} heroes={heroes}/>
+                </Paper>
+                <Stack width={0.5}>
+                    <Scoreboard/>
+                    <Box
+                        display="flex"
+                        marginY={2}
+                        alignItems="center"
+                        justifyContent="right"
+                    >
+                        <MatchDetailDialog matchDialogMode={'create'}/>
+                    </Box>
+                </Stack>
+            </Stack>
+        </Stack>
     )
 }

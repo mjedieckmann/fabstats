@@ -25,12 +25,8 @@ export const options = {
             borderWidth: 2,
         },
     },
-    layout: {
-      padding: {
-          left: 60
-      }
-    },
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
         legend: {
             display: false,
@@ -56,8 +52,8 @@ export const options = {
             beginAtZero: true
         },
         y: {
-            ticks :{
-                display: false,
+            ticks: {
+                autoSkip: false,
             }
         }
     }

@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import { Link as RouterLink } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {RecoilRoot} from "recoil";
+import "./styles.css";
 
 import reportWebVitals from './reportWebVitals';
 import App from './App';

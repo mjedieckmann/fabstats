@@ -30,6 +30,7 @@ export const useHeroImagePlugin = () => {
                     afterDraw: (chart) => {
                         let ctx = chart.ctx;
                         let yAxis = chart.scales['y'];
+                        let xAxis = chart.scales['x'];
                         let chart_height = chart.chartArea.height;
                         let y_number = yAxis.ticks.length;
                         let img_height = Math.min(chart_height / y_number, 80);
@@ -44,7 +45,7 @@ export const useHeroImagePlugin = () => {
                             }
                             let image = new Image();
                             image.src = src;
-                            ctx.drawImage(image, 60 - (img_height * 0.75), y - (img_height / 2), img_height * 0.75, img_height);
+                            ctx.drawImage(image, xAxis.left - (img_height * 0.25), y - (img_height / 2), img_height * 0.75, img_height);
                         });
                     }
                 };
