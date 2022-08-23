@@ -45,7 +45,7 @@ export const useHeroImagePlugin = () => {
                             }
                             let image = new Image();
                             image.src = src;
-                            ctx.drawImage(image, xAxis.left - (img_height * 0.25), y - (img_height / 2), img_height * 0.75, img_height);
+                            ctx.drawImage(image, xAxis.left, y - (img_height / 2), img_height * 0.75, img_height);
                         });
                     }
                 };
