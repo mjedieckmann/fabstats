@@ -80,7 +80,7 @@ TablePaginationActions.propTypes = {
 };
 
 export default function Scoreboard() {
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
     const [page, setPage] = useRecoilState(pageState);
     const [filteredMatches,] = useRecoilState(filteredMatchesState);
     const [ currentUser, ] = useRecoilState(currentUserState);
@@ -117,7 +117,7 @@ export default function Scoreboard() {
                 <TableFooter>
                     <TableRow>
                         <TablePagination
-                            rowsPerPageOptions={[10, 25, 50, { label: 'All', value: -1 }]}
+                            rowsPerPageOptions={[5, 10, 25]}
                             colSpan={5}
                             count={filteredMatches.length}
                             rowsPerPage={rowsPerPage}

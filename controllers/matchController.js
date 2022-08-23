@@ -10,15 +10,34 @@ const {body} = require("express-validator");
 const {getValidationResult} = require("../utils/_helpers");
 
 function sortMatches(a, b) {
-    if (a.date < b.date) {return -1;}
-    if (a.date > b.date) {return 1;}
-
-    if (a.hero_winner.descriptor < b.hero_winner.descriptor) {return -1;}
-    if (a.hero_winner.descriptor > b.hero_winner.descriptor) {return 1;}
-
-    if (a.round < b.round) {return -1;}
-    if (a.round > b.round) {return 1;}
-
+    let round_a = parseInt(a.round);
+    let round_b = parseInt(b.round);
+    if (!isNaN(round_a) && !isNaN(round_b)){
+        if (round_a < round_b) {return -1;}
+        if (round_a > round_b) {return 1;}
+    } else if (isNaN(round_a) && isNaN(round_b)){
+        if ('N/A' === a.round){
+            return 1;
+        } else if ('N/A' === b.round) {
+            return -1;
+        } else if ('Final' === a.round){
+            return 1;
+        } else if ('Final' === b.round) {
+            return -1;
+        } else if ('Semifinal' === a.round){
+            return 1;
+        } else if ('Semifinal' === b.round) {
+            return -1;
+        } else if ('Quarterfinal' === a.round){
+            return 1;
+        } else if ('Quarterfinal' === b.round) {
+            return -1;
+        }
+    } else if (isNaN(round_a)) {
+        return 1;
+    } else if (isNaN(round_b)) {
+        return -1;
+    }
     return 0;
 }
 
