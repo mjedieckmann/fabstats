@@ -7,7 +7,6 @@
 
 const User = require('../models/user');
 const genPassword = require('../utils/password_utils').genPassword;
-const multer = require("multer");
 const {validPassword} = require("../utils/password_utils");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
@@ -15,14 +14,23 @@ const {body} = require("express-validator");
 const {getValidationResult} = require("../utils/_helpers");
 
 // Constants used for file manipulation
-const unlink = require('node:fs').unlink;
+const multer = require("multer");
+const multerS3 = require("multer-s3");
+const s3Client =  require("../utils/s3Client.js").s3Client;
+const DeleteObjectCommand = require("@aws-sdk/client-s3").DeleteObjectCommand;
+const path = require("path");
 const MAX_FILE_SIZE = 1000000;
-const storage = multer.diskStorage(
-    {
-        destination: (req, file, cb) => cb(null, 'public/images/avatars'),
-        filename: (req, file, cb) => cb(null, Date.now() + '-' +file.originalname)
+
+const storage = multerS3({
+    s3: s3Client,
+    bucket: 'fabstats-store',
+    acl: 'public-read',
+    key: function (request, file, cb) {
+        console.log(file);
+        cb(null, file.originalname);
     }
-);
+});
+
 const upload = multer({storage: storage, limits: { fileSize: MAX_FILE_SIZE }}).single('file');
 
 /**
@@ -38,13 +46,11 @@ exports.upload_user_avatar = function (req, res, next) {
         // Gets the current authentication
         let user = req.user;
         const old_img = user.img;
-        user.img = req.file.path;
+        user.img = req.file.location;
         user.save().then(() => {
             // Delete old file
             if (old_img){
-                unlink(old_img, (err) => {
-                    if (err) {return next(err)}
-                });
+                s3Client.send(new DeleteObjectCommand({Bucket: 'fabstats-store', Key: path.basename(old_img)}));
             }
             res.status(200).json({message: 'File upload successful!'});
         }, (err => {return next(err)}));
